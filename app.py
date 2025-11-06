@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
 import mysql.connector
 import bcrypt
 import re
@@ -12,7 +12,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'user_auth_db'
+    'database': 'kriptografinew1'
 }
 
 class Database:
@@ -81,11 +81,31 @@ class Validator:
         
         return errors
 
+    @staticmethod
+    def validate_login_data(username, password):
+        """Validasi data login"""
+        errors = []
+        
+        if not username:
+            errors.append("Username harus diisi")
+        
+        if not password:
+            errors.append("Password harus diisi")
+        
+        return errors
+
 class AuthService:
     @staticmethod
     def hash_password(password):
         """Hash password menggunakan bcrypt"""
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12))
+    
+    @staticmethod
+    def verify_password(password, hashed_password):
+        """Verifikasi password dengan hash"""
+        if isinstance(hashed_password, str):
+            hashed_password = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
     
     @staticmethod
     def register_user(nama, username, password):
@@ -122,7 +142,47 @@ class AuthService:
             cursor.close()
             conn.close()
 
-# Routes
+    @staticmethod
+    def login_user(username, password):
+        """Login user"""
+        conn = Database.get_connection()
+        if not conn:
+            return False, "Koneksi database gagal"
+        
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Cari user berdasarkan username
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            
+            if not user:
+                return False, "Username tidak ditemukan"
+            
+            # Verifikasi password
+            if AuthService.verify_password(password, user['password_hash']):
+                return True, "Login berhasil", user
+            else:
+                return False, "Password salah"
+            
+        except mysql.connector.Error as err:
+            return False, f"Database error: {err}"
+        finally:
+            cursor.close()
+            conn.close()
+
+# ==================== ROUTES UNTUK STATIC FILES ====================
+@app.route('/styles/<path:filename>')
+def serve_styles(filename):
+    """Serve static files dari folder styles"""
+    return send_from_directory('styles', filename)
+
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    """Serve static files untuk JavaScript"""
+    return send_from_directory('.', filename)
+
+# ==================== ROUTES UNTUK PAGES ====================
 @app.route('/')
 def home():
     return redirect('/register')
@@ -139,6 +199,7 @@ def login_page():
 def dashboard_page():
     return render_template('dashboard.html')
 
+# ==================== API ROUTES ====================
 @app.route('/api/register', methods=['POST'])
 def api_register():
     """API endpoint untuk registrasi"""
@@ -180,6 +241,60 @@ def api_register():
             return jsonify({
                 'success': False,
                 'message': message
+            }), 400
+            
+    except Exception as e:
+        print(f"💥 Server error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Terjadi kesalahan server: {str(e)}'
+        }), 500
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    """API endpoint untuk login"""
+    try:
+        # Get data dari request
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'Data tidak valid'
+            }), 400
+        
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        print(f"📝 Login attempt: {username}")
+        
+        # Validasi data
+        validation_errors = Validator.validate_login_data(username, password)
+        if validation_errors:
+            return jsonify({
+                'success': False,
+                'message': ' | '.join(validation_errors)
+            }), 400
+        
+        # Login user
+        result = AuthService.login_user(username, password)
+        
+        if result[0]:  # Jika success
+            print(f"✅ Login successful: {username}")
+            return jsonify({
+                'success': True,
+                'message': result[1],
+                'user': {
+                    'id': result[2]['id'],
+                    'nama': result[2]['nama'],
+                    'username': result[2]['username']
+                }
+            })
+        else:
+            print(f"❌ Login failed: {result[1]}")
+            return jsonify({
+                'success': False,
+                'message': result[1]
             }), 400
             
     except Exception as e:
@@ -233,6 +348,51 @@ def api_check_username(username):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/debug-db')
+def api_debug_db():
+    """API endpoint untuk debug database"""
+    try:
+        conn = Database.get_connection()
+        if not conn:
+            return jsonify({'success': False, 'message': 'Database connection failed'})
+        
+        cursor = conn.cursor(dictionary=True)
+        
+        # Cek tabel
+        cursor.execute("SHOW TABLES")
+        tables = cursor.fetchall()
+        
+        # Cek users
+        cursor.execute("SELECT COUNT(*) as user_count FROM users")
+        user_count = cursor.fetchone()
+        
+        # Get all users
+        cursor.execute("SELECT * FROM users")
+        users = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'tables': tables,
+            'user_count': user_count['user_count'],
+            'users': users
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+# ==================== ERROR HANDLERS ====================
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'success': False, 'message': 'Endpoint tidak ditemukan'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'success': False, 'message': 'Terjadi kesalahan internal server'}), 500
+
+# ==================== MAIN ====================
 if __name__ == '__main__':
     # Inisialisasi database
     Database.init_db()
@@ -240,4 +400,6 @@ if __name__ == '__main__':
     # Jalankan server
     port = 5001
     print(f"🚀 Server running on http://localhost:{port}")
+    print(f"📊 Debug DB: http://localhost:{port}/api/debug-db")
+    print(f"👥 Users API: http://localhost:{port}/api/users")
     app.run(debug=True, host='0.0.0.0', port=port)
