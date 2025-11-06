@@ -1,0 +1,306 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0a1128 0%, #1a3a5f 50%, #0d1b2a 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    animation: float 20s infinite ease-in-out;
+    filter: blur(1px);
+}
+
+.shape-1 {
+    width: 100px;
+    height: 100px;
+    top: 15%;
+    left: 15%;
+    background: radial-gradient(circle at 30% 30%, #1e40af, #1e3a8a);
+    animation-duration: 25s;
+    animation-delay: 0s;
+    box-shadow: 0 0 30px rgba(30, 64, 175, 0.4);
+}
+
+.shape-2 {
+    width: 150px;
+    height: 150px;
+    top: 65%;
+    left: 75%;
+    background: radial-gradient(circle at 40% 40%, #2563eb, #1d4ed8);
+    animation-duration: 30s;
+    animation-delay: 3s;
+    box-shadow: 0 0 40px rgba(37, 99, 235, 0.3);
+}
+
+.shape-3 {
+    width: 80px;
+    height: 80px;
+    top: 75%;
+    left: 25%;
+    background: radial-gradient(circle at 50% 50%, #3b82f6, #2563eb);
+    animation-duration: 22s;
+    animation-delay: 6s;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+}
+
+.shape-4 {
+    width: 120px;
+    height: 120px;
+    top: 25%;
+    left: 65%;
+    background: radial-gradient(circle at 60% 60%, #60a5fa, #3b82f6);
+    animation-duration: 28s;
+    animation-delay: 2s;
+    box-shadow: 0 0 35px rgba(96, 165, 250, 0.3);
+}
+
+.shape-5 {
+    width: 90px;
+    height: 90px;
+    top: 70%;
+    left: 45%;
+    background: radial-gradient(circle at 45% 45%, #1e3a8a, #1e40af);
+    animation-duration: 26s;
+    animation-delay: 4s;
+    box-shadow: 0 0 30px rgba(30, 58, 138, 0.4);
+}
+
+.shape-6 {
+    width: 110px;
+    height: 110px;
+    top: 35%;
+    left: 10%;
+    background: radial-gradient(circle at 35% 35%, #3730a3, #312e81);
+    animation-duration: 32s;
+    animation-delay: 1s;
+    box-shadow: 0 0 35px rgba(55, 48, 163, 0.3);
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0.8;
+    }
+    25% {
+        transform: translate(30px, 50px) rotate(90deg) scale(1.1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(60px, 30px) rotate(180deg) scale(0.9);
+        opacity: 0.7;
+    }
+    75% {
+        transform: translate(30px, -30px) rotate(270deg) scale(1.05);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(0, 0) rotate(360deg) scale(1);
+        opacity: 0.8;
+    }
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 15% 20%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),
+        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 70% 10%, rgba(96, 165, 250, 0.1) 0%, transparent 45%);
+    animation: gradientShift 12s ease-in-out infinite alternate;
+}
+
+@keyframes gradientShift {
+    0% {
+        background: 
+            radial-gradient(circle at 15% 20%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
+            radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),
+            radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 70% 10%, rgba(96, 165, 250, 0.1) 0%, transparent 45%);
+    }
+    33% {
+        background: 
+            radial-gradient(circle at 25% 70%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
+            radial-gradient(circle at 75% 15%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),
+            radial-gradient(circle at 35% 45%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 90% 60%, rgba(96, 165, 250, 0.1) 0%, transparent 45%);
+    }
+    66% {
+        background: 
+            radial-gradient(circle at 5% 40%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
+            radial-gradient(circle at 95% 75%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),
+            radial-gradient(circle at 65% 25%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 40% 90%, rgba(96, 165, 250, 0.1) 0%, transparent 45%);
+    }
+    100% {
+        background: 
+            radial-gradient(circle at 80% 45%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
+            radial-gradient(circle at 20% 85%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),
+            radial-gradient(circle at 45% 15%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 10% 65%, rgba(96, 165, 250, 0.1) 0%, transparent 45%);
+    }
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.495);
+    border-radius: 16px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.15);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    position: relative;
+    z-index: 2;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #475569;
+    font-size: 15px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #1e293b;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background-color: white;
+}
+
+.signin-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.signin-btn:hover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+}
+
+.divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #e2e8f0;
+    z-index: 1;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.register-link a {
+    color: #1e40af;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+    color: #1e3a8a;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 30px 20px;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #0a1128 0%, #1a3a5f 100%);
+    }
+    
+    .shape {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    .shape-1, .shape-2, .shape-3, .shape-4, .shape-5, .shape-6 {
+        display: block;
+    }
+}
