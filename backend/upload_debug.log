@@ -1,0 +1,296 @@
+[2025-11-07 13:17:12] === NEW REQUEST STARTED ===
+[2025-11-07 13:17:12] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 13:17:12] Database connected successfully
+[2025-11-07 13:17:12] Request method: POST
+[2025-11-07 13:17:12] === START PROCESSING FORM DATA ===
+[2025-11-07 13:17:12] POST data: Array
+(
+    [namaPasien] => adasds
+    [tanggalLahir] => 2025-11-20
+    [alamat] => aa d jan jadjads
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => perawatan
+    [hasilPemeriksaan] => asdasdadasdad
+    [jumlahPembayaran] => 534212
+)
+
+[2025-11-07 13:17:12] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpwVMNbY
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => Aplikasi.pdf
+            [full_path] => Aplikasi.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpCwlhis
+            [error] => 0
+            [size] => 4040002
+        )
+
+)
+
+[2025-11-07 13:17:13] Detected MIME type: image/webp
+[2025-11-07 13:17:13] Image validation: VALID
+[2025-11-07 13:17:13] Detected MIME type: application/pdf
+[2025-11-07 13:17:13] PDF validation: VALID
+[2025-11-07 13:17:13] Form data sanitized successfully
+[2025-11-07 13:17:13] Data encrypted successfully
+[2025-11-07 13:17:13] Starting file upload process...
+[2025-11-07 13:17:13] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 13:17:13] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpwVMNbY
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 13:17:13] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 13:17:13] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:17:13] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:17:13] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:17:13] ERROR: Directory is not writable
+[2025-11-07 13:17:13] Directory permissions: 0755
+[2025-11-07 13:17:13] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 13:17:13] File info: Array
+(
+    [name] => Aplikasi.pdf
+    [full_path] => Aplikasi.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpCwlhis
+    [error] => 0
+    [size] => 4040002
+)
+
+[2025-11-07 13:17:13] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-07 13:17:13] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 13:17:13] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 13:17:13] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 13:17:13] ERROR: Directory is not writable
+[2025-11-07 13:17:13] Directory permissions: 0755
+[2025-11-07 13:17:13] File upload results - Foto: NULL, PDF: NULL
+[2025-11-07 13:17:13] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 13:17:13] Data successfully inserted with ID: 60
+[2025-11-07 13:17:13] Sending success response
+[2025-11-07 13:17:13] === REQUEST COMPLETED ===
+[2025-11-07 13:18:09] === NEW REQUEST STARTED ===
+[2025-11-07 13:18:09] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 13:18:09] Database connected successfully
+[2025-11-07 13:18:09] Request method: POST
+[2025-11-07 13:18:09] === START PROCESSING FORM DATA ===
+[2025-11-07 13:18:09] POST data: Array
+(
+    [namaPasien] => idcnkjsnck
+    [tanggalLahir] => 2025-11-19
+    [alamat] => kaodsjsnssjnjd
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => perawatan
+    [hasilPemeriksaan] => hari ini
+    [jumlahPembayaran] => 098098
+)
+
+[2025-11-07 13:18:09] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpp03AAT
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 
+            [full_path] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+[2025-11-07 13:18:09] Detected MIME type: image/webp
+[2025-11-07 13:18:09] Image validation: VALID
+[2025-11-07 13:18:09] Form data sanitized successfully
+[2025-11-07 13:18:09] Data encrypted successfully
+[2025-11-07 13:18:09] Starting file upload process...
+[2025-11-07 13:18:09] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 13:18:09] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpp03AAT
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 13:18:09] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 13:18:09] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:18:09] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:18:09] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:18:09] ERROR: Directory is not writable
+[2025-11-07 13:18:09] Directory permissions: 0755
+[2025-11-07 13:18:09] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 13:18:09] File info: Array
+(
+    [name] => 
+    [full_path] => 
+    [type] => 
+    [tmp_name] => 
+    [error] => 4
+    [size] => 0
+)
+
+[2025-11-07 13:18:09] ERROR: Upload error code: 4
+[2025-11-07 13:18:09] Upload error meaning: No file was uploaded
+[2025-11-07 13:18:09] File upload results - Foto: NULL, PDF: NULL
+[2025-11-07 13:18:09] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 13:18:09] Data successfully inserted with ID: 61
+[2025-11-07 13:18:09] Sending success response
+[2025-11-07 13:18:09] === REQUEST COMPLETED ===
+[2025-11-07 13:21:52] === NEW REQUEST STARTED ===
+[2025-11-07 13:21:52] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 13:21:52] Database connected successfully
+[2025-11-07 13:21:52] Request method: POST
+[2025-11-07 13:21:52] === START PROCESSING FORM DATA ===
+[2025-11-07 13:21:52] POST data: Array
+(
+    [namaPasien] => testate
+    [tanggalLahir] => 2025-11-12
+    [alamat] => okeajalah
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => menunggu
+    [hasilPemeriksaan] => tes ajalah bin
+    [jumlahPembayaran] => 534453
+)
+
+[2025-11-07 13:21:52] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpLhMMVt
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => Aplikasi.pdf
+            [full_path] => Aplikasi.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpGpTVfk
+            [error] => 0
+            [size] => 4040002
+        )
+
+)
+
+[2025-11-07 13:21:52] Detected MIME type: image/webp
+[2025-11-07 13:21:52] Image validation: VALID
+[2025-11-07 13:21:52] Detected MIME type: application/pdf
+[2025-11-07 13:21:52] PDF validation: VALID
+[2025-11-07 13:21:52] Form data sanitized successfully
+[2025-11-07 13:21:52] Data encrypted successfully
+[2025-11-07 13:21:52] Starting file upload process...
+[2025-11-07 13:21:52] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 13:21:52] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpLhMMVt
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 13:21:52] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 13:21:52] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:21:52] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:21:52] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 13:21:52] Directory is writable
+[2025-11-07 13:21:52] Detected MIME type: image/webp
+[2025-11-07 13:21:52] Image validation: VALID
+[2025-11-07 13:21:52] File validation passed
+[2025-11-07 13:21:52] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690de460984cb_1762518112.webp
+[2025-11-07 13:21:52] Temp file exists: YES
+[2025-11-07 13:21:52] Temp file size: 70498
+[2025-11-07 13:21:52] File moved successfully
+[2025-11-07 13:21:52] File verified - Size: 70498 bytes
+[2025-11-07 13:21:52] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 13:21:52] File info: Array
+(
+    [name] => Aplikasi.pdf
+    [full_path] => Aplikasi.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpGpTVfk
+    [error] => 0
+    [size] => 4040002
+)
+
+[2025-11-07 13:21:52] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-07 13:21:52] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 13:21:52] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 13:21:52] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 13:21:52] Directory is writable
+[2025-11-07 13:21:52] Detected MIME type: application/pdf
+[2025-11-07 13:21:52] PDF validation: VALID
+[2025-11-07 13:21:52] File validation passed
+[2025-11-07 13:21:52] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690de46099183_1762518112.pdf
+[2025-11-07 13:21:52] Temp file exists: YES
+[2025-11-07 13:21:52] Temp file size: 4040002
+[2025-11-07 13:21:52] File moved successfully
+[2025-11-07 13:21:52] File verified - Size: 4040002 bytes
+[2025-11-07 13:21:52] File upload results - Foto: 690de460984cb_1762518112.webp, PDF: 690de46099183_1762518112.pdf
+[2025-11-07 13:21:52] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 13:21:52] Data successfully inserted with ID: 62
+[2025-11-07 13:21:52] Sending success response
+[2025-11-07 13:21:52] === REQUEST COMPLETED ===
