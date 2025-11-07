@@ -82,8 +82,10 @@ class PatientHandler
             $status_pasien = $this->mapStatusPasien($_POST['statusPasien']);
             $hasil_pemeriksaan = $this->sanitizeInput($_POST['hasilPemeriksaan']);
             $jumlah_pembayaran = floatval($_POST['jumlahPembayaran']);
+            $medical_message = isset($_POST['medmsg']) ? $this->sanitizeInput($_POST['medmsg']) : '';
 
             $this->logMessage("Form data sanitized successfully");
+            $this->logMessage("Medical message: " . $medical_message);
 
             // Encrypt sensitive data
             $encrypted_nama = $this->xorEncrypt($nama_lengkap, XOR_KEY);
@@ -94,7 +96,7 @@ class PatientHandler
 
             // Handle file uploads
             $this->logMessage("Starting file upload process...");
-            $foto_pasien = $this->handleFileUpload('fotoPasien', 'images');
+            $foto_pasien = $this->handleFileUpload('fotoPasien', 'images', $medical_message);
             $dokumen_pdf = $this->handleFileUpload('pdfDokumen', 'pdfs');
 
             $this->logMessage("File upload results - Foto: " . ($foto_pasien ? $foto_pasien : 'NULL') . ", PDF: " . ($dokumen_pdf ? $dokumen_pdf : 'NULL'));
@@ -147,6 +149,8 @@ class PatientHandler
                     'jumlah_pembayaran' => $jumlah_pembayaran,
                     'foto_pasien' => $foto_pasien,
                     'dokumen_pdf' => $dokumen_pdf,
+                    'medical_message' => $medical_message,
+                    'steganography_applied' => !empty($medical_message) && !empty($foto_pasien),
                     'debug_info' => [
                         'foto_uploaded' => !empty($foto_pasien),
                         'pdf_uploaded' => !empty($dokumen_pdf),
@@ -165,7 +169,7 @@ class PatientHandler
         }
     }
 
-    private function handleFileUpload($fieldName, $type)
+    private function handleFileUpload($fieldName, $type, $medicalMessage = '')
     {
         $this->logMessage("=== START FILE UPLOAD: $fieldName ===");
         
@@ -185,9 +189,9 @@ class PatientHandler
 
         // Multiple path attempts
         $possiblePaths = [
-            __DIR__ . '/../../uploads/' . $type . '/',  // Current attempt
-            __DIR__ . '/../uploads/' . $type . '/',     // One level up
-            $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $type . '/', // From document root
+            __DIR__ . '/../../uploads/' . $type . '/',
+            __DIR__ . '/../uploads/' . $type . '/',
+            $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $type . '/',
         ];
 
         $uploadDir = null;
@@ -200,7 +204,6 @@ class PatientHandler
             }
         }
 
-        // If no existing directory found, create the first one
         if (!$uploadDir) {
             $uploadDir = $possiblePaths[0];
             $this->logMessage("No existing directory found, will create: " . $uploadDir);
@@ -243,7 +246,7 @@ class PatientHandler
         $this->logMessage("Temp file exists: " . (file_exists($file['tmp_name']) ? 'YES' : 'NO'));
         $this->logMessage("Temp file size: " . $file['size']);
 
-        // Encrypt PDF files before moving
+        // Handle different file types
         if ($type === 'pdfs') {
             $this->logMessage("Starting PDF encryption process...");
             if (!$this->encryptPdfFile($file['tmp_name'], $targetPath)) {
@@ -251,8 +254,24 @@ class PatientHandler
                 return null;
             }
             $this->logMessage("PDF encrypted and saved successfully");
+        } elseif ($type === 'images') {
+            $this->logMessage("Starting image steganography process...");
+            
+            $this->logMessage("Medical message for steganography: " . $medicalMessage);
+            
+            if (!$this->applySteganographyToImage($file['tmp_name'], $targetPath, $medicalMessage)) {
+                $this->logMessage("ERROR: Image steganography failed");
+                // Fallback: move original file without steganography
+                if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    $this->logMessage("ERROR: Fallback move_uploaded_file also failed");
+                    return null;
+                }
+                $this->logMessage("Fallback: Original image moved without steganography");
+            } else {
+                $this->logMessage("Image steganography applied successfully");
+            }
         } else {
-            // For images, just move normally
+            // For other file types, just move normally
             if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
                 $this->logMessage("ERROR: move_uploaded_file failed");
                 $this->logMessage("Last PHP error: " . error_get_last()['message'] ?? 'Unknown');
@@ -267,8 +286,367 @@ class PatientHandler
             $this->logMessage("File verified - Size: " . $fileSize . " bytes");
             return $fileName;
         } else {
-            $this->logMessage("ERROR: File not found at target after move/encryption");
+            $this->logMessage("ERROR: File not found at target after processing");
             return null;
+        }
+    }
+
+    /**
+     * Apply AES + LSB Steganography to Image
+     */
+    private function applySteganographyToImage($sourcePath, $targetPath, $message)
+    {
+        try {
+            $this->logMessage("=== START IMAGE STEGANOGRAPHY ===");
+            
+            if (empty($message)) {
+                $this->logMessage("No message provided for steganography, copying original image");
+                return copy($sourcePath, $targetPath);
+            }
+
+            $this->logMessage("Original message: " . $message);
+            
+            // Step 1: Encrypt message with AES
+            $encryptedMessage = $this->aesEncryptForSteganography($message);
+            $this->logMessage("Message encrypted with AES");
+            
+            // Step 2: Get image dimensions and type
+            $imageInfo = getimagesize($sourcePath);
+            if ($imageInfo === false) {
+                throw new Exception("Cannot get image information");
+            }
+
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+            $imageType = $imageInfo[2];
+            
+            $this->logMessage("Image dimensions: {$width}x{$height}, Type: {$imageType}");
+
+            // Step 3: Load image based on type
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
+                    $image = imagecreatefromjpeg($sourcePath);
+                    break;
+                case IMAGETYPE_PNG:
+                    $image = imagecreatefrompng($sourcePath);
+                    break;
+                case IMAGETYPE_GIF:
+                    $image = imagecreatefromgif($sourcePath);
+                    break;
+                default:
+                    throw new Exception("Unsupported image type");
+            }
+
+            if (!$image) {
+                throw new Exception("Cannot create image from source");
+            }
+
+            // Step 4: Calculate maximum message capacity
+            $maxCapacity = ($width * $height * 3) / 8; // 3 bits per pixel (RGB)
+            $messageLength = strlen($encryptedMessage);
+            
+            $this->logMessage("Max capacity: " . $maxCapacity . " bytes");
+            $this->logMessage("Encrypted message length: " . $messageLength . " bytes");
+
+            if ($messageLength > $maxCapacity - 10) { // Reserve 10 bytes for header
+                throw new Exception("Message too large for image. Max: " . ($maxCapacity - 10) . " bytes, Current: " . $messageLength . " bytes");
+            }
+
+            // Step 5: Add header to message (message length + encrypted message)
+            $header = pack('N', $messageLength); // 4 bytes for length
+            $dataToHide = $header . $encryptedMessage;
+            $dataToHideLength = strlen($dataToHide);
+
+            $this->logMessage("Total data to hide: " . $dataToHideLength . " bytes");
+
+            // Step 6: Convert data to binary string
+            $binaryData = '';
+            for ($i = 0; $i < $dataToHideLength; $i++) {
+                $byte = ord($dataToHide[$i]);
+                $binaryData .= str_pad(decbin($byte), 8, '0', STR_PAD_LEFT);
+            }
+
+            $binaryDataLength = strlen($binaryData);
+            $this->logMessage("Binary data length: " . $binaryDataLength . " bits");
+
+            // Step 7: Embed data using LSB
+            $bitPosition = 0;
+            $dataEmbedded = false;
+
+            for ($y = 0; $y < $height; $y++) {
+                for ($x = 0; $x < $width; $x++) {
+                    if ($bitPosition >= $binaryDataLength) {
+                        $dataEmbedded = true;
+                        break 2;
+                    }
+
+                    $rgb = imagecolorat($image, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    // Embed in Red channel
+                    if ($bitPosition < $binaryDataLength) {
+                        $r = ($r & 0xFE) | intval($binaryData[$bitPosition]);
+                        $bitPosition++;
+                    }
+
+                    // Embed in Green channel  
+                    if ($bitPosition < $binaryDataLength) {
+                        $g = ($g & 0xFE) | intval($binaryData[$bitPosition]);
+                        $bitPosition++;
+                    }
+
+                    // Embed in Blue channel
+                    if ($bitPosition < $binaryDataLength) {
+                        $b = ($b & 0xFE) | intval($binaryData[$bitPosition]);
+                        $bitPosition++;
+                    }
+
+                    $newColor = imagecolorallocate($image, $r, $g, $b);
+                    imagesetpixel($image, $x, $y, $newColor);
+                }
+            }
+
+            if (!$dataEmbedded && $bitPosition < $binaryDataLength) {
+                throw new Exception("Could not embed all data into image");
+            }
+
+            $this->logMessage("Data embedded successfully. Bits used: " . $bitPosition);
+
+            // Step 8: Save the steganographed image
+            $saveResult = false;
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
+                    $saveResult = imagejpeg($image, $targetPath, 90); // 90% quality
+                    break;
+                case IMAGETYPE_PNG:
+                    $saveResult = imagepng($image, $targetPath, 9); // Maximum compression
+                    break;
+                case IMAGETYPE_GIF:
+                    $saveResult = imagegif($image, $targetPath);
+                    break;
+            }
+
+            if (!$saveResult) {
+                throw new Exception("Failed to save steganographed image");
+            }
+
+            // Step 9: Clean up
+            imagedestroy($image);
+
+            $this->logMessage("Steganographed image saved successfully: " . $targetPath);
+            
+            // Verify the saved file
+            if (file_exists($targetPath)) {
+                $finalSize = filesize($targetPath);
+                $this->logMessage("Final file size: " . $finalSize . " bytes");
+                return true;
+            } else {
+                throw new Exception("Steganographed file not found after save");
+            }
+
+        } catch (Exception $e) {
+            $this->logMessage("ERROR in applySteganographyToImage: " . $e->getMessage());
+            
+            
+            return false;
+        }
+    }
+
+    /**
+     * AES Encryption for Steganography (returns binary data)
+     */
+    private function aesEncryptForSteganography($data)
+    {
+        if (empty($data)) {
+            return '';
+        }
+
+        $this->logMessage("Encrypting message for steganography: " . $data);
+        
+        // Use AES-256-CBC with proper padding
+        $paddedData = $this->pkcs7Pad($data, 16);
+        
+        $encrypted = openssl_encrypt(
+            $paddedData,
+            'AES-256-CBC',
+            AES_KEY,
+            OPENSSL_RAW_DATA,
+            AES_IV
+        );
+
+        if ($encrypted === false) {
+            throw new Exception("AES encryption failed: " . openssl_error_string());
+        }
+
+        $this->logMessage("AES encryption successful, encrypted length: " . strlen($encrypted) . " bytes");
+        
+        return $encrypted;
+    }
+
+    /**
+     * PKCS7 Padding for AES
+     */
+    private function pkcs7Pad($data, $blockSize)
+    {
+        $padding = $blockSize - (strlen($data) % $blockSize);
+        return $data . str_repeat(chr($padding), $padding);
+    }
+
+    /**
+     * PKCS7 Unpadding for AES
+     */
+    private function pkcs7Unpad($data)
+    {
+        $padding = ord($data[strlen($data) - 1]);
+        return substr($data, 0, -$padding);
+    }
+
+    /**
+     * Extract hidden message from steganographed image (for verification)
+     */
+    public function extractMessageFromImage($imagePath)
+    {
+        try {
+            $this->logMessage("=== EXTRACTING MESSAGE FROM IMAGE ===");
+            
+            $imageInfo = getimagesize($imagePath);
+            if ($imageInfo === false) {
+                throw new Exception("Cannot get image information");
+            }
+
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+            $imageType = $imageInfo[2];
+
+            // Load image
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
+                    $image = imagecreatefromjpeg($imagePath);
+                    break;
+                case IMAGETYPE_PNG:
+                    $image = imagecreatefrompng($imagePath);
+                    break;
+                case IMAGETYPE_GIF:
+                    $image = imagecreatefromgif($imagePath);
+                    break;
+                default:
+                    throw new Exception("Unsupported image type");
+            }
+
+            if (!$image) {
+                throw new Exception("Cannot create image from source");
+            }
+
+            // Extract header first (4 bytes = 32 bits)
+            $headerBits = '';
+            $bitsExtracted = 0;
+            $headerSize = 32; // 4 bytes * 8 bits
+
+            for ($y = 0; $y < $height; $y++) {
+                for ($x = 0; $x < $width; $x++) {
+                    if ($bitsExtracted >= $headerSize) break 2;
+                    
+                    $rgb = imagecolorat($image, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    // Extract from LSB
+                    $headerBits .= $r & 1;
+                    $bitsExtracted++;
+                    if ($bitsExtracted >= $headerSize) break;
+                    
+                    $headerBits .= $g & 1;
+                    $bitsExtracted++;
+                    if ($bitsExtracted >= $headerSize) break;
+                    
+                    $headerBits .= $b & 1;
+                    $bitsExtracted++;
+                    if ($bitsExtracted >= $headerSize) break;
+                }
+            }
+
+            // Convert header bits to message length
+            $messageLength = 0;
+            for ($i = 0; $i < 32; $i += 8) {
+                $byte = bindec(substr($headerBits, $i, 8));
+                $messageLength = ($messageLength << 8) | $byte;
+            }
+
+            $this->logMessage("Extracted message length: " . $messageLength);
+
+            // Extract encrypted message
+            $encryptedBits = '';
+            $bitsNeeded = $messageLength * 8;
+            $bitsExtracted = 0;
+
+            for ($y = 0; $y < $height; $y++) {
+                for ($x = 0; $x < $width; $x++) {
+                    if ($bitsExtracted >= $bitsNeeded) break 2;
+                    
+                    $rgb = imagecolorat($image, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    // Skip header bits we already extracted
+                    $pixelBitIndex = ($y * $width + $x) * 3;
+                    if ($pixelBitIndex < 32) continue;
+
+                    // Extract from LSB
+                    if ($bitsExtracted < $bitsNeeded) {
+                        $encryptedBits .= $r & 1;
+                        $bitsExtracted++;
+                    }
+                    if ($bitsExtracted < $bitsNeeded) {
+                        $encryptedBits .= $g & 1;
+                        $bitsExtracted++;
+                    }
+                    if ($bitsExtracted < $bitsNeeded) {
+                        $encryptedBits .= $b & 1;
+                        $bitsExtracted++;
+                    }
+                }
+            }
+
+            // Convert bits to bytes
+            $encryptedMessage = '';
+            for ($i = 0; $i < $bitsNeeded; $i += 8) {
+                $byte = bindec(substr($encryptedBits, $i, 8));
+                $encryptedMessage .= chr($byte);
+            }
+
+            $this->logMessage("Encrypted message extracted, length: " . strlen($encryptedMessage));
+
+            // Decrypt the message
+            $decrypted = openssl_decrypt(
+                $encryptedMessage,
+                'AES-256-CBC',
+                AES_KEY,
+                OPENSSL_RAW_DATA,
+                AES_IV
+            );
+
+            if ($decrypted === false) {
+                throw new Exception("AES decryption failed: " . openssl_error_string());
+            }
+
+            $originalMessage = $this->pkcs7Unpad($decrypted);
+            
+            $this->logMessage("Message successfully extracted and decrypted: " . $originalMessage);
+            
+            imagedestroy($image);
+            
+            return $originalMessage;
+
+        } catch (Exception $e) {
+            $this->logMessage("ERROR in extractMessageFromImage: " . $e->getMessage());
+            if (isset($image)) {
+                imagedestroy($image);
+            }
+            return false;
         }
     }
 
@@ -419,7 +797,6 @@ class PatientHandler
         error_log($logMessage, 3, __DIR__ . '/upload_debug.log');
     }
 
-    // ... (encryption methods for text data remain the same)
     private function altbashAesEncrypt($data)
     {
         if (empty($data)) return '';
@@ -591,3 +968,4 @@ class PatientHandler
 // Handle the request
 $handler = new PatientHandler();
 $handler->handleRequest();
+?>
