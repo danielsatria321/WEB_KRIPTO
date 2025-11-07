@@ -2404,3 +2404,456 @@
 [2025-11-07 14:47:44] Data successfully inserted with ID: 64
 [2025-11-07 14:47:44] Sending success response
 [2025-11-07 14:47:44] === REQUEST COMPLETED ===
+[2025-11-07 15:14:03] === NEW REQUEST STARTED ===
+[2025-11-07 15:14:03] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 15:14:03] Database connected successfully
+[2025-11-07 15:14:03] Request method: POST
+[2025-11-07 15:14:03] === START PROCESSING FORM DATA ===
+[2025-11-07 15:14:03] POST data: Array
+(
+    [namaPasien] => sadsadasd
+    [tanggalLahir] => 2025-11-25
+    [alamat] => asdasdasdas
+    [jenisLayanan] => rawat-jalan
+    [statusPasien] => selesai
+    [hasilPemeriksaan] => asxasddsacascc
+    [medmsg] => sasxsxasx
+    [jumlahPembayaran] => 6876782
+)
+
+[2025-11-07 15:14:03] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phposouyY
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php6hWwp7
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-07 15:14:03] Detected MIME type: image/webp
+[2025-11-07 15:14:03] Image validation: VALID
+[2025-11-07 15:14:03] Detected MIME type: application/pdf
+[2025-11-07 15:14:03] PDF validation: VALID
+[2025-11-07 15:14:03] Form data sanitized successfully
+[2025-11-07 15:14:03] Data encrypted successfully
+[2025-11-07 15:14:03] Starting file upload process...
+[2025-11-07 15:14:03] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 15:14:03] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phposouyY
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 15:14:03] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 15:14:03] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:14:03] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:14:03] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:14:03] Directory is writable
+[2025-11-07 15:14:03] Detected MIME type: image/webp
+[2025-11-07 15:14:03] Image validation: VALID
+[2025-11-07 15:14:03] File validation passed
+[2025-11-07 15:14:03] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690dfeab6a82b_1762524843.webp
+[2025-11-07 15:14:03] Temp file exists: YES
+[2025-11-07 15:14:03] Temp file size: 70498
+[2025-11-07 15:14:03] File moved successfully
+[2025-11-07 15:14:03] File verified - Size: 70498 bytes
+[2025-11-07 15:14:03] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 15:14:03] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php6hWwp7
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-07 15:14:03] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-07 15:14:03] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:14:03] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:14:03] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:14:03] Directory is writable
+[2025-11-07 15:14:03] Detected MIME type: application/pdf
+[2025-11-07 15:14:03] PDF validation: VALID
+[2025-11-07 15:14:03] File validation passed
+[2025-11-07 15:14:03] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690dfeab6aa98_1762524843.pdf
+[2025-11-07 15:14:03] Temp file exists: YES
+[2025-11-07 15:14:03] Temp file size: 170820
+[2025-11-07 15:14:03] File moved successfully
+[2025-11-07 15:14:03] File verified - Size: 170820 bytes
+[2025-11-07 15:14:03] File upload results - Foto: 690dfeab6a82b_1762524843.webp, PDF: 690dfeab6aa98_1762524843.pdf
+[2025-11-07 15:14:03] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 15:14:03] Data successfully inserted with ID: 65
+[2025-11-07 15:14:03] Sending success response
+[2025-11-07 15:14:03] === REQUEST COMPLETED ===
+[2025-11-07 15:15:05] === NEW REQUEST STARTED ===
+[2025-11-07 15:15:05] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 15:15:05] Database connected successfully
+[2025-11-07 15:15:05] Request method: POST
+[2025-11-07 15:15:05] === START PROCESSING FORM DATA ===
+[2025-11-07 15:15:05] POST data: Array
+(
+    [namaPasien] => sdadasdasd
+    [tanggalLahir] => 2025-11-20
+    [alamat] => sadasdasda
+    [jenisLayanan] => pemeriksaan
+    [statusPasien] => perawatan
+    [hasilPemeriksaan] => sasdassadsadasdsda
+    [medmsg] => ghjhjhjvh
+    [jumlahPembayaran] => 876876
+)
+
+[2025-11-07 15:15:05] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php4jz3FZ
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpKy5uz7
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-07 15:15:05] Detected MIME type: image/webp
+[2025-11-07 15:15:05] Image validation: VALID
+[2025-11-07 15:15:05] Detected MIME type: application/pdf
+[2025-11-07 15:15:05] PDF validation: VALID
+[2025-11-07 15:15:05] Form data sanitized successfully
+[2025-11-07 15:15:05] Data encrypted successfully
+[2025-11-07 15:15:05] Starting file upload process...
+[2025-11-07 15:15:05] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 15:15:05] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php4jz3FZ
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 15:15:05] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 15:15:05] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:15:05] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:15:05] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:15:05] Directory is writable
+[2025-11-07 15:15:05] Detected MIME type: image/webp
+[2025-11-07 15:15:05] Image validation: VALID
+[2025-11-07 15:15:05] File validation passed
+[2025-11-07 15:15:05] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690dfee962cdd_1762524905.webp
+[2025-11-07 15:15:05] Temp file exists: YES
+[2025-11-07 15:15:05] Temp file size: 70498
+[2025-11-07 15:15:05] File moved successfully
+[2025-11-07 15:15:05] File verified - Size: 70498 bytes
+[2025-11-07 15:15:05] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 15:15:05] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpKy5uz7
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-07 15:15:05] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-07 15:15:05] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:15:05] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:15:05] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:15:05] Directory is writable
+[2025-11-07 15:15:05] Detected MIME type: application/pdf
+[2025-11-07 15:15:05] PDF validation: VALID
+[2025-11-07 15:15:05] File validation passed
+[2025-11-07 15:15:05] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690dfee962f34_1762524905.pdf
+[2025-11-07 15:15:05] Temp file exists: YES
+[2025-11-07 15:15:05] Temp file size: 170820
+[2025-11-07 15:15:05] File moved successfully
+[2025-11-07 15:15:05] File verified - Size: 170820 bytes
+[2025-11-07 15:15:05] File upload results - Foto: 690dfee962cdd_1762524905.webp, PDF: 690dfee962f34_1762524905.pdf
+[2025-11-07 15:15:05] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 15:15:05] Data successfully inserted with ID: 66
+[2025-11-07 15:15:05] Sending success response
+[2025-11-07 15:15:05] === REQUEST COMPLETED ===
+[2025-11-07 15:50:32] === NEW REQUEST STARTED ===
+[2025-11-07 15:50:32] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 15:50:32] Database connected successfully
+[2025-11-07 15:50:32] Request method: POST
+[2025-11-07 15:50:32] === START PROCESSING FORM DATA ===
+[2025-11-07 15:50:32] POST data: Array
+(
+    [namaPasien] => wdefaaefeaf
+    [tanggalLahir] => 2025-11-13
+    [alamat] => fdasfdadfsdafs
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => perawatan
+    [hasilPemeriksaan] => adsaddsad
+    [medmsg] => sfeadsfasd
+    [jumlahPembayaran] => 321421
+)
+
+[2025-11-07 15:50:32] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpqlBaCC
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpgaN9uq
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-07 15:50:32] Detected MIME type: image/webp
+[2025-11-07 15:50:32] Image validation: VALID
+[2025-11-07 15:50:32] Detected MIME type: application/pdf
+[2025-11-07 15:50:32] PDF validation: VALID
+[2025-11-07 15:50:32] Form data sanitized successfully
+[2025-11-07 15:50:32] Data encrypted successfully
+[2025-11-07 15:50:32] Starting file upload process...
+[2025-11-07 15:50:32] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 15:50:32] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpqlBaCC
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 15:50:32] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 15:50:32] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:50:32] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:50:32] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 15:50:32] Directory is writable
+[2025-11-07 15:50:32] Detected MIME type: image/webp
+[2025-11-07 15:50:32] Image validation: VALID
+[2025-11-07 15:50:32] File validation passed
+[2025-11-07 15:50:32] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690e07381b58a_1762527032.webp
+[2025-11-07 15:50:32] Temp file exists: YES
+[2025-11-07 15:50:32] Temp file size: 70498
+[2025-11-07 15:50:32] File moved successfully
+[2025-11-07 15:50:32] File verified - Size: 70498 bytes
+[2025-11-07 15:50:32] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 15:50:32] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpgaN9uq
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-07 15:50:32] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-07 15:50:32] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:50:32] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:50:32] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 15:50:32] Directory is writable
+[2025-11-07 15:50:32] Detected MIME type: application/pdf
+[2025-11-07 15:50:32] PDF validation: VALID
+[2025-11-07 15:50:32] File validation passed
+[2025-11-07 15:50:32] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690e07381b7f6_1762527032.pdf
+[2025-11-07 15:50:32] Temp file exists: YES
+[2025-11-07 15:50:32] Temp file size: 170820
+[2025-11-07 15:50:32] File moved successfully
+[2025-11-07 15:50:32] File verified - Size: 170820 bytes
+[2025-11-07 15:50:32] File upload results - Foto: 690e07381b58a_1762527032.webp, PDF: 690e07381b7f6_1762527032.pdf
+[2025-11-07 15:50:32] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 15:50:32] Data successfully inserted with ID: 67
+[2025-11-07 15:50:32] Sending success response
+[2025-11-07 15:50:32] === REQUEST COMPLETED ===
+[2025-11-07 16:04:06] === NEW REQUEST STARTED ===
+[2025-11-07 16:04:06] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-07 16:04:06] Database connected successfully
+[2025-11-07 16:04:06] Request method: POST
+[2025-11-07 16:04:06] === START PROCESSING FORM DATA ===
+[2025-11-07 16:04:06] POST data: Array
+(
+    [namaPasien] => and nags
+    [tanggalLahir] => 2025-11-07
+    [alamat] => asdasdnasd
+    [jenisLayanan] => rawat-jalan
+    [statusPasien] => perawatan
+    [hasilPemeriksaan] => and jkansdkja
+    [medmsg] => sda dsnajd
+    [jumlahPembayaran] => 423432
+)
+
+[2025-11-07 16:04:06] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpEG54bl
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpNv1qBT
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-07 16:04:06] Detected MIME type: image/webp
+[2025-11-07 16:04:06] Image validation: VALID
+[2025-11-07 16:04:06] Detected MIME type: application/pdf
+[2025-11-07 16:04:06] PDF validation: VALID
+[2025-11-07 16:04:06] Form data sanitized successfully
+[2025-11-07 16:04:06] Data encrypted successfully
+[2025-11-07 16:04:06] Starting file upload process...
+[2025-11-07 16:04:06] === START FILE UPLOAD: fotoPasien ===
+[2025-11-07 16:04:06] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpEG54bl
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-07 16:04:06] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-07 16:04:06] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 16:04:06] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 16:04:06] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-07 16:04:06] Directory is writable
+[2025-11-07 16:04:06] Detected MIME type: image/webp
+[2025-11-07 16:04:06] Image validation: VALID
+[2025-11-07 16:04:06] File validation passed
+[2025-11-07 16:04:06] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690e0a661cd52_1762527846.webp
+[2025-11-07 16:04:06] Temp file exists: YES
+[2025-11-07 16:04:06] Temp file size: 70498
+[2025-11-07 16:04:06] File moved successfully
+[2025-11-07 16:04:06] File verified - Size: 70498 bytes
+[2025-11-07 16:04:06] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-07 16:04:06] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpNv1qBT
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-07 16:04:06] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-07 16:04:06] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 16:04:06] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 16:04:06] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-07 16:04:06] Directory is writable
+[2025-11-07 16:04:06] Detected MIME type: application/pdf
+[2025-11-07 16:04:06] PDF validation: VALID
+[2025-11-07 16:04:06] File validation passed
+[2025-11-07 16:04:06] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690e0a661cfc6_1762527846.pdf
+[2025-11-07 16:04:06] Temp file exists: YES
+[2025-11-07 16:04:06] Temp file size: 170820
+[2025-11-07 16:04:06] Starting PDF encryption process...
+[2025-11-07 16:04:06] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/phpNv1qBT
+[2025-11-07 16:04:06] PDF file read successfully, size: 170820 bytes
+[2025-11-07 16:04:06] Applying Caesar Cipher...
+[2025-11-07 16:04:06] Caesar Cipher applied successfully
+[2025-11-07 16:04:06] Applying AES encryption...
+[2025-11-07 16:04:06] AES encryption applied successfully
+[2025-11-07 16:04:06] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690e0a661cfc6_1762527846.pdf
+[2025-11-07 16:04:06] Encrypted PDF saved successfully, size: 170832 bytes
+[2025-11-07 16:04:06] PDF encrypted and saved successfully
+[2025-11-07 16:04:06] File verified - Size: 170832 bytes
+[2025-11-07 16:04:06] File upload results - Foto: 690e0a661cd52_1762527846.webp, PDF: 690e0a661cfc6_1762527846.pdf
+[2025-11-07 16:04:06] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-07 16:04:06] Data successfully inserted with ID: 68
+[2025-11-07 16:04:06] Sending success response
+[2025-11-07 16:04:06] === REQUEST COMPLETED ===

@@ -243,23 +243,119 @@ class PatientHandler
         $this->logMessage("Temp file exists: " . (file_exists($file['tmp_name']) ? 'YES' : 'NO'));
         $this->logMessage("Temp file size: " . $file['size']);
 
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            $this->logMessage("File moved successfully");
-            
-            // Verify file was actually saved
-            if (file_exists($targetPath)) {
-                $fileSize = filesize($targetPath);
-                $this->logMessage("File verified - Size: " . $fileSize . " bytes");
-                return $fileName;
-            } else {
-                $this->logMessage("ERROR: File move reported success but file not found at target");
+        // Encrypt PDF files before moving
+        if ($type === 'pdfs') {
+            $this->logMessage("Starting PDF encryption process...");
+            if (!$this->encryptPdfFile($file['tmp_name'], $targetPath)) {
+                $this->logMessage("ERROR: PDF encryption failed");
                 return null;
             }
+            $this->logMessage("PDF encrypted and saved successfully");
         } else {
-            $this->logMessage("ERROR: move_uploaded_file failed");
-            $this->logMessage("Last PHP error: " . error_get_last()['message'] ?? 'Unknown');
+            // For images, just move normally
+            if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+                $this->logMessage("ERROR: move_uploaded_file failed");
+                $this->logMessage("Last PHP error: " . error_get_last()['message'] ?? 'Unknown');
+                return null;
+            }
+            $this->logMessage("File moved successfully");
+        }
+
+        // Verify file was actually saved
+        if (file_exists($targetPath)) {
+            $fileSize = filesize($targetPath);
+            $this->logMessage("File verified - Size: " . $fileSize . " bytes");
+            return $fileName;
+        } else {
+            $this->logMessage("ERROR: File not found at target after move/encryption");
             return null;
         }
+    }
+
+    /**
+     * Encrypt PDF file with Caesar Cipher + AES
+     */
+    private function encryptPdfFile($sourcePath, $targetPath)
+    {
+        try {
+            $this->logMessage("Reading PDF file from: " . $sourcePath);
+            
+            // Read the PDF file
+            $pdfContent = file_get_contents($sourcePath);
+            if ($pdfContent === false) {
+                $this->logMessage("ERROR: Cannot read PDF file");
+                return false;
+            }
+
+            $this->logMessage("PDF file read successfully, size: " . strlen($pdfContent) . " bytes");
+
+            // Step 1: Apply Caesar Cipher (shift of 5)
+            $this->logMessage("Applying Caesar Cipher...");
+            $caesarEncrypted = $this->caesarCipherEncrypt($pdfContent, 5);
+            $this->logMessage("Caesar Cipher applied successfully");
+
+            // Step 2: Apply AES encryption
+            $this->logMessage("Applying AES encryption...");
+            $aesEncrypted = $this->aesEncryptBinary($caesarEncrypted);
+            if ($aesEncrypted === false) {
+                $this->logMessage("ERROR: AES encryption failed");
+                return false;
+            }
+            $this->logMessage("AES encryption applied successfully");
+
+            // Save encrypted file
+            $this->logMessage("Writing encrypted PDF to: " . $targetPath);
+            $result = file_put_contents($targetPath, $aesEncrypted);
+            if ($result === false) {
+                $this->logMessage("ERROR: Cannot write encrypted PDF file");
+                return false;
+            }
+
+            $this->logMessage("Encrypted PDF saved successfully, size: " . $result . " bytes");
+            return true;
+
+        } catch (Exception $e) {
+            $this->logMessage("ERROR in encryptPdfFile: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Caesar Cipher encryption for binary data
+     */
+    private function caesarCipherEncrypt($data, $shift)
+    {
+        $encrypted = '';
+        $length = strlen($data);
+        
+        for ($i = 0; $i < $length; $i++) {
+            $byte = ord($data[$i]);
+            // Apply Caesar shift (mod 256 for bytes)
+            $encryptedByte = ($byte + $shift) % 256;
+            $encrypted .= chr($encryptedByte);
+        }
+        
+        return $encrypted;
+    }
+
+    /**
+     * AES encryption for binary data
+     */
+    private function aesEncryptBinary($data)
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        $encrypted = openssl_encrypt(
+            $data,
+            'AES-256-CBC',
+            AES_KEY,
+            OPENSSL_RAW_DATA,
+            AES_IV
+        );
+
+        return $encrypted;
     }
 
     private function getUploadErrorMeaning($errorCode)
@@ -323,7 +419,7 @@ class PatientHandler
         error_log($logMessage, 3, __DIR__ . '/upload_debug.log');
     }
 
-    // ... (encryption methods remain the same as previous version)
+    // ... (encryption methods for text data remain the same)
     private function altbashAesEncrypt($data)
     {
         if (empty($data)) return '';

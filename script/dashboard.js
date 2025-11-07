@@ -1,12 +1,10 @@
-// dashboard.js - Complete Working Version with Steganography
 class Dashboard {
     constructor() {
-        this.STEGANOGRAPHY_KEY = "medcare-secure-key-2024"; // Key untuk AES encryption
         this.init();
     }
 
     init() {
-        console.log('Initializing Dashboard with Steganography...');
+        console.log('Initializing Dashboard...');
         this.updateCurrentDate();
         this.initializeModal();
         this.initializeFileUploads();
@@ -24,210 +22,20 @@ class Dashboard {
         }, 100);
     }
 
-    // ==================== STEGANOGRAPHY METHODS ====================
+    // ==================== FILE UPLOAD METHODS ====================
 
-    // AES Encryption using Web Crypto API
-    async encryptAES(message, key) {
-        try {
-            // Convert key to proper format
-            const encoder = new TextEncoder();
-            const keyData = encoder.encode(key);
-            const messageData = encoder.encode(message);
-
-            // Import key
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                keyData,
-                { name: 'AES-CBC', length: 256 },
-                false,
-                ['encrypt']
-            );
-
-            // Generate IV (Initialization Vector)
-            const iv = crypto.getRandomValues(new Uint8Array(16));
-
-            // Encrypt
-            const encrypted = await crypto.subtle.encrypt(
-                {
-                    name: 'AES-CBC',
-                    iv: iv
-                },
-                cryptoKey,
-                messageData
-            );
-
-            // Combine IV and encrypted data
-            const result = new Uint8Array(iv.length + encrypted.byteLength);
-            result.set(iv);
-            result.set(new Uint8Array(encrypted), iv.length);
-
-            return result;
-        } catch (error) {
-            console.error('AES Encryption error:', error);
-            throw new Error('Gagal mengenkripsi pesan');
-        }
-    }
-
-    // Convert data to binary string
-    dataToBinary(data) {
-        let binary = '';
-        for (let i = 0; i < data.length; i++) {
-            binary += data[i].toString(2).padStart(8, '0');
-        }
-        return binary;
-    }
-
-    // Embed encrypted message into image using LSB
-    embedMessageInImage(imageData, encryptedMessage) {
-        const data = imageData.data;
-        const binaryMessage = this.dataToBinary(encryptedMessage);
-        
-        // Add header: message length (32 bits)
-        const messageLength = binaryMessage.length;
-        const lengthBinary = messageLength.toString(2).padStart(32, '0');
-        const fullBinary = lengthBinary + binaryMessage;
-
-        // Check if image can hold the message
-        const availableBits = data.length * 4; // Each RGBA pixel has 4 channels
-        if (fullBinary.length > availableBits) {
-            throw new Error(`Pesan terlalu panjang untuk gambar ini. Diperlukan: ${fullBinary.length} bits, Tersedia: ${availableBits} bits`);
-        }
-
-        let bitIndex = 0;
-        
-        // Embed the message in LSB
-        for (let i = 0; i < data.length; i++) {
-            if (bitIndex < fullBinary.length) {
-                // Clear the least significant bit and set it to our message bit
-                data[i] = (data[i] & 0xFE) | parseInt(fullBinary[bitIndex], 2);
-                bitIndex++;
-            } else {
-                break;
-            }
-        }
-
-        return imageData;
-    }
-
-    // Process image with steganography
-    async processImageWithSteganography(file, message) {
-        return new Promise((resolve, reject) => {
-            // Encrypt the message first
-            this.encryptAES(message, this.STEGANOGRAPHY_KEY)
-                .then(encryptedData => {
-                    const img = new Image();
-                    img.onload = () => {
-                        try {
-                            // Create canvas
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            
-                            // Draw image to canvas
-                            ctx.drawImage(img, 0, 0);
-                            
-                            // Get image data
-                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                            
-                            // Embed encrypted message
-                            const modifiedImageData = this.embedMessageInImage(imageData, encryptedData);
-                            
-                            // Put modified data back
-                            ctx.putImageData(modifiedImageData, 0, 0);
-                            
-                            // Convert to blob
-                            canvas.toBlob(blob => {
-                                if (blob) {
-                                    resolve(blob);
-                                } else {
-                                    reject(new Error('Gagal mengonversi gambar'));
-                                }
-                            }, file.type, 0.95); // Maintain good quality
-                            
-                        } catch (error) {
-                            reject(error);
-                        }
-                    };
-                    
-                    img.onerror = () => {
-                        reject(new Error('Gagal memuat gambar'));
-                    };
-                    
-                    img.src = URL.createObjectURL(file);
-                })
-                .catch(error => {
-                    reject(error);
-                });
-        });
-    }
-
-    // Modified file upload handler with steganography
     setupFileUpload(inputId, fileNameId) {
         const fileInput = document.getElementById(inputId);
         const fileName = document.getElementById(fileNameId);
         
         if (fileInput && fileName) {
-            fileInput.addEventListener('change', async (e) => {
-                await this.handleFileChangeWithSteganography(e.target, fileName, inputId);
+            fileInput.addEventListener('change', (e) => {
+                this.handleFileChange(e.target, fileName, inputId);
             });
         }
     }
 
-    // Enhanced file change handler with steganography
-    async handleFileChangeWithSteganography(fileInput, fileNameElement, inputId) {
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            
-            // Only apply steganography for image files when medmsg exists
-            if (inputId === 'fotoPasien' && this.validateFile(file, inputId)) {
-                const medmsg = document.getElementById('medmsg').value.trim();
-                
-                if (medmsg) {
-                    try {
-                        // Show processing notification
-                        this.showNotification('Menyisipkan pesan medis ke dalam gambar...', 'info');
-                        
-                        // Process image with steganography
-                        const processedBlob = await this.processImageWithSteganography(file, medmsg);
-                        
-                        // Create new file from processed blob
-                        const processedFile = new File([processedBlob], file.name, {
-                            type: file.type,
-                            lastModified: new Date().getTime()
-                        });
-                        
-                        // Replace the original file with processed one
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(processedFile);
-                        fileInput.files = dataTransfer.files;
-                        
-                        fileNameElement.textContent = `✓ ${file.name} (dengan pesan medis)`;
-                        fileNameElement.style.color = '#28a745';
-                        
-                        this.showNotification('Pesan medis berhasil disisipkan ke dalam gambar!', 'success');
-                        
-                    } catch (error) {
-                        console.error('Steganography error:', error);
-                        fileNameElement.textContent = file.name;
-                        fileNameElement.style.color = '#dc3545';
-                        this.showNotification(`Gagal menyisipkan pesan: ${error.message}`, 'error');
-                    }
-                } else {
-                    // No medmsg, proceed normally
-                    this.handleFileChange(fileInput, fileNameElement, inputId);
-                }
-            } else {
-                // Not an image or validation failed, proceed normally
-                this.handleFileChange(fileInput, fileNameElement, inputId);
-            }
-        } else {
-            fileNameElement.textContent = 'Belum ada file';
-            fileNameElement.style.color = '#6c757d';
-        }
-    }
-
-    // Original file change handler (for non-image files)
+    // File change handler
     handleFileChange(fileInput, fileNameElement, inputId) {
         if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
@@ -246,7 +54,33 @@ class Dashboard {
         }
     }
 
-    // ==================== EXISTING METHODS (with minor updates) ====================
+    validateFile(file, inputId) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (file.size > maxSize) {
+            this.showNotification('Ukuran file terlalu besar (maksimal 5MB)', 'error');
+            return false;
+        }
+
+        if (inputId === 'fotoPasien') {
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validImageTypes.includes(file.type)) {
+                this.showNotification('Format file tidak didukung. Gunakan JPG, PNG, atau GIF.', 'error');
+                return false;
+            }
+        }
+
+        if (inputId === 'pdfDokumen') {
+            if (file.type !== 'application/pdf') {
+                this.showNotification('Hanya file PDF yang diperbolehkan.', 'error');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // ==================== EXISTING METHODS ====================
 
     // Update current date display
     updateCurrentDate() {
@@ -326,32 +160,6 @@ class Dashboard {
     initializeFileUploads() {
         this.setupFileUpload('fotoPasien', 'fotoFileName');
         this.setupFileUpload('pdfDokumen', 'pdfFileName');
-    }
-
-    validateFile(file, inputId) {
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        
-        if (file.size > maxSize) {
-            this.showNotification('Ukuran file terlalu besar (maksimal 5MB)', 'error');
-            return false;
-        }
-
-        if (inputId === 'fotoPasien') {
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validImageTypes.includes(file.type)) {
-                this.showNotification('Format file tidak didukung. Gunakan JPG, PNG, atau GIF.', 'error');
-                return false;
-            }
-        }
-
-        if (inputId === 'pdfDokumen') {
-            if (file.type !== 'application/pdf') {
-                this.showNotification('Hanya file PDF yang diperbolehkan.', 'error');
-                return false;
-            }
-        }
-
-        return true;
     }
 
     // Selectable cards functionality
@@ -564,14 +372,6 @@ class Dashboard {
         try {
             const formData = new FormData(this.patientForm);
             
-            // Log steganography status
-            const medmsg = document.getElementById('medmsg').value.trim();
-            const hasImage = formData.get('fotoPasien') && formData.get('fotoPasien').size > 0;
-            
-            if (hasImage && medmsg) {
-                console.log('Data dikirim dengan steganografi AES+LSB');
-            }
-            
             // Simulate successful submission (remove this in production)
             // await this.simulateSubmission(formData);
             
@@ -584,7 +384,7 @@ class Dashboard {
 
             this.handleSuccess({
                 success: true,
-                message: "Data pemeriksaan berhasil disimpan!" + (hasImage && medmsg ? " (dengan steganografi)" : ""),
+                message: "Data pemeriksaan berhasil disimpan!",
                 data: {
                     id: 'SIM-' + Date.now(),
                     nama: formData.get('namaPasien'),
