@@ -10,9 +10,14 @@ ini_set('display_errors', 1);
 
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root'); // Ganti dengan username database Anda
-define('DB_PASS', ''); // Ganti dengan password database Anda
+define('DB_USER', 'root');
+define('DB_PASS', '');
 define('DB_NAME', 'kriptoproject');
+
+// Encryption keys
+define('XOR_KEY', 'medicare_secret_key_2024');
+define('AES_KEY', 'medicare_aes_key_2024_32bytes_long!'); // 32 bytes for AES-256
+define('AES_IV', '1234567890123456'); // 16 bytes for AES
 
 class PatientHandler
 {
@@ -63,7 +68,14 @@ class PatientHandler
             $jenis_layanan = $this->sanitizeInput($_POST['jenisLayanan']);
             $status_pasien = $this->mapStatusPasien($_POST['statusPasien']);
             $hasil_pemeriksaan = $this->sanitizeInput($_POST['hasilPemeriksaan']);
-            $jumlah_pembayaran = floatval($_POST['jumlahPembayaran']);
+            $jumlah_pembayaran = floatval($_POST['jumlahPembayaran']); // Tetap sebagai float
+
+            // Encrypt sensitive data
+            $encrypted_nama = $this->xorEncrypt($nama_lengkap, XOR_KEY);
+            $encrypted_alamat = $this->xorEncrypt($alamat_lengkap, XOR_KEY);
+
+            // Encrypt hasil pemeriksaan menggunakan Altbash + AES
+            $encrypted_hasil = $this->altbashAesEncrypt($hasil_pemeriksaan);
 
             // Handle file uploads
             $foto_pasien = $this->handleFileUpload('fotoPasien', 'images');
@@ -87,31 +99,40 @@ class PatientHandler
                 throw new Exception("Prepare statement failed: " . $this->conn->error);
             }
 
-            // Bind parameters
+            // Bind parameters - jumlah_pembayaran sebagai decimal (d)
             $stmt->bind_param(
                 "ssssssssd",
-                $nama_lengkap,
+                $encrypted_nama,
                 $tanggal_lahir,
-                $alamat_lengkap,
-                $jenis_layanan, // disimpan di informasi_medis
+                $encrypted_alamat,
+                $jenis_layanan,
                 $status_pasien,
-                $hasil_pemeriksaan,
+                $encrypted_hasil,
                 $foto_pasien,
                 $dokumen_pdf,
-                $jumlah_pembayaran
+                $jumlah_pembayaran // TIDAK dienkripsi - disimpan sebagai angka
             );
 
             if ($stmt->execute()) {
                 $patientId = $stmt->insert_id;
+
                 $this->sendSuccess([
                     'id_pasien' => $patientId,
                     'nama_lengkap' => $nama_lengkap,
                     'tanggal_lahir' => $tanggal_lahir,
+                    'alamat_lengkap' => $alamat_lengkap,
                     'jenis_layanan' => $jenis_layanan,
                     'status_pasien' => $status_pasien,
+                    'hasil_pemeriksaan' => $hasil_pemeriksaan,
                     'jumlah_pembayaran' => $jumlah_pembayaran,
                     'foto_pasien' => $foto_pasien,
-                    'dokumen_pdf' => $dokumen_pdf
+                    'dokumen_pdf' => $dokumen_pdf,
+                    'encryption_info' => [
+                        'nama_encryption' => 'XOR',
+                        'alamat_encryption' => 'XOR',
+                        'hasil_encryption' => 'Altbash + AES',
+                        'pembayaran_encryption' => 'Tidak dienkripsi'
+                    ]
                 ], "Data pasien berhasil disimpan!");
             } else {
                 throw new Exception("Execute failed: " . $stmt->error);
@@ -121,6 +142,213 @@ class PatientHandler
         } catch (Exception $e) {
             $this->sendError($e->getMessage());
         }
+    }
+
+    /**
+     * Altbash + AES Encryption
+     * Kombinasi algoritma Altbash (custom) dan AES untuk keamanan berlapis
+     */
+    private function altbashAesEncrypt($data)
+    {
+        // Step 1: Altbash Encryption (Custom Algorithm)
+        $altbash_encrypted = $this->altbashEncrypt($data);
+
+        // Step 2: AES Encryption
+        $aes_encrypted = $this->aesEncrypt($altbash_encrypted);
+
+        return $aes_encrypted;
+    }
+
+    /**
+     * Altbash Decryption (untuk keperluan debugging/verifikasi)
+     */
+    private function altbashAesDecrypt($encryptedData)
+    {
+        // Step 1: AES Decryption
+        $aes_decrypted = $this->aesDecrypt($encryptedData);
+
+        // Step 2: Altbash Decryption
+        $altbash_decrypted = $this->altbashDecrypt($aes_decrypted);
+
+        return $altbash_decrypted;
+    }
+
+    /**
+     * Custom Altbash Encryption Algorithm
+     * Menggunakan kombinasi character shifting, XOR, dan base64 encoding
+     */
+    private function altbashEncrypt($data)
+    {
+        if (empty($data)) return '';
+
+        $data = mb_convert_encoding($data, 'UTF-8');
+        $key = mb_convert_encoding(XOR_KEY, 'UTF-8');
+
+        $encrypted = '';
+        $dataLen = mb_strlen($data, 'UTF-8');
+        $keyLen = mb_strlen($key, 'UTF-8');
+
+        // Step 1: Character shifting (+3 positions)
+        for ($i = 0; $i < $dataLen; $i++) {
+            $char = mb_substr($data, $i, 1, 'UTF-8');
+            $ascii = ord($char);
+            $shifted_ascii = ($ascii + 3) % 256;
+            $encrypted .= chr($shifted_ascii);
+        }
+
+        // Step 2: XOR with key
+        $xor_encrypted = '';
+        for ($i = 0; $i < $dataLen; $i++) {
+            $dataChar = $encrypted[$i];
+            $keyChar = mb_substr($key, $i % $keyLen, 1, 'UTF-8');
+
+            $dataAscii = ord($dataChar);
+            $keyAscii = ord($keyChar);
+            $xorAscii = $dataAscii ^ $keyAscii;
+
+            $xor_encrypted .= chr($xorAscii);
+        }
+
+        // Step 3: Reverse string
+        $reversed = strrev($xor_encrypted);
+
+        // Step 4: Base64 encode
+        return base64_encode($reversed);
+    }
+
+    /**
+     * Altbash Decryption
+     */
+    private function altbashDecrypt($encryptedData)
+    {
+        if (empty($encryptedData)) return '';
+
+        $key = mb_convert_encoding(XOR_KEY, 'UTF-8');
+
+        // Step 1: Base64 decode
+        $decoded = base64_decode($encryptedData);
+
+        // Step 2: Reverse string (undo step 3)
+        $reversed = strrev($decoded);
+
+        // Step 3: XOR with key (undo step 2)
+        $dataLen = strlen($reversed);
+        $keyLen = mb_strlen($key, 'UTF-8');
+        $xor_decrypted = '';
+
+        for ($i = 0; $i < $dataLen; $i++) {
+            $dataChar = $reversed[$i];
+            $keyChar = mb_substr($key, $i % $keyLen, 1, 'UTF-8');
+
+            $dataAscii = ord($dataChar);
+            $keyAscii = ord($keyChar);
+            $xorAscii = $dataAscii ^ $keyAscii;
+
+            $xor_decrypted .= chr($xorAscii);
+        }
+
+        // Step 4: Character shifting (-3 positions) - undo step 1
+        $decrypted = '';
+        for ($i = 0; $i < $dataLen; $i++) {
+            $char = $xor_decrypted[$i];
+            $ascii = ord($char);
+            $shifted_ascii = ($ascii - 3 + 256) % 256;
+            $decrypted .= chr($shifted_ascii);
+        }
+
+        return $decrypted;
+    }
+
+    /**
+     * AES Encryption
+     */
+    private function aesEncrypt($data)
+    {
+        if (empty($data)) return '';
+
+        $encrypted = openssl_encrypt(
+            $data,
+            'AES-256-CBC',
+            AES_KEY,
+            OPENSSL_RAW_DATA,
+            AES_IV
+        );
+
+        return base64_encode($encrypted);
+    }
+
+    /**
+     * AES Decryption
+     */
+    private function aesDecrypt($encryptedData)
+    {
+        if (empty($encryptedData)) return '';
+
+        $decrypted = openssl_decrypt(
+            base64_decode($encryptedData),
+            'AES-256-CBC',
+            AES_KEY,
+            OPENSSL_RAW_DATA,
+            AES_IV
+        );
+
+        return $decrypted;
+    }
+
+    /**
+     * XOR Encryption method
+     */
+    private function xorEncrypt($data, $key)
+    {
+        if (empty($data)) return '';
+
+        $data = mb_convert_encoding($data, 'UTF-8');
+        $key = mb_convert_encoding($key, 'UTF-8');
+
+        $encrypted = '';
+        $dataLen = mb_strlen($data, 'UTF-8');
+        $keyLen = mb_strlen($key, 'UTF-8');
+
+        for ($i = 0; $i < $dataLen; $i++) {
+            $dataChar = mb_substr($data, $i, 1, 'UTF-8');
+            $keyChar = mb_substr($key, $i % $keyLen, 1, 'UTF-8');
+
+            $dataAscii = ord($dataChar);
+            $keyAscii = ord($keyChar);
+            $encryptedAscii = $dataAscii ^ $keyAscii;
+
+            $encrypted .= chr($encryptedAscii);
+        }
+
+        return base64_encode($encrypted);
+    }
+
+    /**
+     * XOR Decryption method
+     */
+    private function xorDecrypt($encryptedData, $key)
+    {
+        if (empty($encryptedData)) return '';
+
+        $encrypted = base64_decode($encryptedData);
+        $key = mb_convert_encoding($key, 'UTF-8');
+
+        $decrypted = '';
+        $dataLen = strlen($encrypted);
+        $keyLen = mb_strlen($key, 'UTF-8');
+
+        for ($i = 0; $i < $dataLen; $i++) {
+            $encryptedChar = $encrypted[$i];
+            $keyChar = mb_substr($key, $i % $keyLen, 1, 'UTF-8');
+
+            $encryptedAscii = ord($encryptedChar);
+            $keyAscii = ord($keyChar);
+            $decryptedAscii = $encryptedAscii ^ $keyAscii;
+
+            $decrypted .= chr($decryptedAscii);
+        }
+
+        return $decrypted;
     }
 
     private function validateFormData()
@@ -138,7 +366,7 @@ class PatientHandler
 
         foreach ($requiredFields as $field => $label) {
             if (empty($_POST[$field])) {
-                $errors[] = $label;
+                $errors[] = $label . ' harus diisi';
             }
         }
 
