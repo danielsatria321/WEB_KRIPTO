@@ -17,7 +17,7 @@
                         <i class="fas fa-user-md"></i>
                     </div>
                     <div class="profile-info">
-                        <h3>Dr. Andi Wijaya anjir</h3>
+                        <h3>Dr. Andi Wijaya</h3>
                         <p>Dokter Umum</p>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                     </button>
                 </div>
                 
-                <form class="patient-form" id="patientForm">
+                <form class="patient-form" id="patientForm" enctype="multipart/form-data">
                     <!-- Personal Information -->
                     <div class="form-section">
                         <h3><i class="fas fa-user"></i> Informasi Pribadi</h3>
@@ -201,12 +201,11 @@
                         <h3><i class="fas fa-stethoscope"></i> Informasi Medis</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="jenisLayanan" style="display: block; margin-bottom: 15px; font-size: 1rem; font-weight: 600; color: var(--dark);">
+                                <label style="display: block; margin-bottom: 15px; font-size: 1rem; font-weight: 600; color: var(--dark);">
                                     Jenis Layanan <span style="color: var(--danger);">*</span>
                                 </label>
                                 
                                 <div class="card-group-vertical" id="jenisLayananGroup">
-                                    <!-- Rawat Inap Card -->
                                     <label class="selectable-card" data-value="rawat-inap">
                                         <input type="radio" name="jenisLayanan" value="rawat-inap" class="card-input" required>
                                         <div class="card-icon rawat-inap">
@@ -214,11 +213,9 @@
                                         </div>
                                         <div class="card-content">
                                             <div class="card-title">Rawat Inap</div>
-                                          
                                         </div>
                                     </label>
                                     
-                                    <!-- Rawat Jalan Card -->
                                     <label class="selectable-card" data-value="rawat-jalan">
                                         <input type="radio" name="jenisLayanan" value="rawat-jalan" class="card-input" required>
                                         <div class="card-icon rawat-jalan">
@@ -226,11 +223,9 @@
                                         </div>
                                         <div class="card-content">
                                             <div class="card-title">Rawat Jalan</div>
-                                          
                                         </div>
                                     </label>
                                     
-                                    <!-- Pemeriksaan Card -->
                                     <label class="selectable-card" data-value="pemeriksaan">
                                         <input type="radio" name="jenisLayanan" value="pemeriksaan" class="card-input" required>
                                         <div class="card-icon pemeriksaan">
@@ -238,13 +233,8 @@
                                         </div>
                                         <div class="card-content">
                                             <div class="card-title">Pemeriksaan</div>
-                                           
                                         </div>
                                     </label>
-                                </div>
-                                
-                                <div class="form-hint" style="margin-top: 8px; font-size: 0.85rem; color: var(--secondary);">
-                                    Pilih satu jenis layanan yang sesuai dengan kebutuhan pasien
                                 </div>
                             </div>
 

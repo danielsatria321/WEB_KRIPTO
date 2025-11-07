@@ -3,68 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi Akun</title>
-    <link rel="stylesheet" href="../styles/registerstyle.css">
+    <title>MediCare - Dashboard Rumah Sakit</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
-    
-    <div class="animated-background">
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-            <div class="shape shape-5"></div>
-            <div class="shape shape-6"></div>
-        </div>
-        <div class="gradient-overlay"></div>
-    </div>
-
-    <div class="auth-container">
-        <div class="auth-card">
-            <h1 class="auth-title">Daftar Akun Baru</h1>
-            
-           <form id="registerForm" class="auth-form" action="../backend/registrasi.php" method="POST">
-    <div class="form-group">
-        <label for="nama" class="form-label">Nama Lengkap</label>
-        <input type="text" id="nama" name="nama" class="form-input" 
-               placeholder="Masukkan nama lengkap" required>
-        <div class="error-message" id="namaError"></div>
-    </div>
-    
-    <div class="form-group">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" id="username" name="username" class="form-input" 
-               placeholder="Buat username unik" required>
-        <div class="error-message" id="usernameError"></div>
-    </div>
-    
-    <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <div class="password-container">
-            <input type="password" id="password" name="password" class="form-input" 
-                   placeholder="Buat password kuat" required>
-            <button type="button" class="password-toggle" id="togglePassword">
-                <span class="toggle-icon"></span>
-            </button>
-        </div>
-        <div class="error-message" id="passwordError"></div>
-    </div>
-    
-    <button type="submit" class="auth-button" id="submitBtn">
-        <span class="button-text">Daftar Sekarang</span>
-        <span class="button-loading" style="display: none;">Memproses...</span>
-    </button>
-</form>
-
-            <div class="auth-footer">
-                <p>Sudah punya akun? <a href="../templates/login.html" class="auth-link">Masuk di sini</a></p>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="profile">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3>Dr. Andi Wijaya</h3>
+                        <p>Dokter Umum</p>
+                    </div>
+                </div>
             </div>
-            
-            <div id="message" class="message-container"></div>
+
+            <nav class="sidebar-menu">
+                <ul>
+                    <li class="menu-item active">
+                        <a href="#">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" id="inputPemeriksaanBtn">
+                            <i class="fas fa-file-medical"></i>
+                            <span>Input Pemeriksaan</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Pengaturan</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Dashboard MediCare</h1>
+                    <p>Manajemen Data Pasien Terintegrasi</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Cari pasien...">
+                    </div>
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="date-display">
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Pasien</h3>
+                        <span class="stat-number">156</span>
+                        <span class="stat-change positive">+12%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-procedures"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Rawat Inap</h3>
+                        <span class="stat-number">24</span>
+                        <span class="stat-change positive">+5%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-walking"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Rawat Jalan</h3>
+                        <span class="stat-number">89</span>
+                        <span class="stat-change positive">+8%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Pemeriksaan</h3>
+                        <span class="stat-number">43</span>
+                        <span class="stat-change negative">-3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Patients -->
+            <div class="recent-patients-section">
+                <div class="section-header">
+                    <h2>Pasien Terbaru</h2>
+                    <button class="view-all-btn">Lihat Semua</button>
+                </div>
+                <div class="patients-list">
+                    <div class="patient-item">
+                        <div class="patient-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="patient-info">
+                            <h4>Budi Santoso</h4>
+                            <p>Rawat Jalan • 45 Tahun</p>
+                            <span class="patient-date">12 Mar 2024</span>
+                        </div>
+                        <span class="status-badge completed">Selesai</span>
+                    </div>
+                    <div class="patient-item">
+                        <div class="patient-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="patient-info">
+                            <h4>Siti Rahayu</h4>
+                            <p>Rawat Inap • 32 Tahun</p>
+                            <span class="patient-date">11 Mar 2024</span>
+                        </div>
+                        <span class="status-badge in-progress">Perawatan</span>
+                    </div>
+                    <div class="patient-item">
+                        <div class="patient-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="patient-info">
+                            <h4>Ahmad Fauzi</h4>
+                            <p>Pemeriksaan • 28 Tahun</p>
+                            <span class="patient-date">10 Mar 2024</span>
+                        </div>
+                        <span class="status-badge pending">Menunggu</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Modal -->
+        <div class="modal-overlay" id="formModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-file-medical"></i> Input Hasil Pemeriksaan</h2>
+                    <button class="close-btn" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form class="patient-form" id="patientForm" action="../backend/dashboard.php" method="POST" enctype="multipart/form-data">
+                    <!-- Personal Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Informasi Pribadi</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="namaPasien">Nama Lengkap Pasien</label>
+                                <input type="text" id="namaPasien" name="namaPasien" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tanggalLahir">Tanggal Lahir</label>
+                                <input type="date" id="tanggalLahir" name="tanggalLahir" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="alamat">Alamat Lengkap</label>
+                            <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap pasien..." required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Medical Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-stethoscope"></i> Informasi Medis</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="jenisLayanan">Jenis Layanan <span style="color: var(--danger);">*</span></label>
+                                
+                                <div class="card-group-vertical" id="jenisLayananGroup">
+                                    <!-- Rawat Inap Card -->
+                                    <label class="selectable-card" data-value="rawat-inap">
+                                        <input type="radio" name="jenisLayanan" value="rawat-inap" class="card-input" required>
+                                        <div class="card-icon rawat-inap">
+                                            <i class="fas fa-procedures"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-title">Rawat Inap</div>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- Rawat Jalan Card -->
+                                    <label class="selectable-card" data-value="rawat-jalan">
+                                        <input type="radio" name="jenisLayanan" value="rawat-jalan" class="card-input" required>
+                                        <div class="card-icon rawat-jalan">
+                                            <i class="fas fa-walking"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-title">Rawat Jalan</div>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- Pemeriksaan Card -->
+                                    <label class="selectable-card" data-value="pemeriksaan">
+                                        <input type="radio" name="jenisLayanan" value="pemeriksaan" class="card-input" required>
+                                        <div class="card-icon pemeriksaan">
+                                            <i class="fas fa-stethoscope"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-title">Pemeriksaan</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-hint">
+                                    Pilih satu jenis layanan yang sesuai dengan kebutuhan pasien
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="statusPasien">Status Pasien</label>
+                                <select id="statusPasien" name="statusPasien" required>
+                                    <option value="">Pilih Status</option>
+                                    <option value="menunggu">Menunggu</option>
+                                    <option value="dalam perawatan">Dalam Perawatan</option>
+                                    <option value="selesai">Selesai</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hasilPemeriksaan">Hasil Pemeriksaan & Diagnosis</label>
+                            <textarea id="hasilPemeriksaan" name="hasilPemeriksaan" rows="5" placeholder="Tuliskan hasil pemeriksaan, diagnosis, dan rencana perawatan..." required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- File Uploads -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-paperclip"></i> Dokumen & Media</h3>
+                        <div class="form-row">
+                            <div class="form-group file-upload-group">
+                                <label for="fotoPasien">Foto Pasien</label>
+                                <div class="file-upload">
+                                    <input type="file" id="fotoPasien" name="fotoPasien" accept="image/*" class="file-input">
+                                    <label for="fotoPasien" class="file-label">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Unggah Foto</span>
+                                    </label>
+                                    <span class="file-name" id="fotoFileName">Belum ada file</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group file-upload-group">
+                                <label for="pdfDokumen">Dokumen PDF</label>
+                                <div class="file-upload">
+                                    <input type="file" id="pdfDokumen" name="pdfDokumen" accept=".pdf" class="file-input">
+                                    <label for="pdfDokumen" class="file-label">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>Unggah PDF</span>
+                                    </label>
+                                    <span class="file-name" id="pdfFileName">Belum ada file</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-money-bill-wave"></i> Informasi Pembayaran</h3>
+                        <div class="form-group">
+                            <label for="jumlahPembayaran">Jumlah Pembayaran (Rp)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-rupiah-sign"></i>
+                                <input type="number" id="jumlahPembayaran" name="jumlahPembayaran" min="0" placeholder="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields for encrypted data -->
+                    <input type="hidden" id="alamatEncrypted" name="alamat_encrypted">
+                    <input type="hidden" id="informasiMedisEncrypted" name="informasi_medis_encrypted">
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelForm">
+                            <i class="fas fa-times"></i>
+                            Batal
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i>
+                            Simpan Data Pemeriksaan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" id="toast">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">Data berhasil disimpan!</span>
         </div>
     </div>
 
-    <script src="../script/register.js"></script>
+    <script>
+        // Fungsi enkripsi XOR
+        function xorEncrypt(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return btoa(result); // Encode ke base64 untuk penyimpanan
+        }
+
+        // Fungsi Atbash Cipher
+        function atbashEncrypt(text) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                if (char >= 'A' && char <= 'Z') {
+                    result += String.fromCharCode(90 - (char.charCodeAt(0) - 65));
+                } else if (char >= 'a' && char <= 'z') {
+                    result += String.fromCharCode(122 - (char.charCodeAt(0) - 97));
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        // Fungsi AES Encryption
+        function aesEncrypt(text, key) {
+            return CryptoJS.AES.encrypt(text, key).toString();
+        }
+
+        // DOM Elements
+        const inputPemeriksaanBtn = document.getElementById('inputPemeriksaanBtn');
+        const formModal = document.getElementById('formModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelForm = document.getElementById('cancelForm');
+        const patientForm = document.getElementById('patientForm');
+        const currentDate = document.getElementById('currentDate');
+        const selectableCards = document.querySelectorAll('.selectable-card');
+        const fileInputs = document.querySelectorAll('.file-input');
+        const fileNames = {
+            fotoPasien: document.getElementById('fotoFileName'),
+            pdfDokumen: document.getElementById('pdfFileName')
+        };
+
+        // Set current date
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        currentDate.textContent = now.toLocaleDateString('id-ID', options);
+
+        // Event Listeners
+        inputPemeriksaanBtn.addEventListener('click', () => {
+            formModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeModal.addEventListener('click', () => {
+            formModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        cancelForm.addEventListener('click', () => {
+            formModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            patientForm.reset();
+            resetFileNames();
+            resetCardSelection();
+        });
+
+        // Selectable card functionality
+        selectableCards.forEach(card => {
+            card.addEventListener('click', () => {
+                selectableCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                card.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // File input functionality
+        fileInputs.forEach(input => {
+            input.addEventListener('change', (e) => {
+                const fileName = e.target.files[0] ? e.target.files[0].name : 'Belum ada file';
+                fileNames[e.target.id].textContent = fileName;
+            });
+        });
+
+        // Reset file names
+        function resetFileNames() {
+            fileNames.fotoPasien.textContent = 'Belum ada file';
+            fileNames.pdfDokumen.textContent = 'Belum ada file';
+        }
+
+        // Reset card selection
+        function resetCardSelection() {
+            selectableCards.forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        // Form submission
+        patientForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Kunci enkripsi
+            const xorKey = "medicare2024";
+            const aesKey = "medicare-secret-key-2024";
+            
+            // Enkripsi data
+            const alamat = document.getElementById('alamat').value;
+            const jenisLayanan = document.querySelector('input[name="jenisLayanan"]:checked').value;
+            
+            // Enkripsi alamat dengan XOR
+            const alamatEncrypted = xorEncrypt(alamat, xorKey);
+            document.getElementById('alamatEncrypted').value = alamatEncrypted;
+            
+            // Enkripsi informasi medis dengan Atbash + AES
+            const informasiMedisAtbash = atbashEncrypt(jenisLayanan);
+            const informasiMedisEncrypted = aesEncrypt(informasiMedisAtbash, aesKey);
+            document.getElementById('informasiMedisEncrypted').value = informasiMedisEncrypted;
+            
+            // Submit form
+            this.submit();
+        });
+
+        // Close modal when clicking outside
+        formModal.addEventListener('click', (e) => {
+            if (e.target === formModal) {
+                formModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
 </body>
 </html>
