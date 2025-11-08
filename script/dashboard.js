@@ -452,6 +452,8 @@ class Dashboard {
 
     async showPatientDetail(patientId) {
         try {
+            this.showNotification('Memuat detail pasien...', 'info');
+            
             const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
             
             if (!response.ok) {
@@ -462,6 +464,7 @@ class Dashboard {
 
             if (result.success) {
                 this.displayPatientDetail(result.data);
+                this.showNotification('Detail pasien berhasil dimuat', 'success');
             } else {
                 throw new Error(result.error || 'Unknown error');
             }
@@ -471,6 +474,7 @@ class Dashboard {
         }
     }
 
+    // Dalam method displayPatientDetail - GANTI bagian patient-detail-header dan tambahkan section gambar
     displayPatientDetail(patient) {
         const modal = document.getElementById('detailModal');
         const content = document.getElementById('patientDetailContent');
@@ -490,10 +494,130 @@ class Dashboard {
         });
         const birthDate = new Date(patient.tanggal_lahir).toLocaleDateString('id-ID');
 
+        // ✅ Dapatkan path gambar untuk ditampilkan
+        const imagePath = this.getImagePath(patient.foto_pasien);
+        const hasImage = imagePath !== null;
+
+        // Tombol download PDF hanya ditampilkan jika ada dokumen PDF
+        const downloadPdfButton = patient.dokumen_pdf ? `
+            <button class="btn-primary" id="downloadPdfBtn" data-patient-id="${patient.id_pasien}">
+                <i class="fas fa-download"></i>
+                Download PDF (Decrypted)
+            </button>
+        ` : '';
+
+        // ✅ PERBAIKAN: Tampilkan gambar pasien jika ada
+        const patientImageSection = hasImage ? `
+            <div class="detail-section">
+                <h4><i class="fas fa-image"></i> Foto Pasien</h4>
+                <div class="patient-image-container">
+                    <div class="image-wrapper">
+                        <img src="${imagePath}" alt="Foto Pasien ${patient.nama_lengkap}" 
+                             class="patient-image" onerror="this.style.display='none'">
+                        <div class="image-overlay">
+                            <button class="btn-view-image" id="viewImageBtn">
+                                <i class="fas fa-expand"></i>
+                                Lihat Gambar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-info">
+                        <div class="file-info">
+                            <strong>File:</strong> ${patient.foto_pasien}
+                        </div>
+                        <div class="image-meta">
+                            <span class="image-size" id="imageSizeInfo">Memuat...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ` : `
+            <div class="detail-section">
+                <h4><i class="fas fa-image"></i> Foto Pasien</h4>
+                <div class="no-image-message">
+                    <i class="fas fa-camera-slash"></i>
+                    <p>Tidak ada foto pasien</p>
+                </div>
+            </div>
+        `;
+
+        // ✅ PERBAIKAN: Tampilkan medical message dengan styling yang lebih baik
+        const medicalMessageSection = patient.medical_message ? `
+            <div class="detail-section">
+                <h4><i class="fas fa-comment-medical"></i> Pesan Medis Tersembunyi (Steganografi)</h4>
+                <div class="steganography-message">
+                    <div class="message-content">
+                        <p><strong>Pesan yang diekstrak:</strong></p>
+                        <div class="message-text">${this.escapeHtml(patient.medical_message)}</div>
+                    </div>
+                    <div class="message-meta">
+                        <small class="message-source">
+                            <i class="fas fa-shield-alt"></i>
+                            Pesan ini diekstrak dari gambar menggunakan teknik steganografi LSB + AES
+                        </small>
+                        <button class="btn-small" id="copyMessageBtn" data-message="${this.escapeHtml(patient.medical_message)}">
+                            <i class="fas fa-copy"></i>
+                            Salin Pesan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ` : `
+            <div class="detail-section">
+                <h4><i class="fas fa-comment-medical"></i> Pesan Medis Tersembunyi (Steganografi)</h4>
+                <div class="no-steganography-message">
+                    <i class="fas fa-search"></i>
+                    <p>Tidak ada pesan tersembunyi yang ditemukan dalam gambar</p>
+                    <small class="message-info">
+                        Gambar mungkin tidak mengandung pesan steganografi atau proses ekstraksi gagal
+                    </small>
+                </div>
+            </div>
+        `;
+
+        // ✅ PERBAIKAN: Informasi status steganografi
+        const steganographyInfoSection = patient.foto_pasien ? `
+            <div class="detail-section">
+                <h4><i class="fas fa-info-circle"></i> Status Steganografi</h4>
+                <div class="steganography-status-info">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">File Gambar:</span>
+                            <span class="status-value">${patient.foto_pasien}</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Status Ekstraksi:</span>
+                            <span class="status-badge ${patient.medical_message ? 'success' : 'warning'}">
+                                <i class="fas ${patient.medical_message ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                                ${patient.medical_message ? 'Berhasil' : 'Tidak ditemukan'}
+                            </span>
+                        </div>
+                        ${patient.medical_message ? `
+                        <div class="status-item full-width">
+                            <span class="status-label">Panjang Pesan:</span>
+                            <span class="status-value">${patient.medical_message.length} karakter</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ${patient.medical_message ? `
+                    <div class="extraction-actions">
+                        <button class="btn-small btn-outline" id="reExtractBtn" data-patient-id="${patient.id_pasien}">
+                            <i class="fas fa-redo"></i>
+                            Ekstrak Ulang Pesan
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        ` : '';
+
         content.innerHTML = `
             <div class="patient-detail-header">
                 <div class="patient-avatar large">
-                    <i class="fas fa-user"></i>
+                    ${hasImage ? 
+                        `<img src="${imagePath}" alt="${patient.nama_lengkap}" class="avatar-image" onerror="this.style.display='none'">` : 
+                        `<i class="fas fa-user"></i>`
+                    }
                 </div>
                 <div class="patient-basic-info">
                     <h3>${patient.nama_lengkap || 'N/A'}</h3>
@@ -545,12 +669,18 @@ class Dashboard {
                     </div>
                 </div>
 
+                ${patientImageSection}
+
                 <div class="detail-section">
                     <h4><i class="fas fa-file-medical"></i> Hasil Pemeriksaan</h4>
                     <div class="medical-notes">
                         ${patient.hasil_pemeriksaan || '<em>Tidak ada catatan pemeriksaan</em>'}
                     </div>
                 </div>
+
+                ${steganographyInfoSection}
+
+                ${medicalMessageSection}
 
                 <div class="detail-section">
                     <h4><i class="fas fa-money-bill-wave"></i> Informasi Pembayaran</h4>
@@ -560,6 +690,19 @@ class Dashboard {
                         </div>
                     </div>
                 </div>
+
+                ${patient.dokumen_pdf ? `
+                <div class="detail-section">
+                    <h4><i class="fas fa-file-pdf"></i> Dokumen</h4>
+                    <div class="document-actions">
+                        ${downloadPdfButton}
+                        <small class="document-info">
+                            <i class="fas fa-shield-alt"></i>
+                            PDF ini didekripsi menggunakan Caesar Cipher + AES
+                        </small>
+                    </div>
+                </div>
+                ` : ''}
             </div>
 
             <div class="detail-actions">
@@ -578,20 +721,188 @@ class Dashboard {
         modal.classList.add('active');
 
         // Add event listeners
+        this.attachDetailModalEventListeners(patient);
+
+        // ✅ Load image size information jika ada gambar
+        if (hasImage) {
+            this.loadImageSizeInfo(imagePath);
+        }
+    }
+
+    // ✅ NEW: Method untuk mendapatkan path gambar
+    getImagePath(filename) {
+        if (!filename) return null;
+
+        const possiblePaths = [
+            `../uploads/images/${filename}`,
+            `../../uploads/images/${filename}`,
+            `../../../uploads/images/${filename}`,
+            `/uploads/images/${filename}`
+        ];
+
+        for (const path of possiblePaths) {
+            // Dalam real implementation, kita bisa check jika file exists
+            // Untuk sekarang kita return path relatif
+            return path;
+        }
+        return null;
+    }
+
+    // ✅ NEW: Method untuk load info ukuran gambar
+    loadImageSizeInfo(imagePath) {
+        const img = new Image();
+        img.onload = () => {
+            const sizeInfo = document.getElementById('imageSizeInfo');
+            if (sizeInfo) {
+                sizeInfo.textContent = `${img.naturalWidth} × ${img.naturalHeight} pixels`;
+            }
+        };
+        img.onerror = () => {
+            const sizeInfo = document.getElementById('imageSizeInfo');
+            if (sizeInfo) {
+                sizeInfo.textContent = 'Gagal memuat gambar';
+            }
+        };
+        img.src = imagePath;
+    }
+
+    attachDetailModalEventListeners(patient) {
         const closeBtn = document.getElementById('closeDetailModal');
         const editBtn = document.getElementById('editPatientFromDetail');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const copyMessageBtn = document.getElementById('copyMessageBtn');
+        const reExtractBtn = document.getElementById('reExtractBtn');
+        const viewImageBtn = document.getElementById('viewImageBtn');
         
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                modal.classList.remove('active');
+                document.getElementById('detailModal').classList.remove('active');
             });
         }
 
         if (editBtn) {
             editBtn.addEventListener('click', () => {
-                modal.classList.remove('active');
+                document.getElementById('detailModal').classList.remove('active');
                 this.editPatient(patient.id_pasien);
             });
+        }
+
+        if (downloadPdfBtn) {
+            downloadPdfBtn.addEventListener('click', () => {
+                this.downloadDecryptedPdf(patient.id_pasien);
+            });
+        }
+
+        if (copyMessageBtn) {
+            copyMessageBtn.addEventListener('click', (e) => {
+                const message = e.target.dataset.message || e.target.closest('#copyMessageBtn').dataset.message;
+                this.copyToClipboard(message);
+            });
+        }
+
+        if (reExtractBtn) {
+            reExtractBtn.addEventListener('click', async (e) => {
+                const patientId = e.target.dataset.patientId || e.target.closest('#reExtractBtn').dataset.patientId;
+                await this.reExtractSteganography(patientId);
+            });
+        }
+
+        if (viewImageBtn) {
+            viewImageBtn.addEventListener('click', () => {
+                this.viewFullImage(patient.foto_pasien);
+            });
+        }
+    }
+
+    // ✅ NEW: Method untuk melihat gambar full size
+    viewFullImage(filename) {
+        const imagePath = this.getImagePath(filename);
+        if (imagePath) {
+            window.open(imagePath, '_blank');
+        }
+    }
+
+    // ✅ NEW: Method untuk mengekstrak ulang pesan steganografi
+    async reExtractSteganography(patientId) {
+        try {
+            this.showNotification('Mengekstrak ulang pesan dari gambar...', 'info');
+            
+            const response = await fetch(`../backend/dashboardview.php?action=extract_steganography&patient_id=${patientId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showNotification('Pesan berhasil diekstrak ulang!', 'success');
+                // Reload detail pasien untuk menampilkan pesan baru
+                this.showPatientDetail(patientId);
+            } else {
+                throw new Error(result.error || 'Gagal mengekstrak pesan');
+            }
+        } catch (error) {
+            console.error('Error re-extracting steganography:', error);
+            this.showNotification('Gagal mengekstrak pesan: ' + error.message, 'error');
+        }
+    }
+
+    // ✅ NEW: Method untuk copy pesan ke clipboard
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            this.showNotification('Pesan berhasil disalin ke clipboard', 'success');
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            this.showNotification('Gagal menyalin pesan', 'error');
+        });
+    }
+
+    // ✅ NEW: Method untuk escape HTML
+    escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    async downloadDecryptedPdf(patientId) {
+        try {
+            // Show loading
+            this.showNotification('Mempersiapkan download PDF...', 'info');
+            
+            const response = await fetch(`../backend/dashboardview.php?action=download_decrypted_pdf&patient_id=${patientId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Check if response is JSON (error) or PDF
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const result = await response.json();
+                throw new Error(result.error || 'Unknown error');
+            }
+
+            // Create blob and download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `decrypted_patient_${patientId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            this.showNotification('PDF berhasil diunduh dan didekripsi', 'success');
+            
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            this.showNotification('Gagal mengunduh PDF: ' + error.message, 'error');
         }
     }
 
@@ -626,6 +937,7 @@ class Dashboard {
         const statusPasienField = document.getElementById('statusPasien');
         const hasilPemeriksaanField = document.getElementById('hasilPemeriksaan');
         const jumlahPembayaranField = document.getElementById('jumlahPembayaran');
+        const medmsgField = document.getElementById('medmsg');
 
         if (patientIdField) patientIdField.value = patient.id_pasien || '';
         if (namaPasienField) namaPasienField.value = patient.nama_lengkap || '';
@@ -634,6 +946,7 @@ class Dashboard {
         if (statusPasienField) statusPasienField.value = patient.status_pasien || '';
         if (hasilPemeriksaanField) hasilPemeriksaanField.value = patient.hasil_pemeriksaan || '';
         if (jumlahPembayaranField) jumlahPembayaranField.value = patient.jumlah_pembayaran || '';
+        if (medmsgField) medmsgField.value = patient.medical_message || '';
 
         // Select the service type card
         if (patient.informasi_medis) {
@@ -1259,15 +1572,21 @@ class Dashboard {
         });
 
         // Quick actions
-        document.getElementById('quickAddPatient').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.openModal();
-        });
+        const quickAddPatient = document.getElementById('quickAddPatient');
+        if (quickAddPatient) {
+            quickAddPatient.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.openModal();
+            });
+        }
 
-        document.getElementById('quickViewPatients').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.switchView('patients');
-        });
+        const quickViewPatients = document.getElementById('quickViewPatients');
+        if (quickViewPatients) {
+            quickViewPatients.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchView('patients');
+            });
+        }
 
         document.getElementById('addNewPatient').addEventListener('click', (e) => {
             e.preventDefault();
@@ -1292,11 +1611,6 @@ class Dashboard {
                 this.loadPatientsList(1);
             }
         }, 500));
-
-        // Close detail modal
-        document.getElementById('closeDetailModal').addEventListener('click', () => {
-            document.getElementById('detailModal').classList.remove('active');
-        });
     }
 
     setupSearch() {
@@ -1486,6 +1800,529 @@ class Dashboard {
             const style = document.createElement('style');
             style.id = 'dashboard-styles';
             style.textContent = `
+                /* ✅ IMPROVED: Padding dan spacing untuk detail modal */
+                .modal-content.large {
+                    max-width: 800px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                }
+
+                .modal-body {
+                    padding: 0;
+                }
+
+                .detail-sections {
+                    padding: 24px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+
+                .detail-section {
+                    background: white;
+                    border: 1px solid #e9ecef;
+                    border-radius: 12px;
+                    padding: 24px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                    transition: box-shadow 0.2s ease;
+                }
+
+                .detail-section:hover {
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+                }
+
+                .detail-section h4 {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin: 0 0 20px 0;
+                    padding-bottom: 16px;
+                    border-bottom: 2px solid #f8f9fa;
+                    color: #2c3e50;
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                }
+
+                .detail-section h4 i {
+                    color: var(--primary);
+                    font-size: 1.1em;
+                    width: 24px;
+                    text-align: center;
+                }
+
+                .patient-detail-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 24px;
+                    padding: 32px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border-radius: 12px 12px 0 0;
+                }
+
+                .patient-avatar.large {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 2.5rem;
+                    border: 4px solid rgba(255,255,255,0.3);
+                    overflow: hidden;
+                    flex-shrink: 0;
+                }
+
+                .patient-avatar.large .avatar-image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: 50%;
+                }
+
+                .patient-basic-info {
+                    flex: 1;
+                }
+
+                .patient-basic-info h3 {
+                    margin: 0 0 8px 0;
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                }
+
+                .patient-basic-info > p {
+                    margin: 0 0 16px 0;
+                    opacity: 0.9;
+                    font-size: 1.1rem;
+                }
+
+                .patient-meta {
+                    display: flex;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                }
+
+                .detail-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+
+                .detail-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+
+                .detail-item.full-width {
+                    grid-column: 1 / -1;
+                }
+
+                .detail-item label {
+                    font-weight: 600;
+                    color: #6c757d;
+                    font-size: 0.9rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .detail-item span {
+                    color: #2c3e50;
+                    font-size: 1rem;
+                    line-height: 1.5;
+                }
+
+                .medical-notes {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 8px;
+                    border-left: 4px solid var(--primary);
+                    line-height: 1.6;
+                    color: #495057;
+                }
+
+                .payment-amount {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    color: var(--success);
+                    text-align: center;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                    border-radius: 12px;
+                    border: 2px dashed #dee2e6;
+                }
+
+                /* ✅ NEW: Styles untuk gambar pasien */
+                .patient-image-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .image-wrapper {
+                    position: relative;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    background: #f8f9fa;
+                    min-height: 200px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .patient-image {
+                    max-width: 100%;
+                    max-height: 400px;
+                    width: auto;
+                    height: auto;
+                    display: block;
+                    margin: 0 auto;
+                }
+
+                .image-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+
+                .image-wrapper:hover .image-overlay {
+                    opacity: 1;
+                }
+
+                .btn-view-image {
+                    background: rgba(255,255,255,0.9);
+                    color: #2c3e50;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-view-image:hover {
+                    background: white;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                }
+
+                .image-info {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 12px 16px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    border: 1px solid #e9ecef;
+                }
+
+                .file-info {
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9rem;
+                    color: #495057;
+                }
+
+                .image-meta {
+                    font-size: 0.85rem;
+                    color: #6c757d;
+                }
+
+                .no-image-message {
+                    text-align: center;
+                    padding: 40px 20px;
+                    background: #f8f9fa;
+                    border: 2px dashed #dee2e6;
+                    border-radius: 12px;
+                    color: #6c757d;
+                }
+
+                .no-image-message i {
+                    font-size: 3rem;
+                    margin-bottom: 16px;
+                    opacity: 0.5;
+                }
+
+                .no-image-message p {
+                    margin: 0;
+                    font-size: 1.1rem;
+                }
+
+                /* ✅ NEW: Styles untuk status steganografi */
+                .steganography-status-info {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 8px;
+                    border: 1px solid #e9ecef;
+                }
+
+                .status-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 16px;
+                    margin-bottom: 16px;
+                }
+
+                .status-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+
+                .status-item.full-width {
+                    grid-column: 1 / -1;
+                }
+
+                .status-label {
+                    font-weight: 600;
+                    color: #6c757d;
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .status-value {
+                    color: #2c3e50;
+                    font-size: 0.95rem;
+                    font-family: 'Courier New', monospace;
+                }
+
+                .extraction-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                }
+
+                /* ✅ IMPROVED: Styles untuk pesan steganografi */
+                .steganography-message {
+                    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+                    border: 1px solid #c3e6cb;
+                    border-radius: 12px;
+                    padding: 24px;
+                    margin-top: 8px;
+                }
+
+                .message-content {
+                    margin-bottom: 20px;
+                }
+
+                .message-content p {
+                    margin: 0 0 12px 0;
+                    font-weight: 700;
+                    color: #155724;
+                    font-size: 1.1rem;
+                }
+
+                .message-text {
+                    background: white;
+                    padding: 16px;
+                    border-radius: 8px;
+                    border: 1px solid #c3e6cb;
+                    font-family: 'Courier New', monospace;
+                    color: #155724;
+                    line-height: 1.6;
+                    word-break: break-word;
+                    font-size: 0.95rem;
+                    max-height: 200px;
+                    overflow-y: auto;
+                }
+
+                .message-meta {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    padding-top: 16px;
+                    border-top: 1px solid rgba(195, 230, 203, 0.5);
+                }
+
+                .message-source {
+                    color: #155724;
+                    font-size: 0.85rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    opacity: 0.8;
+                }
+
+                .btn-small {
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.85rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.2s ease;
+                    font-weight: 500;
+                }
+
+                .btn-small:hover {
+                    background: #218838;
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+                }
+
+                .btn-outline {
+                    background: transparent;
+                    color: #28a745;
+                    border: 1px solid #28a745;
+                }
+
+                .btn-outline:hover {
+                    background: #28a745;
+                    color: white;
+                }
+
+                .no-steganography-message {
+                    text-align: center;
+                    padding: 40px 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px dashed #dee2e6;
+                    color: #6c757d;
+                }
+
+                .no-steganography-message i {
+                    font-size: 2.5rem;
+                    margin-bottom: 16px;
+                    opacity: 0.5;
+                }
+
+                .no-steganography-message p {
+                    margin: 0 0 12px 0;
+                    font-size: 1.1rem;
+                }
+
+                .message-info {
+                    color: #6c757d;
+                    font-size: 0.9rem;
+                }
+
+                .detail-actions {
+                    display: flex;
+                    gap: 12px;
+                    justify-content: flex-end;
+                    padding: 24px;
+                    background: #f8f9fa;
+                    border-top: 1px solid #e9ecef;
+                    border-radius: 0 0 12px 12px;
+                }
+
+                /* Responsive design */
+                @media (max-width: 768px) {
+                    .patient-detail-header {
+                        flex-direction: column;
+                        text-align: center;
+                        gap: 16px;
+                        padding: 24px;
+                    }
+
+                    .patient-meta {
+                        justify-content: center;
+                    }
+
+                    .detail-grid {
+                        grid-template-columns: 1fr;
+                        gap: 16px;
+                    }
+
+                    .status-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .message-meta {
+                        flex-direction: column;
+                        align-items: stretch;
+                    }
+
+                    .detail-actions {
+                        flex-direction: column;
+                    }
+
+                    .modal-content.large {
+                        margin: 20px;
+                        width: calc(100% - 40px);
+                    }
+                }
+
+                /* Existing styles tetap dipertahankan... */
+                .service-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                }
+
+                .service-badge.rawat-inap {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                .service-badge.rawat-jalan {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                }
+
+                .service-badge.pemeriksaan {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                .status-badge {
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .status-badge.pending {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                .status-badge.in-progress {
+                    background: #cce7ff;
+                    color: #004085;
+                }
+
+                .status-badge.completed {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                .status-badge.success {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                .status-badge.warning {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                /* Notification, Pagination, dan existing styles lainnya */
                 @keyframes slideInRight {
                     from {
                         transform: translateX(100%);
@@ -1552,58 +2389,6 @@ class Dashboard {
                 }
                 .hidden {
                     display: none !important;
-                }
-                .patient-avatar.large {
-                    width: 80px;
-                    height: 80px;
-                    border-radius: 50%;
-                    background: var(--primary);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 2rem;
-                }
-                .detail-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 16px;
-                }
-                .detail-item.full-width {
-                    grid-column: 1 / -1;
-                }
-                .medical-notes {
-                    background: #f8f9fa;
-                    padding: 16px;
-                    border-radius: 8px;
-                    border-left: 4px solid var(--primary);
-                }
-                .payment-amount {
-                    font-size: 2rem;
-                    font-weight: 700;
-                    color: var(--success);
-                    text-align: center;
-                }
-                .service-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 4px 8px;
-                    border-radius: 20px;
-                    font-size: 0.75rem;
-                    font-weight: 500;
-                }
-                .service-badge.rawat-inap {
-                    background: #fff3cd;
-                    color: #856404;
-                }
-                .service-badge.rawat-jalan {
-                    background: #d1ecf1;
-                    color: #0c5460;
-                }
-                .service-badge.pemeriksaan {
-                    background: #d4edda;
-                    color: #155724;
                 }
                 .action-buttons {
                     display: flex;

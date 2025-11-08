@@ -69,12 +69,18 @@ class DashboardView
             case 'delete_patient':
                 $this->deletePatient();
                 break;
+            case 'download_decrypted_pdf':
+                $this->downloadDecryptedPdf();
+                break;
+            case 'extract_steganography': // NEW ACTION untuk ekstraksi steganografi
+                $this->extractSteganographyMessage();
+                break;
             default:
                 $this->sendError('Action tidak valid');
         }
     }
 
-    // ==================== DECRYPTION METHODS ====================
+    // ==================== IMPROVED DECRYPTION METHODS ====================
 
     /**
      * Decrypt XOR encrypted data
@@ -178,6 +184,473 @@ class DashboardView
         return $decrypted;
     }
 
+    /**
+     * Decrypt PDF file that was encrypted with Caesar + AES
+     */
+    private function decryptPdfFile($encryptedContent)
+    {
+        try {
+            // Step 1: AES decryption
+            $aesDecrypted = $this->aesDecryptBinary($encryptedContent);
+            if ($aesDecrypted === false) {
+                throw new Exception("AES decryption failed");
+            }
+
+            // Step 2: Caesar Cipher decryption (shift of 5)
+            $decrypted = $this->caesarCipherDecrypt($aesDecrypted, 5);
+
+            return $decrypted;
+        } catch (Exception $e) {
+            $this->logMessage("ERROR in decryptPdfFile: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * AES decryption for binary data
+     */
+    private function aesDecryptBinary($data)
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        $decrypted = openssl_decrypt(
+            $data,
+            'AES-256-CBC',
+            AES_KEY,
+            OPENSSL_RAW_DATA,
+            AES_IV
+        );
+
+        return $decrypted;
+    }
+
+    /**
+     * Caesar Cipher decryption for binary data
+     */
+    private function caesarCipherDecrypt($data, $shift)
+    {
+        $decrypted = '';
+        $length = strlen($data);
+        
+        for ($i = 0; $i < $length; $i++) {
+            $byte = ord($data[$i]);
+            // Apply Caesar shift (mod 256 for bytes)
+            $decryptedByte = ($byte - $shift + 256) % 256;
+            $decrypted .= chr($decryptedByte);
+        }
+        
+        return $decrypted;
+    }
+
+    /**
+     * ✅ FIXED: Extract hidden message from steganographed image menggunakan algoritma yang sama dengan test
+     */
+    private function extractMessageFromImage($imagePath)
+    {
+        try {
+            $this->logMessage("=== EXTRACTING MESSAGE FROM IMAGE (FIXED ALGORITHM) ===");
+            
+            if (!file_exists($imagePath)) {
+                throw new Exception("Image file not found: " . $imagePath);
+            }
+
+            $imageInfo = getimagesize($imagePath);
+            if ($imageInfo === false) {
+                throw new Exception("Cannot get image information");
+            }
+
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+            $imageType = $imageInfo[2];
+            
+            $this->logMessage("Image dimensions: {$width}x{$height}, Type: {$imageType}");
+
+            // Load image - support WebP dan format lainnya
+            $image = null;
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
+                    $image = imagecreatefromjpeg($imagePath);
+                    $this->logMessage("Loaded as JPEG");
+                    break;
+                case IMAGETYPE_PNG:
+                    $image = imagecreatefrompng($imagePath);
+                    $this->logMessage("Loaded as PNG");
+                    break;
+                case IMAGETYPE_GIF:
+                    $image = imagecreatefromgif($imagePath);
+                    $this->logMessage("Loaded as GIF");
+                    break;
+                case 18: // IMAGETYPE_WEBP
+                    if (function_exists('imagecreatefromwebp')) {
+                        $image = imagecreatefromwebp($imagePath);
+                        $this->logMessage("Loaded as WEBP");
+                    } else {
+                        throw new Exception("WebP not supported on this server");
+                    }
+                    break;
+                default:
+                    throw new Exception("Unsupported image type: " . $imageType);
+            }
+
+            if (!$image) {
+                throw new Exception("Cannot create image from source");
+            }
+
+            // ✅ FIXED: Extract header menggunakan algoritma yang sama dengan embedding
+            $headerBits = '';
+            $bitsExtracted = 0;
+            $headerSize = 32;
+
+            $this->logMessage("Extracting header...");
+            for ($y = 0; $y < $height; $y++) {
+                for ($x = 0; $x < $width; $x++) {
+                    if ($bitsExtracted >= $headerSize) break 2;
+                    
+                    $rgb = imagecolorat($image, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    // Extract dari LSB - URUTAN SAMA dengan enkripsi
+                    $headerBits .= $r & 1;
+                    $bitsExtracted++;
+                    if ($bitsExtracted >= $headerSize) break;
+                    
+                    $headerBits .= $g & 1;
+                    $bitsExtracted++;
+                    if ($bitsExtracted >= $headerSize) break;
+                    
+                    $headerBits .= $b & 1;
+                    $bitsExtracted++;
+                    if ($bitsExtracted >= $headerSize) break;
+                }
+            }
+
+            $this->logMessage("Header bits extracted: " . $bitsExtracted);
+
+            // Convert header bits to message length
+            $messageLength = 0;
+            for ($i = 0; $i < 32; $i += 8) {
+                $byte = bindec(substr($headerBits, $i, 8));
+                $messageLength = ($messageLength << 8) | $byte;
+            }
+
+            $this->logMessage("Message length from header: " . $messageLength);
+
+            if ($messageLength <= 0 || $messageLength > 100000) {
+                $this->logMessage("No valid message found (invalid length: $messageLength)");
+                imagedestroy($image);
+                return false;
+            }
+
+            // ✅ FIXED: Extract encrypted message dengan algoritma yang DIPERBAIKI
+            $encryptedBits = '';
+            $bitsNeeded = $messageLength * 8;
+            $bitsExtracted = 0;
+
+            $this->logMessage("Extracting message data ($bitsNeeded bits needed)...");
+            
+            // ✅ PERBAIKAN: Gunakan counter bit GLOBAL, bukan skip per pixel
+            $globalBitCounter = 0;
+            
+            for ($y = 0; $y < $height; $y++) {
+                for ($x = 0; $x < $width; $x++) {
+                    $rgb = imagecolorat($image, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    // Process each channel
+                    $channels = [$r, $g, $b];
+                    
+                    foreach ($channels as $channel) {
+                        // Skip bits yang sudah digunakan untuk header
+                        if ($globalBitCounter < 32) {
+                            $globalBitCounter++;
+                            continue;
+                        }
+
+                        // Extract message bits setelah header
+                        if ($bitsExtracted < $bitsNeeded) {
+                            $encryptedBits .= $channel & 1;
+                            $bitsExtracted++;
+                            $globalBitCounter++;
+                        } else {
+                            break 3; // Keluar dari semua loop
+                        }
+                    }
+                }
+            }
+
+            $this->logMessage("Message bits extracted: " . $bitsExtracted);
+            $this->logMessage("Total bits processed: " . $globalBitCounter);
+
+            if ($bitsExtracted < $bitsNeeded) {
+                $this->logMessage("ERROR: Not enough bits extracted. Needed: $bitsNeeded, Got: $bitsExtracted");
+                imagedestroy($image);
+                return false;
+            }
+
+            // Convert bits to bytes
+            $encryptedMessage = '';
+            for ($i = 0; $i < $bitsNeeded; $i += 8) {
+                $byteBits = substr($encryptedBits, $i, 8);
+                if (strlen($byteBits) < 8) {
+                    $this->logMessage("ERROR: Incomplete byte at position $i");
+                    break;
+                }
+                $byte = bindec($byteBits);
+                $encryptedMessage .= chr($byte);
+            }
+
+            $this->logMessage("Encrypted message length: " . strlen($encryptedMessage) . " bytes");
+
+            // ✅ FIXED: DECRYPTION dengan error handling yang lebih baik
+            $this->logMessage("Attempting AES decryption...");
+            
+            $decrypted = openssl_decrypt(
+                $encryptedMessage,
+                'AES-256-CBC',
+                AES_KEY,
+                OPENSSL_RAW_DATA,
+                AES_IV
+            );
+
+            if ($decrypted === false) {
+                $error = openssl_error_string();
+                $this->logMessage("AES decryption failed: " . $error);
+                
+                // Coba alternatif: handle padding manual
+                $decrypted = $this->decryptWithPaddingHandling($encryptedMessage);
+                if ($decrypted === false) {
+                    $this->logMessage("Alternative decryption also failed");
+                    imagedestroy($image);
+                    return false;
+                }
+            }
+
+            // Remove PKCS7 padding
+            $originalMessage = $this->pkcs7Unpad($decrypted);
+            
+            if ($originalMessage === false) {
+                $this->logMessage("Padding removal failed, using raw decrypted data");
+                $originalMessage = $decrypted;
+            }
+            
+            $this->logMessage("✓ Decryption successful");
+            
+            imagedestroy($image);
+            
+            return $originalMessage;
+
+        } catch (Exception $e) {
+            $this->logMessage("ERROR in extractMessageFromImage: " . $e->getMessage());
+            if (isset($image)) {
+                imagedestroy($image);
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Alternative decryption dengan padding handling
+     */
+    private function decryptWithPaddingHandling($encryptedMessage)
+    {
+        $this->logMessage("Trying alternative decryption with padding handling...");
+        
+        // Coba tanpa OPENSSL_RAW_DATA dulu
+        $decrypted = openssl_decrypt(
+            $encryptedMessage,
+            'AES-256-CBC',
+            AES_KEY,
+            0, // Bukan raw data
+            AES_IV
+        );
+
+        if ($decrypted === false) {
+            // Coba dengan zero padding
+            $decrypted = openssl_decrypt(
+                $encryptedMessage,
+                'AES-256-CBC',
+                AES_KEY,
+                OPENSSL_ZERO_PADDING,
+                AES_IV
+            );
+        }
+
+        return $decrypted;
+    }
+
+    /**
+     * PKCS7 Unpadding dengan error handling
+     */
+    private function pkcs7Unpad($data)
+    {
+        if (empty($data)) return '';
+        
+        $dataLength = strlen($data);
+        if ($dataLength == 0) return '';
+        
+        $padding = ord($data[$dataLength - 1]);
+        
+        // Validasi padding
+        if ($padding > 16 || $padding == 0 || $padding > $dataLength) {
+            return $data; // Return data as-is jika padding invalid
+        }
+        
+        // Check semua byte padding
+        for ($i = 0; $i < $padding; $i++) {
+            if (ord($data[$dataLength - $i - 1]) != $padding) {
+                return $data; // Return data as-is jika padding tidak konsisten
+            }
+        }
+        
+        return substr($data, 0, -$padding);
+    }
+
+    /**
+     * New endpoint untuk download decrypted PDF
+     */
+    private function downloadDecryptedPdf()
+    {
+        try {
+            $patientId = intval($_GET['patient_id'] ?? 0);
+
+            if ($patientId <= 0) {
+                throw new Exception("Patient ID tidak valid");
+            }
+
+            // Get patient data including PDF filename
+            $query = "SELECT dokumen_pdf FROM pasien WHERE id_pasien = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $patientId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 0) {
+                throw new Exception("Data pasien tidak ditemukan");
+            }
+
+            $patient = $result->fetch_assoc();
+            $encryptedPdfFilename = $patient['dokumen_pdf'];
+
+            if (empty($encryptedPdfFilename)) {
+                throw new Exception("Tidak ada dokumen PDF untuk pasien ini");
+            }
+
+            // Find the encrypted PDF file
+            $possiblePaths = [
+                __DIR__ . '/../../uploads/pdfs/' . $encryptedPdfFilename,
+                __DIR__ . '/../uploads/pdfs/' . $encryptedPdfFilename,
+                $_SERVER['DOCUMENT_ROOT'] . '/uploads/pdfs/' . $encryptedPdfFilename,
+            ];
+
+            $pdfPath = null;
+            foreach ($possiblePaths as $path) {
+                if (file_exists($path)) {
+                    $pdfPath = $path;
+                    break;
+                }
+            }
+
+            if ($pdfPath === null) {
+                throw new Exception("File PDF tidak ditemukan");
+            }
+
+            // Read encrypted file
+            $encryptedContent = file_get_contents($pdfPath);
+            if ($encryptedContent === false) {
+                throw new Exception("Tidak dapat membaca file PDF");
+            }
+
+            // Decrypt PDF
+            $decryptedContent = $this->decryptPdfFile($encryptedContent);
+            if ($decryptedContent === false) {
+                throw new Exception("Gagal mendekripsi PDF");
+            }
+
+            // Set headers for download
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="decrypted_patient_' . $patientId . '.pdf"');
+            header('Content-Length: ' . strlen($decryptedContent));
+
+            echo $decryptedContent;
+            exit;
+
+        } catch (Exception $e) {
+            $this->sendError("Error downloading PDF: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * ✅ NEW: Endpoint khusus untuk ekstraksi steganografi
+     */
+    private function extractSteganographyMessage()
+    {
+        try {
+            $patientId = intval($_GET['patient_id'] ?? $_POST['patient_id'] ?? 0);
+
+            if ($patientId <= 0) {
+                throw new Exception("Patient ID tidak valid");
+            }
+
+            $query = "SELECT foto_pasien FROM pasien WHERE id_pasien = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $patientId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 0) {
+                throw new Exception("Data pasien tidak ditemukan");
+            }
+
+            $patient = $result->fetch_assoc();
+            $imageFilename = $patient['foto_pasien'];
+
+            if (empty($imageFilename)) {
+                throw new Exception("Tidak ada gambar untuk pasien ini");
+            }
+
+            // Find the image file
+            $possiblePaths = [
+                __DIR__ . '/../../uploads/images/' . $imageFilename,
+                __DIR__ . '/../uploads/images/' . $imageFilename,
+                $_SERVER['DOCUMENT_ROOT'] . '/uploads/images/' . $imageFilename,
+            ];
+
+            $imagePath = null;
+            foreach ($possiblePaths as $path) {
+                if (file_exists($path)) {
+                    $imagePath = $path;
+                    break;
+                }
+            }
+
+            if ($imagePath === null) {
+                throw new Exception("File gambar tidak ditemukan");
+            }
+
+            // Extract message menggunakan algoritma yang sudah diperbaiki
+            $message = $this->extractMessageFromImage($imagePath);
+
+            if ($message === false) {
+                throw new Exception("Tidak dapat mengekstrak pesan dari gambar");
+            }
+
+            $this->sendSuccess([
+                'message' => $message,
+                'patient_id' => $patientId,
+                'image_file' => $imageFilename
+            ], "Pesan berhasil diekstrak dari gambar");
+
+        } catch (Exception $e) {
+            $this->sendError("Error extracting steganography: " . $e->getMessage());
+        }
+    }
+
     // ==================== DATA RETRIEVAL METHODS ====================
 
     private function getDashboardStats()
@@ -208,7 +681,7 @@ class DashboardView
             $paymentResult = $this->conn->query($paymentQuery);
             $payment = $paymentResult->fetch_assoc();
 
-            // New patients (last 7 days) - PERBAIKI: gunakan created_at
+            // New patients (last 7 days)
             $newQuery = "SELECT COUNT(*) as pasien_baru FROM pasien WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
             $newResult = $this->conn->query($newQuery);
             $new = $newResult->fetch_assoc();
@@ -232,7 +705,6 @@ class DashboardView
     private function getRecentPatients()
     {
         try {
-            // PERBAIKI: gunakan created_at yang benar
             $query = "SELECT * FROM pasien ORDER BY created_at DESC LIMIT 5";
             $result = $this->conn->query($query);
 
@@ -307,7 +779,6 @@ class DashboardView
             $totalCount = $countResult->fetch_assoc()['total'];
             $totalPages = ceil($totalCount / $limit);
 
-            // PERBAIKI: gunakan created_at yang benar
             $dataQuery = "SELECT * FROM pasien $whereClause ORDER BY created_at DESC, id_pasien DESC LIMIT ? OFFSET ?";
             $dataStmt = $this->conn->prepare($dataQuery);
             
@@ -355,7 +826,6 @@ class DashboardView
                 throw new Exception("Patient ID tidak valid");
             }
 
-            // PERBAIKI: gunakan id_pasien yang benar
             $query = "SELECT * FROM pasien WHERE id_pasien = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param("i", $patientId);
@@ -372,6 +842,32 @@ class DashboardView
             $patient['nama_lengkap'] = $this->xorDecrypt($patient['nama_lengkap'], XOR_KEY);
             $patient['alamat_lengkap'] = $this->xorDecrypt($patient['alamat_lengkap'], XOR_KEY);
             $patient['hasil_pemeriksaan'] = $this->altbashAesDecrypt($patient['hasil_pemeriksaan']);
+
+            // ✅ FIXED: Extract medical message from image menggunakan algoritma yang sudah diperbaiki
+            $medicalMessage = '';
+            if (!empty($patient['foto_pasien'])) {
+                $possiblePaths = [
+                    __DIR__ . '/../../uploads/images/' . $patient['foto_pasien'],
+                    __DIR__ . '/../uploads/images/' . $patient['foto_pasien'],
+                    $_SERVER['DOCUMENT_ROOT'] . '/uploads/images/' . $patient['foto_pasien'],
+                ];
+
+                $imagePath = null;
+                foreach ($possiblePaths as $path) {
+                    if (file_exists($path)) {
+                        $imagePath = $path;
+                        break;
+                    }
+                }
+
+                if ($imagePath !== null) {
+                    $medicalMessage = $this->extractMessageFromImage($imagePath);
+                    if ($medicalMessage === false) {
+                        $medicalMessage = ''; // Jika ekstraksi gagal, set kosong
+                    }
+                }
+            }
+            $patient['medical_message'] = $medicalMessage;
 
             $this->sendSuccess($patient, "Patient detail loaded");
 
@@ -403,7 +899,6 @@ class DashboardView
             $encrypted_alamat = $this->xorEncrypt($alamat, XOR_KEY);
             $encrypted_hasil = $this->altbashAesEncrypt($hasil_pemeriksaan);
 
-            // PERBAIKI: gunakan id_pasien yang benar
             $query = "UPDATE pasien SET 
                 nama_lengkap = ?, 
                 tanggal_lahir = ?, 
@@ -448,7 +943,6 @@ class DashboardView
                 throw new Exception("Patient ID tidak valid");
             }
 
-            // PERBAIKI: gunakan id_pasien yang benar
             $query = "DELETE FROM pasien WHERE id_pasien = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param("i", $patientId);
@@ -551,6 +1045,13 @@ class DashboardView
     }
 
     // ==================== UTILITY METHODS ====================
+
+    private function logMessage($message)
+    {
+        $timestamp = date('Y-m-d H:i:s');
+        $logMessage = "[$timestamp] $message\n";
+        error_log($logMessage, 3, __DIR__ . '/dashboard_errors.log');
+    }
 
     private function sanitizeInput($data)
     {

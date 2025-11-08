@@ -1,0 +1,63 @@
+=== STEGANOGRAPHY TEST STARTED ===
+2025-11-08 11:09:39
+
+[2025-11-08 11:09:39] Testing steganography on all patient images...
+[2025-11-08 11:09:39] Found 4 patients with images
+[2025-11-08 11:09:39] 
+--- Testing Patient: LhcNGhcIEwswUzcMHAQYOwQ= (ID: 1) ---
+[2025-11-08 11:09:39] Testing image: 690eeeda6f828_1762586330.webp
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-08 11:09:39] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-08 11:09:39] ✓ File size: 70498 bytes
+[2025-11-08 11:09:39] Starting steganography extraction...
+[2025-11-08 11:09:39] Image dimensions: 1275x1600, Type: 18
+[2025-11-08 11:09:39] ERROR: Unsupported image type
+[2025-11-08 11:09:39] ✗ No message found or extraction failed
+[2025-11-08 11:09:39] 
+--- Testing Patient: IAAXGgo= (ID: 2) ---
+[2025-11-08 11:09:39] Testing image: 690f00d9946c2_1762590937.webp
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f00d9946c2_1762590937.webp
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f00d9946c2_1762590937.webp
+[2025-11-08 11:09:39] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f00d9946c2_1762590937.webp
+[2025-11-08 11:09:39] ✓ File size: 70498 bytes
+[2025-11-08 11:09:39] Starting steganography extraction...
+[2025-11-08 11:09:39] Image dimensions: 1275x1600, Type: 18
+[2025-11-08 11:09:39] ERROR: Unsupported image type
+[2025-11-08 11:09:39] ✗ No message found or extraction failed
+[2025-11-08 11:09:39] 
+--- Testing Patient: LwQJCwIPFQ== (ID: 4) ---
+[2025-11-08 11:09:39] Testing image: 690f114e49877_1762595150.png
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f114e49877_1762595150.png
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
+[2025-11-08 11:09:39] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
+[2025-11-08 11:09:39] ✓ File size: 200952 bytes
+[2025-11-08 11:09:39] Starting steganography extraction...
+[2025-11-08 11:09:39] Image dimensions: 1024x1024, Type: 3
+[2025-11-08 11:09:39] Loaded as PNG
+[2025-11-08 11:09:39] Extracting header...
+[2025-11-08 11:09:39] Header bits extracted: 32
+[2025-11-08 11:09:39] Message length from header: 32
+[2025-11-08 11:09:39] Extracting message data (256 bits needed)...
+[2025-11-08 11:09:39] Message bits extracted: 256
+[2025-11-08 11:09:39] Encrypted message length: 32
+[2025-11-08 11:09:39] AES decryption failed: error:0607A082:digital envelope routines:EVP_CIPHER_CTX_set_key_length:invalid key length
+[2025-11-08 11:09:39] ✗ No message found or extraction failed
+[2025-11-08 11:09:39] 
+--- Testing Patient: JgoWDA8S (ID: 5) ---
+[2025-11-08 11:09:39] Testing image: 690f16d58477c_1762596565.png
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f16d58477c_1762596565.png
+[2025-11-08 11:09:39] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
+[2025-11-08 11:09:39] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
+[2025-11-08 11:09:39] ✓ File size: 1498381 bytes
+[2025-11-08 11:09:39] Starting steganography extraction...
+[2025-11-08 11:09:39] Image dimensions: 1184x864, Type: 3
+[2025-11-08 11:09:39] Loaded as PNG
+[2025-11-08 11:09:39] Extracting header...
+[2025-11-08 11:09:39] Header bits extracted: 32
+[2025-11-08 11:09:39] Message length from header: 32
+[2025-11-08 11:09:39] Extracting message data (256 bits needed)...
+[2025-11-08 11:09:39] Message bits extracted: 256
+[2025-11-08 11:09:39] Encrypted message length: 32
+[2025-11-08 11:09:39] AES decryption failed: error:0607A082:digital envelope routines:EVP_CIPHER_CTX_set_key_length:invalid key length
+[2025-11-08 11:09:39] ✗ No message found or extraction failed

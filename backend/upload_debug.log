@@ -3251,3 +3251,678 @@
 [2025-11-08 08:18:50] Data successfully inserted with ID: 1
 [2025-11-08 08:18:50] Sending success response
 [2025-11-08 08:18:50] === REQUEST COMPLETED ===
+[2025-11-08 09:35:37] === NEW REQUEST STARTED ===
+[2025-11-08 09:35:37] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-08 09:35:37] Database connected successfully
+[2025-11-08 09:35:37] Request method: POST
+[2025-11-08 09:35:37] === START PROCESSING FORM DATA ===
+[2025-11-08 09:35:37] POST data: Array
+(
+    [patientId] => 
+    [namaPasien] => Messi
+    [tanggalLahir] => 2001-11-08
+    [alamat] => wqedqwdwqd
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => dalam perawatan
+    [hasilPemeriksaan] => wqdwqdwdqwd
+    [medmsg] => anjay ambar
+    [jumlahPembayaran] => 654321
+)
+
+[2025-11-08 09:35:37] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpHltg4b
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => Aplikasi.pdf
+            [full_path] => Aplikasi.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php1ZCJfw
+            [error] => 0
+            [size] => 4040002
+        )
+
+)
+
+[2025-11-08 09:35:37] Detected MIME type: image/webp
+[2025-11-08 09:35:37] Image validation: VALID
+[2025-11-08 09:35:37] Detected MIME type: application/pdf
+[2025-11-08 09:35:37] PDF validation: VALID
+[2025-11-08 09:35:37] Form data sanitized successfully
+[2025-11-08 09:35:37] Medical message: anjay ambar
+[2025-11-08 09:35:37] Data encrypted successfully
+[2025-11-08 09:35:37] Starting file upload process...
+[2025-11-08 09:35:37] === START FILE UPLOAD: fotoPasien ===
+[2025-11-08 09:35:37] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpHltg4b
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-08 09:35:37] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-08 09:35:37] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 09:35:37] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 09:35:37] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 09:35:37] Directory is writable
+[2025-11-08 09:35:37] Detected MIME type: image/webp
+[2025-11-08 09:35:37] Image validation: VALID
+[2025-11-08 09:35:37] File validation passed
+[2025-11-08 09:35:37] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f00d9946c2_1762590937.webp
+[2025-11-08 09:35:37] Temp file exists: YES
+[2025-11-08 09:35:37] Temp file size: 70498
+[2025-11-08 09:35:37] Starting image steganography process...
+[2025-11-08 09:35:37] Medical message for steganography: anjay ambar
+[2025-11-08 09:35:37] === START IMAGE STEGANOGRAPHY ===
+[2025-11-08 09:35:37] Original message: anjay ambar
+[2025-11-08 09:35:37] Encrypting message for steganography: anjay ambar
+[2025-11-08 09:35:37] AES encryption successful, encrypted length: 32 bytes
+[2025-11-08 09:35:37] Message encrypted with AES
+[2025-11-08 09:35:37] Image dimensions: 1275x1600, Type: 18
+[2025-11-08 09:35:37] ERROR in applySteganographyToImage: Unsupported image type
+[2025-11-08 09:35:37] ERROR: Image steganography failed
+[2025-11-08 09:35:37] Fallback: Original image moved without steganography
+[2025-11-08 09:35:37] File verified - Size: 70498 bytes
+[2025-11-08 09:35:37] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-08 09:35:37] File info: Array
+(
+    [name] => Aplikasi.pdf
+    [full_path] => Aplikasi.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php1ZCJfw
+    [error] => 0
+    [size] => 4040002
+)
+
+[2025-11-08 09:35:37] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-08 09:35:37] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 09:35:37] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 09:35:37] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 09:35:37] Directory is writable
+[2025-11-08 09:35:37] Detected MIME type: application/pdf
+[2025-11-08 09:35:37] PDF validation: VALID
+[2025-11-08 09:35:37] File validation passed
+[2025-11-08 09:35:37] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f00d995aca_1762590937.pdf
+[2025-11-08 09:35:37] Temp file exists: YES
+[2025-11-08 09:35:37] Temp file size: 4040002
+[2025-11-08 09:35:37] Starting PDF encryption process...
+[2025-11-08 09:35:37] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/php1ZCJfw
+[2025-11-08 09:35:37] PDF file read successfully, size: 4040002 bytes
+[2025-11-08 09:35:37] Applying Caesar Cipher...
+[2025-11-08 09:35:37] Caesar Cipher applied successfully
+[2025-11-08 09:35:37] Applying AES encryption...
+[2025-11-08 09:35:37] AES encryption applied successfully
+[2025-11-08 09:35:37] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f00d995aca_1762590937.pdf
+[2025-11-08 09:35:37] Encrypted PDF saved successfully, size: 4040016 bytes
+[2025-11-08 09:35:37] PDF encrypted and saved successfully
+[2025-11-08 09:35:37] File verified - Size: 4040016 bytes
+[2025-11-08 09:35:37] File upload results - Foto: 690f00d9946c2_1762590937.webp, PDF: 690f00d995aca_1762590937.pdf
+[2025-11-08 09:35:37] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-08 09:35:37] Data successfully inserted with ID: 2
+[2025-11-08 09:35:37] Sending success response
+[2025-11-08 09:35:37] === REQUEST COMPLETED ===
+[2025-11-08 09:39:51] === NEW REQUEST STARTED ===
+[2025-11-08 09:39:51] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-08 09:39:51] Database connected successfully
+[2025-11-08 09:39:51] Request method: POST
+[2025-11-08 09:39:51] === START PROCESSING FORM DATA ===
+[2025-11-08 09:39:51] POST data: Array
+(
+    [patientId] => 
+    [namaPasien] => Pessi
+    [tanggalLahir] => 2025-11-04
+    [alamat] => Pessi
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => menunggu
+    [hasilPemeriksaan] => Pessi
+    [medmsg] => Pessi
+    [jumlahPembayaran] => 645321
+)
+
+[2025-11-08 09:39:51] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpHRiiQu
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpP6DIN1
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-08 09:39:51] Detected MIME type: image/webp
+[2025-11-08 09:39:51] Image validation: VALID
+[2025-11-08 09:39:51] Detected MIME type: application/pdf
+[2025-11-08 09:39:51] PDF validation: VALID
+[2025-11-08 09:39:51] Form data sanitized successfully
+[2025-11-08 09:39:51] Medical message: Pessi
+[2025-11-08 09:39:51] Data encrypted successfully
+[2025-11-08 09:39:51] Starting file upload process...
+[2025-11-08 09:39:51] === START FILE UPLOAD: fotoPasien ===
+[2025-11-08 09:39:51] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpHRiiQu
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-08 09:39:51] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-08 09:39:51] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 09:39:51] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 09:39:51] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 09:39:51] Directory is writable
+[2025-11-08 09:39:51] Detected MIME type: image/webp
+[2025-11-08 09:39:51] Image validation: VALID
+[2025-11-08 09:39:51] File validation passed
+[2025-11-08 09:39:51] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f01d7aae0f_1762591191.webp
+[2025-11-08 09:39:51] Temp file exists: YES
+[2025-11-08 09:39:51] Temp file size: 70498
+[2025-11-08 09:39:51] Starting image steganography process...
+[2025-11-08 09:39:51] Medical message for steganography: Pessi
+[2025-11-08 09:39:51] === START IMAGE STEGANOGRAPHY ===
+[2025-11-08 09:39:51] Original message: Pessi
+[2025-11-08 09:39:51] Encrypting message for steganography: Pessi
+[2025-11-08 09:39:51] AES encryption successful, encrypted length: 32 bytes
+[2025-11-08 09:39:51] Message encrypted with AES
+[2025-11-08 09:39:51] Image dimensions: 1275x1600, Type: 18
+[2025-11-08 09:39:51] ERROR in applySteganographyToImage: Unsupported image type
+[2025-11-08 09:39:51] ERROR: Image steganography failed
+[2025-11-08 09:39:51] Fallback: Original image moved without steganography
+[2025-11-08 09:39:51] File verified - Size: 70498 bytes
+[2025-11-08 09:39:51] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-08 09:39:51] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpP6DIN1
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-08 09:39:51] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-08 09:39:51] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 09:39:51] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 09:39:51] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 09:39:51] Directory is writable
+[2025-11-08 09:39:51] Detected MIME type: application/pdf
+[2025-11-08 09:39:51] PDF validation: VALID
+[2025-11-08 09:39:51] File validation passed
+[2025-11-08 09:39:51] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f01d7ac434_1762591191.pdf
+[2025-11-08 09:39:51] Temp file exists: YES
+[2025-11-08 09:39:51] Temp file size: 170820
+[2025-11-08 09:39:51] Starting PDF encryption process...
+[2025-11-08 09:39:51] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/phpP6DIN1
+[2025-11-08 09:39:51] PDF file read successfully, size: 170820 bytes
+[2025-11-08 09:39:51] Applying Caesar Cipher...
+[2025-11-08 09:39:51] Caesar Cipher applied successfully
+[2025-11-08 09:39:51] Applying AES encryption...
+[2025-11-08 09:39:51] AES encryption applied successfully
+[2025-11-08 09:39:51] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f01d7ac434_1762591191.pdf
+[2025-11-08 09:39:51] Encrypted PDF saved successfully, size: 170832 bytes
+[2025-11-08 09:39:51] PDF encrypted and saved successfully
+[2025-11-08 09:39:51] File verified - Size: 170832 bytes
+[2025-11-08 09:39:51] File upload results - Foto: 690f01d7aae0f_1762591191.webp, PDF: 690f01d7ac434_1762591191.pdf
+[2025-11-08 09:39:51] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-08 09:39:51] Data successfully inserted with ID: 3
+[2025-11-08 09:39:51] Sending success response
+[2025-11-08 09:39:51] === REQUEST COMPLETED ===
+[2025-11-08 10:45:50] === NEW REQUEST STARTED ===
+[2025-11-08 10:45:50] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-08 10:45:50] Database connected successfully
+[2025-11-08 10:45:50] Request method: POST
+[2025-11-08 10:45:50] === START PROCESSING FORM DATA ===
+[2025-11-08 10:45:50] POST data: Array
+(
+    [patientId] => 
+    [namaPasien] => Bambang
+    [tanggalLahir] => 1978-12-31
+    [alamat] => Janujaz
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => menunggu
+    [hasilPemeriksaan] => wqdqdqwd
+    [medmsg] => okeaja
+    [jumlahPembayaran] => 321321
+)
+
+[2025-11-08 10:45:50] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => Chainlink Fundamentals 7VBDFRNZB1GT 2025-9-15.png
+            [full_path] => Chainlink Fundamentals 7VBDFRNZB1GT 2025-9-15.png
+            [type] => image/png
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phphYVYGh
+            [error] => 0
+            [size] => 331879
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpwewgtv
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-08 10:45:50] Detected MIME type: image/png
+[2025-11-08 10:45:50] Image validation: VALID
+[2025-11-08 10:45:50] Detected MIME type: application/pdf
+[2025-11-08 10:45:50] PDF validation: VALID
+[2025-11-08 10:45:50] Form data sanitized successfully
+[2025-11-08 10:45:50] Medical message: okeaja
+[2025-11-08 10:45:50] Data encrypted successfully
+[2025-11-08 10:45:50] Starting file upload process...
+[2025-11-08 10:45:50] === START FILE UPLOAD: fotoPasien ===
+[2025-11-08 10:45:50] File info: Array
+(
+    [name] => Chainlink Fundamentals 7VBDFRNZB1GT 2025-9-15.png
+    [full_path] => Chainlink Fundamentals 7VBDFRNZB1GT 2025-9-15.png
+    [type] => image/png
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phphYVYGh
+    [error] => 0
+    [size] => 331879
+)
+
+[2025-11-08 10:45:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-08 10:45:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 10:45:50] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 10:45:50] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 10:45:50] Directory is writable
+[2025-11-08 10:45:50] Detected MIME type: image/png
+[2025-11-08 10:45:50] Image validation: VALID
+[2025-11-08 10:45:50] File validation passed
+[2025-11-08 10:45:50] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
+[2025-11-08 10:45:50] Temp file exists: YES
+[2025-11-08 10:45:50] Temp file size: 331879
+[2025-11-08 10:45:50] Starting image steganography process...
+[2025-11-08 10:45:50] Medical message for steganography: okeaja
+[2025-11-08 10:45:50] === START IMAGE STEGANOGRAPHY ===
+[2025-11-08 10:45:50] Original message: okeaja
+[2025-11-08 10:45:50] Encrypting message for steganography: okeaja
+[2025-11-08 10:45:50] AES encryption successful, encrypted length: 32 bytes
+[2025-11-08 10:45:50] Message encrypted with AES
+[2025-11-08 10:45:50] Image dimensions: 1024x1024, Type: 3
+[2025-11-08 10:45:50] Max capacity: 393216 bytes
+[2025-11-08 10:45:50] Encrypted message length: 32 bytes
+[2025-11-08 10:45:50] Total data to hide: 36 bytes
+[2025-11-08 10:45:50] Binary data length: 288 bits
+[2025-11-08 10:45:50] Data embedded successfully. Bits used: 288
+[2025-11-08 10:45:50] Steganographed image saved successfully: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
+[2025-11-08 10:45:50] Final file size: 200952 bytes
+[2025-11-08 10:45:50] Image steganography applied successfully
+[2025-11-08 10:45:50] File verified - Size: 200952 bytes
+[2025-11-08 10:45:50] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-08 10:45:50] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpwewgtv
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-08 10:45:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-08 10:45:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 10:45:50] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 10:45:50] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 10:45:50] Directory is writable
+[2025-11-08 10:45:50] Detected MIME type: application/pdf
+[2025-11-08 10:45:50] PDF validation: VALID
+[2025-11-08 10:45:50] File validation passed
+[2025-11-08 10:45:50] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f114eb61f3_1762595150.pdf
+[2025-11-08 10:45:50] Temp file exists: YES
+[2025-11-08 10:45:50] Temp file size: 170820
+[2025-11-08 10:45:50] Starting PDF encryption process...
+[2025-11-08 10:45:50] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/phpwewgtv
+[2025-11-08 10:45:50] PDF file read successfully, size: 170820 bytes
+[2025-11-08 10:45:50] Applying Caesar Cipher...
+[2025-11-08 10:45:50] Caesar Cipher applied successfully
+[2025-11-08 10:45:50] Applying AES encryption...
+[2025-11-08 10:45:50] AES encryption applied successfully
+[2025-11-08 10:45:50] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f114eb61f3_1762595150.pdf
+[2025-11-08 10:45:50] Encrypted PDF saved successfully, size: 170832 bytes
+[2025-11-08 10:45:50] PDF encrypted and saved successfully
+[2025-11-08 10:45:50] File verified - Size: 170832 bytes
+[2025-11-08 10:45:50] File upload results - Foto: 690f114e49877_1762595150.png, PDF: 690f114eb61f3_1762595150.pdf
+[2025-11-08 10:45:50] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-08 10:45:50] Data successfully inserted with ID: 4
+[2025-11-08 10:45:50] Sending success response
+[2025-11-08 10:45:50] === REQUEST COMPLETED ===
+[2025-11-08 11:09:25] === NEW REQUEST STARTED ===
+[2025-11-08 11:09:25] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-08 11:09:25] Database connected successfully
+[2025-11-08 11:09:25] Request method: POST
+[2025-11-08 11:09:25] === START PROCESSING FORM DATA ===
+[2025-11-08 11:09:25] POST data: Array
+(
+    [patientId] => 
+    [namaPasien] => Korels
+    [tanggalLahir] => 2025-11-19
+    [alamat] => Okes
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => dalam perawatan
+    [hasilPemeriksaan] => Korel
+    [medmsg] => Koreldraw
+    [jumlahPembayaran] => 523232
+)
+
+[2025-11-08 11:09:25] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+            [full_path] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+            [type] => image/png
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php4B4NfL
+            [error] => 0
+            [size] => 1508431
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php5owtmF
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-08 11:09:25] Detected MIME type: image/png
+[2025-11-08 11:09:25] Image validation: VALID
+[2025-11-08 11:09:25] Detected MIME type: application/pdf
+[2025-11-08 11:09:25] PDF validation: VALID
+[2025-11-08 11:09:25] Form data sanitized successfully
+[2025-11-08 11:09:25] Medical message: Koreldraw
+[2025-11-08 11:09:25] Data encrypted successfully
+[2025-11-08 11:09:25] Starting file upload process...
+[2025-11-08 11:09:25] === START FILE UPLOAD: fotoPasien ===
+[2025-11-08 11:09:25] File info: Array
+(
+    [name] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+    [full_path] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+    [type] => image/png
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php4B4NfL
+    [error] => 0
+    [size] => 1508431
+)
+
+[2025-11-08 11:09:25] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-08 11:09:25] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 11:09:25] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 11:09:25] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 11:09:25] Directory is writable
+[2025-11-08 11:09:25] Detected MIME type: image/png
+[2025-11-08 11:09:25] Image validation: VALID
+[2025-11-08 11:09:25] File validation passed
+[2025-11-08 11:09:25] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
+[2025-11-08 11:09:25] Temp file exists: YES
+[2025-11-08 11:09:25] Temp file size: 1508431
+[2025-11-08 11:09:25] Starting image steganography process...
+[2025-11-08 11:09:25] Medical message for steganography: Koreldraw
+[2025-11-08 11:09:25] === START IMAGE STEGANOGRAPHY ===
+[2025-11-08 11:09:25] Original message: Koreldraw
+[2025-11-08 11:09:25] Encrypting message for steganography: Koreldraw
+[2025-11-08 11:09:25] AES encryption successful, encrypted length: 32 bytes
+[2025-11-08 11:09:25] Message encrypted with AES
+[2025-11-08 11:09:25] Image dimensions: 1184x864, Type: 3
+[2025-11-08 11:09:25] Max capacity: 383616 bytes
+[2025-11-08 11:09:25] Encrypted message length: 32 bytes
+[2025-11-08 11:09:25] Total data to hide: 36 bytes
+[2025-11-08 11:09:25] Binary data length: 288 bits
+[2025-11-08 11:09:25] Data embedded successfully. Bits used: 288
+[2025-11-08 11:09:26] Steganographed image saved successfully: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
+[2025-11-08 11:09:26] Final file size: 1498381 bytes
+[2025-11-08 11:09:26] Image steganography applied successfully
+[2025-11-08 11:09:26] File verified - Size: 1498381 bytes
+[2025-11-08 11:09:26] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-08 11:09:26] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php5owtmF
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-08 11:09:26] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-08 11:09:26] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 11:09:26] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 11:09:26] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 11:09:26] Directory is writable
+[2025-11-08 11:09:26] Detected MIME type: application/pdf
+[2025-11-08 11:09:26] PDF validation: VALID
+[2025-11-08 11:09:26] File validation passed
+[2025-11-08 11:09:26] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f16d62f640_1762596566.pdf
+[2025-11-08 11:09:26] Temp file exists: YES
+[2025-11-08 11:09:26] Temp file size: 170820
+[2025-11-08 11:09:26] Starting PDF encryption process...
+[2025-11-08 11:09:26] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/php5owtmF
+[2025-11-08 11:09:26] PDF file read successfully, size: 170820 bytes
+[2025-11-08 11:09:26] Applying Caesar Cipher...
+[2025-11-08 11:09:26] Caesar Cipher applied successfully
+[2025-11-08 11:09:26] Applying AES encryption...
+[2025-11-08 11:09:26] AES encryption applied successfully
+[2025-11-08 11:09:26] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f16d62f640_1762596566.pdf
+[2025-11-08 11:09:26] Encrypted PDF saved successfully, size: 170832 bytes
+[2025-11-08 11:09:26] PDF encrypted and saved successfully
+[2025-11-08 11:09:26] File verified - Size: 170832 bytes
+[2025-11-08 11:09:26] File upload results - Foto: 690f16d58477c_1762596565.png, PDF: 690f16d62f640_1762596566.pdf
+[2025-11-08 11:09:26] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-08 11:09:26] Data successfully inserted with ID: 5
+[2025-11-08 11:09:26] Sending success response
+[2025-11-08 11:09:26] === REQUEST COMPLETED ===
+[2025-11-08 12:12:42] === NEW REQUEST STARTED ===
+[2025-11-08 12:12:42] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-08 12:12:42] Database connected successfully
+[2025-11-08 12:12:42] Request method: POST
+[2025-11-08 12:12:42] === START PROCESSING FORM DATA ===
+[2025-11-08 12:12:42] POST data: Array
+(
+    [patientId] => 
+    [namaPasien] => trisudi
+    [tanggalLahir] => 1987-11-02
+    [alamat] => fdvdfdvdfvd
+    [jenisLayanan] => rawat-inap
+    [statusPasien] => menunggu
+    [hasilPemeriksaan] => ugjhkl
+    [medmsg] => sukarno
+    [jumlahPembayaran] => 987907
+)
+
+[2025-11-08 12:12:42] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+            [full_path] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+            [type] => image/png
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpu5uiOg
+            [error] => 0
+            [size] => 1508431
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => ijazah daniel.pdf
+            [full_path] => ijazah daniel.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php1J5USS
+            [error] => 0
+            [size] => 559275
+        )
+
+)
+
+[2025-11-08 12:12:42] Detected MIME type: image/png
+[2025-11-08 12:12:42] Image validation: VALID
+[2025-11-08 12:12:42] Detected MIME type: application/pdf
+[2025-11-08 12:12:42] PDF validation: VALID
+[2025-11-08 12:12:42] Form data sanitized successfully
+[2025-11-08 12:12:42] Medical message: sukarno
+[2025-11-08 12:12:42] Data encrypted successfully
+[2025-11-08 12:12:42] Starting file upload process...
+[2025-11-08 12:12:42] === START FILE UPLOAD: fotoPasien ===
+[2025-11-08 12:12:42] File info: Array
+(
+    [name] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+    [full_path] => Gemini_Generated_Image_1mdrpo1mdrpo1mdr.png
+    [type] => image/png
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpu5uiOg
+    [error] => 0
+    [size] => 1508431
+)
+
+[2025-11-08 12:12:42] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-08 12:12:42] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 12:12:42] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 12:12:42] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 12:12:42] Directory is writable
+[2025-11-08 12:12:42] Detected MIME type: image/png
+[2025-11-08 12:12:42] Image validation: VALID
+[2025-11-08 12:12:42] File validation passed
+[2025-11-08 12:12:42] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f25aa7c13e_1762600362.png
+[2025-11-08 12:12:42] Temp file exists: YES
+[2025-11-08 12:12:42] Temp file size: 1508431
+[2025-11-08 12:12:42] Starting image steganography process...
+[2025-11-08 12:12:42] Medical message for steganography: sukarno
+[2025-11-08 12:12:42] === START IMAGE STEGANOGRAPHY ===
+[2025-11-08 12:12:42] Original message: sukarno
+[2025-11-08 12:12:42] Encrypting message for steganography: sukarno
+[2025-11-08 12:12:42] AES encryption successful, encrypted length: 32 bytes
+[2025-11-08 12:12:42] Message encrypted with AES
+[2025-11-08 12:12:42] Image dimensions: 1184x864, Type: 3
+[2025-11-08 12:12:42] Max capacity: 383616 bytes
+[2025-11-08 12:12:42] Encrypted message length: 32 bytes
+[2025-11-08 12:12:42] Total data to hide: 36 bytes
+[2025-11-08 12:12:42] Binary data length: 288 bits
+[2025-11-08 12:12:42] Data embedded successfully. Bits used: 288
+[2025-11-08 12:12:43] Steganographed image saved successfully: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f25aa7c13e_1762600362.png
+[2025-11-08 12:12:43] Final file size: 1498369 bytes
+[2025-11-08 12:12:43] Image steganography applied successfully
+[2025-11-08 12:12:43] File verified - Size: 1498369 bytes
+[2025-11-08 12:12:43] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-08 12:12:43] File info: Array
+(
+    [name] => ijazah daniel.pdf
+    [full_path] => ijazah daniel.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php1J5USS
+    [error] => 0
+    [size] => 559275
+)
+
+[2025-11-08 12:12:43] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-08 12:12:43] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 12:12:43] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 12:12:43] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 12:12:43] Directory is writable
+[2025-11-08 12:12:43] Detected MIME type: application/pdf
+[2025-11-08 12:12:43] PDF validation: VALID
+[2025-11-08 12:12:43] File validation passed
+[2025-11-08 12:12:43] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f25ab26865_1762600363.pdf
+[2025-11-08 12:12:43] Temp file exists: YES
+[2025-11-08 12:12:43] Temp file size: 559275
+[2025-11-08 12:12:43] Starting PDF encryption process...
+[2025-11-08 12:12:43] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/php1J5USS
+[2025-11-08 12:12:43] PDF file read successfully, size: 559275 bytes
+[2025-11-08 12:12:43] Applying Caesar Cipher...
+[2025-11-08 12:12:43] Caesar Cipher applied successfully
+[2025-11-08 12:12:43] Applying AES encryption...
+[2025-11-08 12:12:43] AES encryption applied successfully
+[2025-11-08 12:12:43] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690f25ab26865_1762600363.pdf
+[2025-11-08 12:12:43] Encrypted PDF saved successfully, size: 559280 bytes
+[2025-11-08 12:12:43] PDF encrypted and saved successfully
+[2025-11-08 12:12:43] File verified - Size: 559280 bytes
+[2025-11-08 12:12:43] File upload results - Foto: 690f25aa7c13e_1762600362.png, PDF: 690f25ab26865_1762600363.pdf
+[2025-11-08 12:12:43] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-08 12:12:43] Data successfully inserted with ID: 6
+[2025-11-08 12:12:43] Sending success response
+[2025-11-08 12:12:43] === REQUEST COMPLETED ===
