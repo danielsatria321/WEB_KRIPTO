@@ -3119,3 +3119,135 @@
 [2025-11-07 16:40:49] Data successfully inserted with ID: 70
 [2025-11-07 16:40:49] Sending success response
 [2025-11-07 16:40:49] === REQUEST COMPLETED ===
+[2025-11-08 08:18:50] === NEW REQUEST STARTED ===
+[2025-11-08 08:18:50] Script location: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend
+[2025-11-08 08:18:50] Database connected successfully
+[2025-11-08 08:18:50] Request method: POST
+[2025-11-08 08:18:50] === START PROCESSING FORM DATA ===
+[2025-11-08 08:18:50] POST data: Array
+(
+    [patientId] => 
+    [namaPasien] => Cristiano Ronaldo
+    [tanggalLahir] => 2025-11-06
+    [alamat] => Portugal
+    [jenisLayanan] => rawat-jalan
+    [statusPasien] => selesai
+    [hasilPemeriksaan] => Cedera
+    [medmsg] => buset dah bro
+    [jumlahPembayaran] => 645323
+)
+
+[2025-11-08 08:18:50] FILES data: Array
+(
+    [fotoPasien] => Array
+        (
+            [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+            [type] => image/webp
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpBjx9My
+            [error] => 0
+            [size] => 70498
+        )
+
+    [pdfDokumen] => Array
+        (
+            [name] => 124230017_Daniel Satria Darmawan.pdf
+            [full_path] => 124230017_Daniel Satria Darmawan.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpRM6Bmo
+            [error] => 0
+            [size] => 170820
+        )
+
+)
+
+[2025-11-08 08:18:50] Detected MIME type: image/webp
+[2025-11-08 08:18:50] Image validation: VALID
+[2025-11-08 08:18:50] Detected MIME type: application/pdf
+[2025-11-08 08:18:50] PDF validation: VALID
+[2025-11-08 08:18:50] Form data sanitized successfully
+[2025-11-08 08:18:50] Medical message: buset dah bro
+[2025-11-08 08:18:50] Data encrypted successfully
+[2025-11-08 08:18:50] Starting file upload process...
+[2025-11-08 08:18:50] === START FILE UPLOAD: fotoPasien ===
+[2025-11-08 08:18:50] File info: Array
+(
+    [name] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [full_path] => American-actor-Leonardo-DiCaprio-2016.jpg.webp
+    [type] => image/webp
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpBjx9My
+    [error] => 0
+    [size] => 70498
+)
+
+[2025-11-08 08:18:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/
+[2025-11-08 08:18:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 08:18:50] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 08:18:50] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/
+[2025-11-08 08:18:50] Directory is writable
+[2025-11-08 08:18:50] Detected MIME type: image/webp
+[2025-11-08 08:18:50] Image validation: VALID
+[2025-11-08 08:18:50] File validation passed
+[2025-11-08 08:18:50] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-08 08:18:50] Temp file exists: YES
+[2025-11-08 08:18:50] Temp file size: 70498
+[2025-11-08 08:18:50] Starting image steganography process...
+[2025-11-08 08:18:50] Medical message for steganography: buset dah bro
+[2025-11-08 08:18:50] === START IMAGE STEGANOGRAPHY ===
+[2025-11-08 08:18:50] Original message: buset dah bro
+[2025-11-08 08:18:50] Encrypting message for steganography: buset dah bro
+[2025-11-08 08:18:50] AES encryption successful, encrypted length: 32 bytes
+[2025-11-08 08:18:50] Message encrypted with AES
+[2025-11-08 08:18:50] Image dimensions: 1275x1600, Type: 18
+[2025-11-08 08:18:50] ERROR in applySteganographyToImage: Unsupported image type
+[2025-11-08 08:18:50] ERROR: Image steganography failed
+[2025-11-08 08:18:50] Fallback: Original image moved without steganography
+[2025-11-08 08:18:50] File verified - Size: 70498 bytes
+[2025-11-08 08:18:50] === START FILE UPLOAD: pdfDokumen ===
+[2025-11-08 08:18:50] File info: Array
+(
+    [name] => 124230017_Daniel Satria Darmawan.pdf
+    [full_path] => 124230017_Daniel Satria Darmawan.pdf
+    [type] => application/pdf
+    [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpRM6Bmo
+    [error] => 0
+    [size] => 170820
+)
+
+[2025-11-08 08:18:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/pdfs/
+[2025-11-08 08:18:50] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 08:18:50] Found existing directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 08:18:50] Final upload directory: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/
+[2025-11-08 08:18:50] Directory is writable
+[2025-11-08 08:18:50] Detected MIME type: application/pdf
+[2025-11-08 08:18:50] PDF validation: VALID
+[2025-11-08 08:18:50] File validation passed
+[2025-11-08 08:18:50] Target path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690eeeda70a89_1762586330.pdf
+[2025-11-08 08:18:50] Temp file exists: YES
+[2025-11-08 08:18:50] Temp file size: 170820
+[2025-11-08 08:18:50] Starting PDF encryption process...
+[2025-11-08 08:18:50] Reading PDF file from: /Applications/XAMPP/xamppfiles/temp/phpRM6Bmo
+[2025-11-08 08:18:50] PDF file read successfully, size: 170820 bytes
+[2025-11-08 08:18:50] Applying Caesar Cipher...
+[2025-11-08 08:18:50] Caesar Cipher applied successfully
+[2025-11-08 08:18:50] Applying AES encryption...
+[2025-11-08 08:18:50] AES encryption applied successfully
+[2025-11-08 08:18:50] Writing encrypted PDF to: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/pdfs/690eeeda70a89_1762586330.pdf
+[2025-11-08 08:18:50] Encrypted PDF saved successfully, size: 170832 bytes
+[2025-11-08 08:18:50] PDF encrypted and saved successfully
+[2025-11-08 08:18:50] File verified - Size: 170832 bytes
+[2025-11-08 08:18:50] File upload results - Foto: 690eeeda6f828_1762586330.webp, PDF: 690eeeda70a89_1762586330.pdf
+[2025-11-08 08:18:50] SQL: INSERT INTO pasien (
+                nama_lengkap, 
+                tanggal_lahir, 
+                alamat_lengkap, 
+                informasi_medis, 
+                status_pasien, 
+                hasil_pemeriksaan, 
+                foto_pasien, 
+                dokumen_pdf, 
+                jumlah_pembayaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-11-08 08:18:50] Data successfully inserted with ID: 1
+[2025-11-08 08:18:50] Sending success response
+[2025-11-08 08:18:50] === REQUEST COMPLETED ===

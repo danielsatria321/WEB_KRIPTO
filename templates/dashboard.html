@@ -26,9 +26,15 @@
             <nav class="sidebar-menu">
                 <ul>
                     <li class="menu-item active">
-                        <a href="#">
+                        <a href="#" id="dashboardMenu">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" id="patientsMenu">
+                            <i class="fas fa-user-injured"></i>
+                            <span>Data Pasien</span>
                         </a>
                     </li>
                     <li class="menu-item">
@@ -59,13 +65,13 @@
             <!-- Header -->
             <header class="content-header">
                 <div class="header-left">
-                    <h1>Dashboard MediCare</h1>
-                    <p>Manajemen Data Pasien Terintegrasi</p>
+                    <h1 id="pageTitle">Dashboard MediCare</h1>
+                    <p id="pageSubtitle">Manajemen Data Pasien Terintegrasi</p>
                 </div>
                 <div class="header-right">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Cari pasien...">
+                        <input type="text" id="globalSearch" placeholder="Cari pasien...">
                     </div>
                     <div class="notification">
                         <i class="fas fa-bell"></i>
@@ -77,90 +83,105 @@
                 </div>
             </header>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-user-injured"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Pasien</h3>
-                        <span class="stat-number">156</span>
-                        <span class="stat-change positive">+12%</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-procedures"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Rawat Inap</h3>
-                        <span class="stat-number">24</span>
-                        <span class="stat-change positive">+5%</span>
+            <!-- Dashboard Content -->
+            <div id="dashboardContent">
+                <!-- Stats Grid -->
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Data akan diisi secara dinamis oleh JavaScript -->
+                    <div class="stat-card loading">
+                        <div class="stat-icon">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Memuat data...</h3>
+                            <span class="stat-number">-</span>
+                            <span class="stat-change">-</span>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-walking"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Rawat Jalan</h3>
-                        <span class="stat-number">89</span>
-                        <span class="stat-change positive">+8%</span>
-                    </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                  
+                    </button>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-stethoscope"></i>
+
+                <!-- Recent Patients -->
+                <div class="recent-patients-section">
+                    <div class="section-header">
+                      
+                        <button class="view-all-btn" id="viewAllPatients">Lihat Semua</button>
                     </div>
-                    <div class="stat-info">
-                        <h3>Pemeriksaan</h3>
-                        <span class="stat-number">43</span>
-                        <span class="stat-change negative">-3%</span>
+                    <div class="patients-list" id="recentPatientsList">
+                        <!-- Data akan diisi secara dinamis oleh JavaScript -->
+                        <div class="patient-item loading">
+                            <div class="patient-avatar">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <div class="patient-info">
+                                <h4>Memuat data pasien...</h4>
+                                <p>-</p>
+                                <span class="patient-date">-</span>
+                            </div>
+                            <span class="status-badge pending">-</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Patients -->
-            <div class="recent-patients-section">
-                <div class="section-header">
-                    <h2>Pasien Terbaru</h2>
-                    <button class="view-all-btn">Lihat Semua</button>
+            <!-- Patients List Content (Hidden by Default) -->
+            <div id="patientsContent" class="hidden">
+                <div class="patients-header">
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addNewPatient">
+                            <i class="fas fa-plus"></i>
+                            Tambah Pasien Baru
+                        </button>
+                        <div class="filters">
+                            <select id="statusFilter" class="filter-select">
+                                <option value="">Semua Status</option>
+                                <option value="menunggu">Menunggu</option>
+                                <option value="dalam perawatan">Dalam Perawatan</option>
+                                <option value="selesai">Selesai</option>
+                            </select>
+                            <select id="serviceFilter" class="filter-select">
+                                <option value="">Semua Layanan</option>
+                                <option value="rawat-inap">Rawat Inap</option>
+                                <option value="rawat-jalan">Rawat Jalan</option>
+                                <option value="pemeriksaan">Pemeriksaan</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="patients-list">
-                    <div class="patient-item">
-                        <div class="patient-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="patient-info">
-                            <h4>Budi Santoso</h4>
-                            <p>Rawat Jalan • 45 Tahun</p>
-                            <span class="patient-date">12 Mar 2024</span>
-                        </div>
-                        <span class="status-badge completed">Selesai</span>
-                    </div>
-                    <div class="patient-item">
-                        <div class="patient-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="patient-info">
-                            <h4>Siti Rahayu</h4>
-                            <p>Rawat Inap • 32 Tahun</p>
-                            <span class="patient-date">11 Mar 2024</span>
-                        </div>
-                        <span class="status-badge in-progress">Perawatan</span>
-                    </div>
-                    <div class="patient-item">
-                        <div class="patient-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="patient-info">
-                            <h4>Ahmad Fauzi</h4>
-                            <p>Pemeriksaan • 28 Tahun</p>
-                            <span class="patient-date">10 Mar 2024</span>
-                        </div>
-                        <span class="status-badge pending">Menunggu</span>
-                    </div>
+
+                <div class="patients-table-container">
+                    <table class="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Pasien</th>
+                                <th>Tanggal Lahir</th>
+                                <th>Jenis Layanan</th>
+                                <th>Status</th>
+                                <th>Tanggal Daftar</th>
+                                <th>Pembayaran</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                            <!-- Data akan diisi secara dinamis oleh JavaScript -->
+                            <tr>
+                                <td colspan="7" class="loading-table">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Memuat data pasien...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                    <!-- Pagination akan diisi secara dinamis oleh JavaScript -->
                 </div>
             </div>
         </div>
@@ -176,22 +197,24 @@
                 </div>
                 
                 <form class="patient-form" id="patientForm" enctype="multipart/form-data">
+                    <input type="hidden" id="patientId" name="patientId">
+                    
                     <!-- Personal Information -->
                     <div class="form-section">
                         <h3><i class="fas fa-user"></i> Informasi Pribadi</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="namaPasien">Nama Lengkap Pasien</label>
+                                <label for="namaPasien">Nama Lengkap Pasien <span class="required">*</span></label>
                                 <input type="text" id="namaPasien" name="namaPasien" required>
                             </div>
                             <div class="form-group">
-                                <label for="tanggalLahir">Tanggal Lahir</label>
+                                <label for="tanggalLahir">Tanggal Lahir <span class="required">*</span></label>
                                 <input type="date" id="tanggalLahir" name="tanggalLahir" required>
                             </div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="alamat">Alamat Lengkap</label>
+                            <label for="alamat">Alamat Lengkap <span class="required">*</span></label>
                             <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap pasien..." required></textarea>
                         </div>
                     </div>
@@ -202,7 +225,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label style="display: block; margin-bottom: 15px; font-size: 1rem; font-weight: 600; color: var(--dark);">
-                                    Jenis Layanan <span style="color: var(--danger);">*</span>
+                                    Jenis Layanan <span class="required">*</span>
                                 </label>
                                 
                                 <div class="card-group-vertical" id="jenisLayananGroup">
@@ -239,18 +262,18 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="statusPasien">Status Pasien</label>
+                                <label for="statusPasien">Status Pasien <span class="required">*</span></label>
                                 <select id="statusPasien" name="statusPasien" required>
                                     <option value="">Pilih Status</option>
                                     <option value="menunggu">Menunggu</option>
-                                    <option value="perawatan">Dalam Perawatan</option>
+                                    <option value="dalam perawatan">Dalam Perawatan</option>
                                     <option value="selesai">Selesai</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="hasilPemeriksaan">Hasil Pemeriksaan & Diagnosis</label>
+                            <label for="hasilPemeriksaan">Hasil Pemeriksaan & Diagnosis <span class="required">*</span></label>
                             <textarea id="hasilPemeriksaan" name="hasilPemeriksaan" rows="5" placeholder="Tuliskan hasil pemeriksaan, diagnosis, dan rencana perawatan..." required></textarea>
                         </div>
                     </div>
@@ -284,30 +307,31 @@
                             </div>
                         </div>
 
-                        <!-- TAMBAHAN: Kolom Pesan Medis -->
-                         <div class="form-row">
-                        <div class="form-group">
-                            <label for="medmsg">
-                                <i class="fas fa-comment-medical"></i>
-                                Pesan Medis
-                            </label>
-                            <textarea 
-                                id="medmsg" 
-                                name="medmsg" 
-                                rows="4" 
-                                placeholder="Tulis pesan medis tambahan, catatan khusus, atau instruksi perawatan untuk pasien..."
-                            ></textarea>
-                            <small class="form-text">
-                                Pesan ini akan disimpan sebagai catatan medis tambahan untuk pasien
-                            </small>
-                        </div></div>
+                        <!-- Kolom Pesan Medis -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="medmsg">
+                                    <i class="fas fa-comment-medical"></i>
+                                    Pesan Medis
+                                </label>
+                                <textarea 
+                                    id="medmsg" 
+                                    name="medmsg" 
+                                    rows="4" 
+                                    placeholder="Tulis pesan medis tambahan, catatan khusus, atau instruksi perawatan untuk pasien..."
+                                ></textarea>
+                                <small class="form-text">
+                                    Pesan ini akan disimpan sebagai catatan medis tambahan untuk pasien
+                                </small>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Payment Information -->
                     <div class="form-section">
                         <h3><i class="fas fa-money-bill-wave"></i> Informasi Pembayaran</h3>
                         <div class="form-group">
-                            <label for="jumlahPembayaran">Jumlah Pembayaran (Rp)</label>
+                            <label for="jumlahPembayaran">Jumlah Pembayaran (Rp) <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-rupiah-sign"></i>
                                 <input type="number" id="jumlahPembayaran" name="jumlahPembayaran" min="0" placeholder="0" required>
@@ -321,12 +345,49 @@
                             <i class="fas fa-times"></i>
                             Batal
                         </button>
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" class="btn-primary" id="submitFormBtn">
                             <i class="fas fa-save"></i>
                             Simpan Data Pemeriksaan
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Detail Patient Modal -->
+        <div class="modal-overlay" id="detailModal">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h2><i class="fas fa-user-injured"></i> Detail Pasien</h2>
+                    <button class="close-btn" id="closeDetailModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="patientDetailContent">
+                        <!-- Detail pasien akan diisi secara dinamis oleh JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal-content small">
+                <div class="modal-header">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h2>
+                    <button class="close-btn" id="cancelDelete">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus data pasien <strong id="deletePatientName"></strong>?</p>
+                    <p>Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancelDeleteBtn">Batal</button>
+                    <button class="btn-danger" id="confirmDelete">Hapus</button>
+                </div>
             </div>
         </div>
     </div>

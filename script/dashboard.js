@@ -1,5 +1,11 @@
 class Dashboard {
     constructor() {
+        this.currentPage = 1;
+        this.currentView = 'dashboard';
+        this.searchTerm = '';
+        this.statusFilter = '';
+        this.serviceFilter = '';
+        this.isLoading = false;
         this.init();
     }
 
@@ -13,6 +19,9 @@ class Dashboard {
         this.initializeEventListeners();
         this.addGlobalStyles();
         
+        // Load initial data
+        this.loadDashboardStats();
+        
         // Auto-select first card
         setTimeout(() => {
             const firstCard = document.querySelector('.selectable-card');
@@ -20,6 +29,750 @@ class Dashboard {
                 this.selectCard(firstCard);
             }
         }, 100);
+    }
+
+    // ==================== VIEW MANAGEMENT ====================
+
+    switchView(view) {
+        if (this.isLoading) return;
+        
+        this.currentView = view;
+        
+        const dashboardContent = document.getElementById('dashboardContent');
+        const patientsContent = document.getElementById('patientsContent');
+        const pageTitle = document.getElementById('pageTitle');
+        const pageSubtitle = document.getElementById('pageSubtitle');
+
+        // Update menu active state
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        if (view === 'dashboard') {
+            dashboardContent.classList.remove('hidden');
+            patientsContent.classList.add('hidden');
+            document.getElementById('dashboardMenu').parentElement.classList.add('active');
+            pageTitle.textContent = 'Dashboard MediCare';
+            pageSubtitle.textContent = 'Manajemen Data Pasien Terintegrasi';
+            this.loadDashboardStats();
+        } else if (view === 'patients') {
+            dashboardContent.classList.add('hidden');
+            patientsContent.classList.remove('hidden');
+            document.getElementById('patientsMenu').parentElement.classList.add('active');
+            pageTitle.textContent = 'Daftar Pasien';
+            pageSubtitle.textContent = 'Kelola data pasien secara lengkap';
+            this.loadPatientsList(1); // Selalu mulai dari page 1
+        }
+    }
+
+    // ==================== DATA LOADING METHODS ====================
+
+    async loadDashboardStats() {
+        try {
+            this.showLoadingState('statsGrid', 'stat-card', 'Memuat statistik...');
+            
+            const response = await fetch('../backend/dashboardview.php?action=get_stats');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+
+            if (result.success) {
+                this.displayStats(result.data);
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            this.showNotification('Gagal memuat data statistik', 'error');
+            this.showErrorState('statsGrid', 'Gagal memuat statistik');
+        }
+    }
+
+    displayStats(stats) {
+        const statsGrid = document.getElementById('statsGrid');
+        
+        if (!statsGrid) {
+            console.error('Stats grid element not found');
+            return;
+        }
+
+        const statsData = [
+            {
+                icon: 'fas fa-user-injured',
+                title: 'Total Pasien',
+                value: stats.total_pasien || 0,
+                change: '+12%',
+                changeType: 'positive'
+            },
+            {
+                icon: 'fas fa-procedures',
+                title: 'Rawat Inap',
+                value: stats.rawat_inap || 0,
+                change: '+5%',
+                changeType: 'positive'
+            },
+            {
+                icon: 'fas fa-walking',
+                title: 'Rawat Jalan',
+                value: stats.rawat_jalan || 0,
+                change: '+8%',
+                changeType: 'positive'
+            },
+            {
+                icon: 'fas fa-stethoscope',
+                title: 'Pemeriksaan',
+                value: stats.pemeriksaan || 0,
+                change: '-3%',
+                changeType: 'negative'
+            },
+            {
+                icon: 'fas fa-money-bill-wave',
+                title: 'Total Pembayaran',
+                value: `Rp ${(stats.total_pembayaran || 0).toLocaleString()}`,
+                change: '+15%',
+                changeType: 'positive'
+            },
+            {
+                icon: 'fas fa-user-plus',
+                title: 'Pasien Baru',
+                value: stats.pasien_baru || 0,
+                change: '+10%',
+                changeType: 'positive'
+            }
+        ];
+
+        statsGrid.innerHTML = statsData.map(stat => `
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="${stat.icon}"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>${stat.title}</h3>
+                    <span class="stat-number">${stat.value}</span>
+                    <span class="stat-change ${stat.changeType}">${stat.change}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async loadPatientsList(page = 1) {
+        if (this.isLoading) return;
+        
+        try {
+            this.isLoading = true;
+            this.currentPage = page;
+            
+            this.showLoadingState('patientsTableBody', 'table-row', 'Memuat data pasien...');
+            
+            const params = new URLSearchParams({
+                action: 'get_patients',
+                page: page,
+                limit: 10,
+                search: this.searchTerm,
+                status: this.statusFilter,
+                service: this.serviceFilter
+            });
+
+            const response = await fetch(`../backend/dashboardview.php?${params}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+
+            if (result.success) {
+                this.displayPatientsList(result.data);
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error loading patients list:', error);
+            this.showNotification('Gagal memuat daftar pasien', 'error');
+            this.showErrorState('patientsTableBody', 'Gagal memuat data pasien');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    displayPatientsList(data) {
+        const tableBody = document.getElementById('patientsTableBody');
+        const pagination = document.getElementById('pagination');
+
+        if (!tableBody) {
+            console.error('Table body element not found');
+            return;
+        }
+
+        // Display patients table
+        if (!data.patients || data.patients.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-table">
+                        <i class="fas fa-search"></i>
+                        <p>Tidak ada data pasien yang ditemukan</p>
+                        ${this.searchTerm || this.statusFilter || this.serviceFilter ? 
+                            '<button class="btn-clear-filters" onclick="window.medicareDashboard.clearFilters()">Hapus Filter</button>' : 
+                            ''
+                        }
+                    </td>
+                </tr>
+            `;
+        } else {
+            tableBody.innerHTML = data.patients.map(patient => {
+                const statusClass = this.getStatusClass(patient.status_pasien);
+                const date = new Date(patient.created_at).toLocaleDateString('id-ID');
+                const birthDate = new Date(patient.tanggal_lahir).toLocaleDateString('id-ID');
+                
+                return `
+                    <tr data-patient-id="${patient.id_pasien}">
+                        <td>
+                            <div class="patient-name">
+                                <strong>${patient.nama_lengkap || 'N/A'}</strong>
+                            </div>
+                        </td>
+                        <td>${birthDate}</td>
+                        <td>
+                            <span class="service-badge ${patient.informasi_medis}">
+                                <i class="${this.getServiceIcon(patient.informasi_medis)}"></i>
+                                ${this.formatServiceType(patient.informasi_medis)}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${this.formatStatus(patient.status_pasien)}</span>
+                        </td>
+                        <td>${date}</td>
+                        <td>Rp ${parseInt(patient.jumlah_pembayaran || 0).toLocaleString()}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon view-btn" title="Lihat Detail" data-patient-id="${patient.id_pasien}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon edit-btn" title="Edit" data-patient-id="${patient.id_pasien}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete-btn" title="Hapus" data-patient-id="${patient.id_pasien}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Add event listeners to action buttons
+            this.attachTableEventListeners();
+        }
+
+        // Display pagination
+        if (data.total_pages > 1) {
+            this.displayPagination(data.total_pages, data.current_page);
+        } else {
+            if (pagination) {
+                pagination.innerHTML = '';
+            }
+        }
+    }
+
+    displayPagination(totalPages, currentPage) {
+        const pagination = document.getElementById('pagination');
+        
+        if (!pagination) {
+            console.error('Pagination element not found');
+            return;
+        }
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = '';
+        
+        // Previous button
+        if (currentPage > 1) {
+            paginationHTML += `
+                <button class="page-btn prev-btn" data-page="${currentPage - 1}">
+                    <i class="fas fa-chevron-left"></i>
+                    Sebelumnya
+                </button>`;
+        }
+
+        // Page numbers
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        // Adjust if we're at the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // First page and ellipsis
+        if (startPage > 1) {
+            paginationHTML += `<button class="page-btn" data-page="1">1</button>`;
+            if (startPage > 2) {
+                paginationHTML += `<span class="page-dots">...</span>`;
+            }
+        }
+
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === currentPage) {
+                paginationHTML += `<button class="page-btn active" data-page="${i}">${i}</button>`;
+            } else {
+                paginationHTML += `<button class="page-btn" data-page="${i}">${i}</button>`;
+            }
+        }
+
+        // Last page and ellipsis
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHTML += `<span class="page-dots">...</span>`;
+            }
+            paginationHTML += `<button class="page-btn" data-page="${totalPages}">${totalPages}</button>`;
+        }
+
+        // Next button
+        if (currentPage < totalPages) {
+            paginationHTML += `
+                <button class="page-btn next-btn" data-page="${currentPage + 1}">
+                    Selanjutnya
+                    <i class="fas fa-chevron-right"></i>
+                </button>`;
+        }
+
+        pagination.innerHTML = paginationHTML;
+
+        // Add event listeners to pagination buttons
+        pagination.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = parseInt(btn.dataset.page);
+                if (page !== this.currentPage) {
+                    this.loadPatientsList(page);
+                    // Scroll to top of table
+                    const tableContainer = document.querySelector('.patients-table-container');
+                    if (tableContainer) {
+                        tableContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    }
+
+    // ==================== LOADING & ERROR STATES ====================
+
+    showLoadingState(containerId, itemClass, message = 'Memuat...') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (containerId === 'patientsTableBody') {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>${message}</p>
+                    </td>
+                </tr>
+            `;
+        } else if (containerId === 'statsGrid') {
+            container.innerHTML = `
+                <div class="stat-card loading">
+                    <div class="stat-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${message}</h3>
+                        <span class="stat-number">-</span>
+                        <span class="stat-change">-</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    showErrorState(containerId, message = 'Terjadi kesalahan') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (containerId === 'patientsTableBody') {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="7" class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${message}</p>
+                        <button class="btn-retry" onclick="window.medicareDashboard.loadPatientsList(${this.currentPage})">
+                            <i class="fas fa-redo"></i>
+                            Coba Lagi
+                        </button>
+                    </td>
+                </tr>
+            `;
+        } else if (containerId === 'statsGrid') {
+            container.innerHTML = `
+                <div class="stat-card error">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Error</h3>
+                        <span class="stat-number">-</span>
+                        <button class="btn-retry" onclick="window.medicareDashboard.loadDashboardStats()">
+                            Coba Lagi
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    clearFilters() {
+        this.searchTerm = '';
+        this.statusFilter = '';
+        this.serviceFilter = '';
+        
+        // Reset filter inputs
+        const globalSearch = document.getElementById('globalSearch');
+        const statusFilter = document.getElementById('statusFilter');
+        const serviceFilter = document.getElementById('serviceFilter');
+        
+        if (globalSearch) globalSearch.value = '';
+        if (statusFilter) statusFilter.value = '';
+        if (serviceFilter) serviceFilter.value = '';
+        
+        // Reload data
+        this.loadPatientsList(1);
+    }
+
+    // ==================== PATIENT CRUD OPERATIONS ====================
+
+    async showPatientDetail(patientId) {
+        try {
+            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+
+            if (result.success) {
+                this.displayPatientDetail(result.data);
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error loading patient detail:', error);
+            this.showNotification('Gagal memuat detail pasien', 'error');
+        }
+    }
+
+    displayPatientDetail(patient) {
+        const modal = document.getElementById('detailModal');
+        const content = document.getElementById('patientDetailContent');
+        
+        if (!modal || !content) {
+            console.error('Detail modal elements not found');
+            return;
+        }
+
+        const statusClass = this.getStatusClass(patient.status_pasien);
+        const serviceIcon = this.getServiceIcon(patient.informasi_medis);
+        const createdDate = new Date(patient.created_at).toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const birthDate = new Date(patient.tanggal_lahir).toLocaleDateString('id-ID');
+
+        content.innerHTML = `
+            <div class="patient-detail-header">
+                <div class="patient-avatar large">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-basic-info">
+                    <h3>${patient.nama_lengkap || 'N/A'}</h3>
+                    <p>${this.calculateAge(patient.tanggal_lahir)} Tahun • ${patient.alamat_lengkap || 'Alamat tidak tersedia'}</p>
+                    <div class="patient-meta">
+                        <span class="status-badge ${statusClass}">${this.formatStatus(patient.status_pasien)}</span>
+                        <span class="service-badge ${patient.informasi_medis}">
+                            <i class="${serviceIcon}"></i>
+                            ${this.formatServiceType(patient.informasi_medis)}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-sections">
+                <div class="detail-section">
+                    <h4><i class="fas fa-info-circle"></i> Informasi Pribadi</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Tanggal Lahir</label>
+                            <span>${birthDate}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Usia</label>
+                            <span>${this.calculateAge(patient.tanggal_lahir)} Tahun</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <label>Alamat</label>
+                            <span>${patient.alamat_lengkap || 'Tidak tersedia'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-stethoscope"></i> Informasi Medis</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Jenis Layanan</label>
+                            <span>${this.formatServiceType(patient.informasi_medis)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status</label>
+                            <span class="status-badge ${statusClass}">${this.formatStatus(patient.status_pasien)}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <label>Tanggal Pendaftaran</label>
+                            <span>${createdDate}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-file-medical"></i> Hasil Pemeriksaan</h4>
+                    <div class="medical-notes">
+                        ${patient.hasil_pemeriksaan || '<em>Tidak ada catatan pemeriksaan</em>'}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-money-bill-wave"></i> Informasi Pembayaran</h4>
+                    <div class="payment-info">
+                        <div class="payment-amount">
+                            Rp ${parseInt(patient.jumlah_pembayaran || 0).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <button class="btn-secondary" id="closeDetailModal">
+                    <i class="fas fa-times"></i>
+                    Tutup
+                </button>
+                <button class="btn-primary" id="editPatientFromDetail" data-patient-id="${patient.id_pasien}">
+                    <i class="fas fa-edit"></i>
+                    Edit Data
+                </button>
+            </div>
+        `;
+
+        // Show modal
+        modal.classList.add('active');
+
+        // Add event listeners
+        const closeBtn = document.getElementById('closeDetailModal');
+        const editBtn = document.getElementById('editPatientFromDetail');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        }
+
+        if (editBtn) {
+            editBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                this.editPatient(patient.id_pasien);
+            });
+        }
+    }
+
+    async editPatient(patientId) {
+        try {
+            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+
+            if (result.success) {
+                this.populateEditForm(result.data);
+                this.openModal();
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error loading patient for edit:', error);
+            this.showNotification('Gagal memuat data pasien untuk edit', 'error');
+        }
+    }
+
+    populateEditForm(patient) {
+        // Set form mode to edit
+        const patientIdField = document.getElementById('patientId');
+        const namaPasienField = document.getElementById('namaPasien');
+        const tanggalLahirField = document.getElementById('tanggalLahir');
+        const alamatField = document.getElementById('alamat');
+        const statusPasienField = document.getElementById('statusPasien');
+        const hasilPemeriksaanField = document.getElementById('hasilPemeriksaan');
+        const jumlahPembayaranField = document.getElementById('jumlahPembayaran');
+
+        if (patientIdField) patientIdField.value = patient.id_pasien || '';
+        if (namaPasienField) namaPasienField.value = patient.nama_lengkap || '';
+        if (tanggalLahirField) tanggalLahirField.value = patient.tanggal_lahir || '';
+        if (alamatField) alamatField.value = patient.alamat_lengkap || '';
+        if (statusPasienField) statusPasienField.value = patient.status_pasien || '';
+        if (hasilPemeriksaanField) hasilPemeriksaanField.value = patient.hasil_pemeriksaan || '';
+        if (jumlahPembayaranField) jumlahPembayaranField.value = patient.jumlah_pembayaran || '';
+
+        // Select the service type card
+        if (patient.informasi_medis) {
+            const serviceCard = document.querySelector(`.selectable-card[data-value="${patient.informasi_medis}"]`);
+            if (serviceCard) {
+                this.selectCard(serviceCard);
+            }
+        }
+
+        // Update form title and button
+        const formTitle = document.querySelector('.modal-header h2');
+        const submitBtn = document.getElementById('submitFormBtn');
+        
+        if (formTitle) {
+            formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Data Pasien';
+        }
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Data Pasien';
+        }
+    }
+
+    showDeleteConfirmation(patientId, patientName) {
+        const modal = document.getElementById('deleteModal');
+        const patientNameElement = document.getElementById('deletePatientName');
+        
+        if (!modal || !patientNameElement) {
+            console.error('Delete modal elements not found');
+            return;
+        }
+        
+        patientNameElement.textContent = patientName || 'Pasien';
+        modal.classList.add('active');
+
+        // Add event listeners
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+        const closeModal = () => modal.classList.remove('active');
+
+        if (cancelDelete) cancelDelete.addEventListener('click', closeModal);
+        if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', closeModal);
+        if (confirmDelete) {
+            confirmDelete.addEventListener('click', async () => {
+                await this.deletePatient(patientId);
+                closeModal();
+            });
+        }
+    }
+
+    async deletePatient(patientId) {
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete_patient');
+            formData.append('patient_id', patientId);
+
+            const response = await fetch('../backend/dashboardview.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showNotification('Data pasien berhasil dihapus', 'success');
+                
+                // Reload the current view
+                if (this.currentView === 'dashboard') {
+                    this.loadDashboardStats();
+                } else {
+                    this.loadPatientsList(this.currentPage);
+                }
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error deleting patient:', error);
+            this.showNotification('Gagal menghapus data pasien', 'error');
+        }
+    }
+
+    // ==================== UTILITY METHODS ====================
+
+    calculateAge(birthDate) {
+        if (!birthDate) return 'Tidak diketahui';
+        
+        const today = new Date();
+        const birth = new Date(birthDate);
+        
+        if (isNaN(birth.getTime())) return 'Tanggal tidak valid';
+        
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
+        return age;
+    }
+
+    getStatusClass(status) {
+        const statusMap = {
+            'menunggu': 'pending',
+            'dalam perawatan': 'in-progress',
+            'selesai': 'completed'
+        };
+        return statusMap[status] || 'pending';
+    }
+
+    formatStatus(status) {
+        const statusMap = {
+            'menunggu': 'Menunggu',
+            'dalam perawatan': 'Perawatan',
+            'selesai': 'Selesai'
+        };
+        return statusMap[status] || status;
+    }
+
+    getServiceIcon(service) {
+        const iconMap = {
+            'rawat-inap': 'fas fa-procedures',
+            'rawat-jalan': 'fas fa-walking',
+            'pemeriksaan': 'fas fa-stethoscope'
+        };
+        return iconMap[service] || 'fas fa-stethoscope';
+    }
+
+    formatServiceType(service) {
+        const serviceMap = {
+            'rawat-inap': 'Rawat Inap',
+            'rawat-jalan': 'Rawat Jalan',
+            'pemeriksaan': 'Pemeriksaan'
+        };
+        return serviceMap[service] || service;
     }
 
     // ==================== FILE UPLOAD METHODS ====================
@@ -35,7 +788,6 @@ class Dashboard {
         }
     }
 
-    // File change handler
     handleFileChange(fileInput, fileNameElement, inputId) {
         if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
@@ -80,9 +832,8 @@ class Dashboard {
         return true;
     }
 
-    // ==================== EXISTING METHODS ====================
+    // ==================== EXISTING METHODS (dengan improvement) ====================
 
-    // Update current date display
     updateCurrentDate() {
         const now = new Date();
         const options = { 
@@ -97,7 +848,6 @@ class Dashboard {
         }
     }
 
-    // Modal functionality
     initializeModal() {
         this.modal = document.getElementById('formModal');
         this.openModalBtn = document.getElementById('inputPemeriksaanBtn');
@@ -156,13 +906,11 @@ class Dashboard {
         }
     }
 
-    // File upload functionality
     initializeFileUploads() {
         this.setupFileUpload('fotoPasien', 'fotoFileName');
         this.setupFileUpload('pdfDokumen', 'pdfFileName');
     }
 
-    // Selectable cards functionality
     initializeSelectableCards() {
         this.cardGroup = document.getElementById('jenisLayananGroup');
         if (!this.cardGroup) return;
@@ -191,6 +939,8 @@ class Dashboard {
     }
 
     selectCard(selectedCard) {
+        if (!this.cards) return;
+        
         this.cards.forEach(card => {
             card.classList.remove('selected');
             card.setAttribute('aria-checked', 'false');
@@ -226,7 +976,6 @@ class Dashboard {
         }
     }
 
-    // Form submission
     initializeFormSubmission() {
         this.patientForm = document.getElementById('patientForm');
         if (!this.patientForm) return;
@@ -371,27 +1120,38 @@ class Dashboard {
 
         try {
             const formData = new FormData(this.patientForm);
+            const patientId = document.getElementById('patientId').value;
             
-            // Simulate successful submission (remove this in production)
-            // await this.simulateSubmission(formData);
+            let url = "../backend/dashboard.php";
+            let method = "POST";
+
+            // If editing existing patient, use update endpoint
+            if (patientId) {
+                url = "../backend/dashboardview.php";
+                formData.append('action', 'update_patient');
+                formData.append('patient_id', patientId);
+                // Rename fields to match update endpoint
+                formData.append('nama_pasien', formData.get('namaPasien'));
+                formData.append('tanggal_lahir', formData.get('tanggalLahir'));
+                formData.append('alamat', formData.get('alamat'));
+                formData.append('jenis_layanan', formData.get('jenisLayanan'));
+                formData.append('status_pasien', formData.get('statusPasien'));
+                formData.append('hasil_pemeriksaan', formData.get('hasilPemeriksaan'));
+                formData.append('jumlah_pembayaran', formData.get('jumlahPembayaran'));
+            }
             
-            const response = await fetch("../backend/dashboard.php", {
-                 method: "POST",
+            const response = await fetch(url, {
+                 method: method,
                  body: formData
              });
              
             const result = await this.handleResponse(response);
 
-            this.handleSuccess({
-                success: true,
-                message: "Data pemeriksaan berhasil disimpan!",
-                data: {
-                    id: 'SIM-' + Date.now(),
-                    nama: formData.get('namaPasien'),
-                    status: formData.get('statusPasien'),
-                    jenis_layanan: formData.get('jenisLayanan')
-                }
-            });
+            if (result.success) {
+                this.handleSuccess(result, patientId);
+            } else {
+                throw new Error(result.error || 'Gagal menyimpan data');
+            }
 
         } catch (error) {
             console.error('Submission error:', error);
@@ -401,25 +1161,6 @@ class Dashboard {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         }
-    }
-
-    // Simulate successful submission (for testing without backend)
-    async simulateSubmission(formData) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('Simulated form data:', {
-                    namaPasien: formData.get('namaPasien'),
-                    tanggalLahir: formData.get('tanggalLahir'),
-                    alamat: formData.get('alamat'),
-                    jenisLayanan: formData.get('jenisLayanan'),
-                    statusPasien: formData.get('statusPasien'),
-                    hasilPemeriksaan: formData.get('hasilPemeriksaan'),
-                    jumlahPembayaran: formData.get('jumlahPembayaran'),
-                    medmsg: formData.get('medmsg')
-                });
-                resolve();
-            }, 1500);
-        });
     }
 
     async handleResponse(response) {
@@ -441,31 +1182,41 @@ class Dashboard {
         }
     }
 
-    handleSuccess(result) {
-        this.showNotification(result.message || "Data pemeriksaan berhasil disimpan!", "success");
+    handleSuccess(result, patientId) {
+        const message = patientId ? "Data pasien berhasil diperbarui!" : "Data pemeriksaan berhasil disimpan!";
+        this.showNotification(result.message || message, "success");
         this.closeModal();
         this.resetForm();
         this.clearAllErrors();
         
-        // Update dashboard stats (simulated)
-        this.updateDashboardStats();
-    }
-
-    updateDashboardStats() {
-        // Simulate updating the dashboard numbers
-        const statNumbers = document.querySelectorAll('.stat-number');
-        if (statNumbers.length > 0) {
-            const current = parseInt(statNumbers[0].textContent);
-            statNumbers[0].textContent = current + 1;
+        // Reload data based on current view
+        if (this.currentView === 'dashboard') {
+            this.loadDashboardStats();
+        } else {
+            this.loadPatientsList(this.currentPage);
         }
     }
 
     resetForm() {
         if (this.patientForm) {
             this.patientForm.reset();
+            // Clear hidden patient ID field
+            const patientIdField = document.getElementById('patientId');
+            if (patientIdField) patientIdField.value = '';
         }
         this.resetFileNames();
         this.resetSelectableCards();
+        
+        // Reset form title and button to default
+        const formTitle = document.querySelector('.modal-header h2');
+        const submitBtn = document.getElementById('submitFormBtn');
+        
+        if (formTitle) {
+            formTitle.innerHTML = '<i class="fas fa-file-medical"></i> Input Hasil Pemeriksaan';
+        }
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Data Pemeriksaan';
+        }
     }
 
     resetFileNames() {
@@ -484,22 +1235,160 @@ class Dashboard {
     }
 
     resetSelectableCards() {
-        if (this.cards) {
-            this.cards.forEach(card => {
-                card.classList.remove('selected');
-                card.setAttribute('aria-checked', 'false');
-                const radioInput = card.querySelector('.card-input');
-                if (radioInput) radioInput.checked = false;
-            });
-
-            // Select first card by default
-            if (this.cards.length > 0) {
-                this.selectCard(this.cards[0]);
-            }
+        if (this.cards && this.cards.length > 0) {
+            this.selectCard(this.cards[0]);
         }
     }
 
-    // Notification system
+    // ==================== EVENT LISTENERS ====================
+
+    initializeEventListeners() {
+        this.setupSearch();
+        this.setupNotificationBell();
+        this.setupLogout();
+        
+        // View switching
+        document.getElementById('dashboardMenu').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.switchView('dashboard');
+        });
+
+        document.getElementById('patientsMenu').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.switchView('patients');
+        });
+
+        // Quick actions
+        document.getElementById('quickAddPatient').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openModal();
+        });
+
+        document.getElementById('quickViewPatients').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.switchView('patients');
+        });
+
+        document.getElementById('addNewPatient').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openModal();
+        });
+
+        // Filters - reset to page 1 when filters change
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            this.statusFilter = e.target.value;
+            this.loadPatientsList(1);
+        });
+
+        document.getElementById('serviceFilter').addEventListener('change', (e) => {
+            this.serviceFilter = e.target.value;
+            this.loadPatientsList(1);
+        });
+
+        // Global search with debounce
+        document.getElementById('globalSearch').addEventListener('input', this.debounce((e) => {
+            this.searchTerm = e.target.value;
+            if (this.currentView === 'patients') {
+                this.loadPatientsList(1);
+            }
+        }, 500));
+
+        // Close detail modal
+        document.getElementById('closeDetailModal').addEventListener('click', () => {
+            document.getElementById('detailModal').classList.remove('active');
+        });
+    }
+
+    setupSearch() {
+        const searchBox = document.querySelector('.search-box input');
+        if (searchBox) {
+            searchBox.addEventListener('input', this.debounce((e) => {
+                this.performSearch(e.target.value);
+            }, 300));
+        }
+    }
+
+    setupNotificationBell() {
+        const notificationBell = document.querySelector('.notification');
+        if (notificationBell) {
+            notificationBell.addEventListener('click', () => {
+                this.showNotification("Fitur notifikasi belum tersedia", "info");
+            });
+        }
+    }
+
+    setupLogout() {
+        const logoutBtn = document.querySelector('.logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Apakah Anda yakin ingin keluar?')) {
+                    this.showNotification("Berhasil logout", "success");
+                    // window.location.href = 'logout.php';
+                }
+            });
+        }
+    }
+
+    attachTableEventListeners() {
+        // View buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const patientId = btn.dataset.patientId;
+                this.showPatientDetail(patientId);
+            });
+        });
+
+        // Edit buttons
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const patientId = btn.dataset.patientId;
+                this.editPatient(patientId);
+            });
+        });
+
+        // Delete buttons
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const patientId = btn.dataset.patientId;
+                const patientName = btn.closest('tr').querySelector('.patient-name strong').textContent;
+                this.showDeleteConfirmation(patientId, patientName);
+            });
+        });
+
+        // Row click for quick view
+        document.querySelectorAll('#patientsTableBody tr[data-patient-id]').forEach(row => {
+            row.addEventListener('click', () => {
+                const patientId = row.dataset.patientId;
+                this.showPatientDetail(patientId);
+            });
+        });
+    }
+
+    performSearch(query) {
+        // Optional: implement additional search functionality if needed
+        if (query.length > 2) {
+            console.log('Searching for:', query);
+        }
+    }
+
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // ==================== NOTIFICATION SYSTEM ====================
+
     showNotification(message, type = 'info') {
         // Remove existing notifications
         this.removeExistingNotifications();
@@ -590,73 +1479,8 @@ class Dashboard {
         }
     }
 
-    // Additional event listeners
-    initializeEventListeners() {
-        this.setupSearch();
-        this.setupNotificationBell();
-        this.setupLogout();
-        this.setupViewAllButton();
-    }
+    // ==================== GLOBAL STYLES ====================
 
-    setupSearch() {
-        const searchBox = document.querySelector('.search-box input');
-        if (searchBox) {
-            searchBox.addEventListener('input', this.debounce((e) => {
-                this.performSearch(e.target.value);
-            }, 300));
-        }
-    }
-
-    setupNotificationBell() {
-        const notificationBell = document.querySelector('.notification');
-        if (notificationBell) {
-            notificationBell.addEventListener('click', () => {
-                this.showNotification("Fitur notifikasi belum tersedia", "info");
-            });
-        }
-    }
-
-    setupLogout() {
-        const logoutBtn = document.querySelector('.logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (confirm('Apakah Anda yakin ingin keluar?')) {
-                    this.showNotification("Berhasil logout", "success");
-                    // window.location.href = 'logout.php';
-                }
-            });
-        }
-    }
-
-    setupViewAllButton() {
-        const viewAllBtn = document.querySelector('.view-all-btn');
-        if (viewAllBtn) {
-            viewAllBtn.addEventListener('click', () => {
-                this.showNotification("Fitur lihat semua pasien belum tersedia", "info");
-            });
-        }
-    }
-
-    performSearch(query) {
-        if (query.length > 2) {
-            console.log('Searching for:', query);
-        }
-    }
-
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    // Global styles
     addGlobalStyles() {
         if (!document.querySelector('#dashboard-styles')) {
             const style = document.createElement('style');
@@ -726,6 +1550,198 @@ class Dashboard {
                     border-color: #dc3545 !important;
                     background-color: #fff5f5 !important;
                 }
+                .hidden {
+                    display: none !important;
+                }
+                .patient-avatar.large {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: var(--primary);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 2rem;
+                }
+                .detail-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 16px;
+                }
+                .detail-item.full-width {
+                    grid-column: 1 / -1;
+                }
+                .medical-notes {
+                    background: #f8f9fa;
+                    padding: 16px;
+                    border-radius: 8px;
+                    border-left: 4px solid var(--primary);
+                }
+                .payment-amount {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    color: var(--success);
+                    text-align: center;
+                }
+                .service-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 4px 8px;
+                    border-radius: 20px;
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                }
+                .service-badge.rawat-inap {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+                .service-badge.rawat-jalan {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                }
+                .service-badge.pemeriksaan {
+                    background: #d4edda;
+                    color: #155724;
+                }
+                .action-buttons {
+                    display: flex;
+                    gap: 8px;
+                }
+                .btn-icon {
+                    width: 32px;
+                    height: 32px;
+                    border: none;
+                    border-radius: 6px;
+                    background: #f8f9fa;
+                    color: var(--gray);
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                }
+                .btn-icon:hover {
+                    background: var(--primary);
+                    color: white;
+                }
+                .btn-icon.delete-btn:hover {
+                    background: var(--danger);
+                }
+                .pagination {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 8px;
+                    margin-top: 24px;
+                    padding: 16px;
+                    flex-wrap: wrap;
+                }
+                .page-btn {
+                    padding: 8px 16px;
+                    border: 1px solid #ddd;
+                    background: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    font-size: 0.875rem;
+                    min-width: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                }
+                .page-btn:hover {
+                    background: #f8f9fa;
+                    border-color: var(--primary);
+                }
+                .page-btn.active {
+                    background: var(--primary);
+                    color: white;
+                    border-color: var(--primary);
+                }
+                .page-btn.prev-btn, .page-btn.next-btn {
+                    padding: 8px 12px;
+                }
+                .page-dots {
+                    padding: 8px 4px;
+                    color: var(--gray);
+                }
+                .empty-state, .empty-table {
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: var(--gray);
+                }
+                .empty-state i, .empty-table i {
+                    font-size: 2rem;
+                    margin-bottom: 16px;
+                    opacity: 0.5;
+                }
+                .loading-state, .error-state {
+                    text-align: center;
+                    padding: 40px 20px;
+                }
+                .loading-state i, .error-state i {
+                    font-size: 2rem;
+                    margin-bottom: 16px;
+                }
+                .loading-state {
+                    color: var(--primary);
+                }
+                .error-state {
+                    color: var(--danger);
+                }
+                .btn-retry {
+                    background: var(--primary);
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    margin-top: 12px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: background 0.2s ease;
+                }
+                .btn-retry:hover {
+                    background: var(--primary-dark);
+                }
+                .btn-clear-filters {
+                    background: var(--warning);
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    margin-top: 12px;
+                    transition: background 0.2s ease;
+                }
+                .btn-clear-filters:hover {
+                    background: #e0a800;
+                }
+                .btn-danger {
+                    background: var(--danger);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: background 0.2s ease;
+                }
+                .btn-danger:hover {
+                    background: #c82333;
+                }
+                .stat-card.loading .stat-icon {
+                    color: var(--primary);
+                }
+                .stat-card.error .stat-icon {
+                    color: var(--danger);
+                }
             `;
             document.head.appendChild(style);
         }
@@ -740,4 +1756,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Global error handling
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
+});
+
+// Handle page unload
+window.addEventListener('beforeunload', function() {
+    // Cleanup jika diperlukan
 });
