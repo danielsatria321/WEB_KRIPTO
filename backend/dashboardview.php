@@ -10,7 +10,14 @@ ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/dashboard_errors.log');
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+
+// Handle CORS with credentials support
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, ['http://localhost', 'http://127.0.0.1', 'http://localhost:80'])) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Credentials: true');
+}
+
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
