@@ -6,29 +6,78 @@ class Dashboard {
         this.statusFilter = '';
         this.serviceFilter = '';
         this.isLoading = false;
+        this.sessionData = null;
         this.init();
     }
 
     init() {
         console.log('Initializing Dashboard...');
-        this.updateCurrentDate();
-        this.initializeModal();
-        this.initializeFileUploads();
-        this.initializeSelectableCards();
-        this.initializeFormSubmission();
-        this.initializeEventListeners();
-        this.addGlobalStyles();
         
-        // Load initial data
-        this.loadDashboardStats();
-        
-        // Auto-select first card
-        setTimeout(() => {
-            const firstCard = document.querySelector('.selectable-card');
-            if (firstCard) {
-                this.selectCard(firstCard);
+        // Check session first
+        this.checkSession().then(hasSession => {
+            if (!hasSession) {
+                // Redirect to login if no session
+                window.location.href = '../templates/login.html';
+                return;
             }
-        }, 100);
+            
+            // Session valid, initialize dashboard
+            this.updateCurrentDate();
+            this.initializeModal();
+            this.initializeFileUploads();
+            this.initializeSelectableCards();
+            this.initializeFormSubmission();
+            this.initializeEventListeners();
+            this.addGlobalStyles();
+            
+            // Load initial data
+            this.loadDashboardStats();
+            
+            // Auto-select first card
+            setTimeout(() => {
+                const firstCard = document.querySelector('.selectable-card');
+                if (firstCard) {
+                    this.selectCard(firstCard);
+                }
+            }, 100);
+        });
+    }
+
+    // ==================== SESSION MANAGEMENT ====================
+
+    async checkSession() {
+        try {
+            const response = await fetch('../backend/check_session.php');
+            const result = await response.json();
+            
+            if (result.success) {
+                this.sessionData = result.data;
+                // Update doctor name in sidebar
+                this.updateDoctorName();
+                return true;
+            } else {
+                console.log('No active session');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error checking session:', error);
+            return false;
+        }
+    }
+
+    updateDoctorName() {
+        if (!this.sessionData || !this.sessionData.username) {
+            console.warn('No session data to update doctor name');
+            return;
+        }
+        
+        const doctorNameEl = document.getElementById('doctorName');
+        if (doctorNameEl) {
+            // Format: Dr. (nama)
+            const nama = this.sessionData.nama || this.sessionData.username;
+            doctorNameEl.textContent = `Dr. ${nama}`;
+            console.log('Updated doctor name to:', doctorNameEl.textContent);
+        }
     }
 
     // ==================== VIEW MANAGEMENT ====================
