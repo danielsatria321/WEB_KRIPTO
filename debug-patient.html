@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Patient Detail</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .section {
+            background: #2d2d2d;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 3px solid #007acc;
+        }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .info { color: #9cdcfe; }
+        .warning { color: #ce9178; }
+        button {
+            background: #007acc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        input {
+            padding: 8px;
+            width: 100px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Patient Detail Loading</h1>
+    
+    <div class="section">
+        <h2>Step 1: Login</h2>
+        <button onclick="debugLogin()">1. Login (321/321)</button>
+        <pre id="loginOutput"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Step 2: Check Session</h2>
+        <button onclick="debugCheckSession()">2. Check Session After Login</button>
+        <pre id="sessionOutput"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Step 3: Get Patient Detail</h2>
+        <label>Patient ID: <input id="patientId" type="number" value="1"></label>
+        <button onclick="debugPatientDetail()">3. Get Patient Detail</button>
+        <pre id="patientOutput"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Network Debug</h2>
+        <pre id="networkOutput"></pre>
+    </div>
+
+    <script>
+        // Helper untuk format output
+        function log(element, title, data, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('id-ID');
+            const color = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' }[type] || '';
+            const className = type;
+            
+            let output = document.getElementById(element).innerHTML;
+            output += `\n[${timestamp}] <span class="${className}">${color} ${title}</span>`;
+            
+            if (typeof data === 'object') {
+                output += '\n' + JSON.stringify(data, null, 2);
+            } else {
+                output += '\n' + String(data);
+            }
+            
+            document.getElementById(element).innerHTML = output;
+            document.getElementById(element).scrollTop = document.getElementById(element).scrollHeight;
+        }
+
+        async function debugLogin() {
+            log('loginOutput', 'Starting login...', '', 'info');
+            
+            try {
+                const form = new FormData();
+                form.append('email', '321');
+                form.append('password', '321');
+                
+                log('loginOutput', 'Sending POST to backend/login.php', {
+                    email: '321',
+                    password: '321',
+                    credentials: 'same-origin'
+                }, 'info');
+                
+                const response = await fetch('./backend/login.php', {
+                    method: 'POST',
+                    body: form,
+                    credentials: 'same-origin'
+                });
+                
+                log('loginOutput', `Response status: ${response.status}`, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries([...response.headers])
+                }, 'info');
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    log('loginOutput', 'Login successful!', data, 'success');
+                    log('sessionOutput', 'Ready to check session', '', 'success');
+                } else {
+                    log('loginOutput', 'Login failed', data, 'error');
+                }
+            } catch (error) {
+                log('loginOutput', 'Exception thrown', error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        async function debugCheckSession() {
+            log('sessionOutput', 'Checking session...', '', 'info');
+            
+            try {
+                const response = await fetch('./backend/check_session.php', {
+                    credentials: 'same-origin'
+                });
+                
+                log('sessionOutput', `Response status: ${response.status}`, {
+                    status: response.status,
+                    headers: Object.fromEntries([...response.headers])
+                }, 'info');
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('sessionOutput', 'Session is valid!', data.data, 'success');
+                } else {
+                    log('sessionOutput', 'Session validation failed', data, 'error');
+                }
+            } catch (error) {
+                log('sessionOutput', 'Exception thrown', error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        async function debugPatientDetail() {
+            const patientId = document.getElementById('patientId').value;
+            log('patientOutput', `Loading patient ${patientId}...`, '', 'info');
+            
+            try {
+                const url = `./backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`;
+                
+                log('patientOutput', 'Sending GET request', {
+                    url: url,
+                    credentials: 'same-origin',
+                    method: 'GET'
+                }, 'info');
+                
+                const response = await fetch(url, {
+                    credentials: 'same-origin'
+                });
+                
+                log('patientOutput', `Response status: ${response.status}`, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    contentType: response.headers.get('content-type'),
+                    corsHeader: response.headers.get('access-control-allow-origin')
+                }, 'info');
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('patientOutput', 'Patient detail loaded successfully!', {
+                        id: data.data.id_pasien,
+                        nama: data.data.nama_lengkap,
+                        alamat: data.data.alamat_lengkap,
+                        status: data.data.status_pasien
+                    }, 'success');
+                } else {
+                    log('patientOutput', 'Error from API', data, 'error');
+                }
+            } catch (error) {
+                log('patientOutput', 'Exception thrown', {
+                    message: error.message,
+                    stack: error.stack
+                }, 'error');
+                console.error(error);
+            }
+        }
+
+        // Monitor cookies
+        window.addEventListener('load', () => {
+            log('networkOutput', 'Page loaded', {
+                cookies: document.cookie || 'No cookies',
+                origin: window.location.origin,
+                pathname: window.location.pathname
+            }, 'info');
+        });
+    </script>
+</body>
+</html>
