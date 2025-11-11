@@ -1006,6 +1006,15 @@ class Dashboard {
             }
         }
 
+        // Disable file uploads in edit mode
+        const fotoPasienField = document.getElementById('fotoPasien');
+        const pdfDokumenField = document.getElementById('pdfDokumen');
+        const fileUploadNote = document.getElementById('fileUploadNote');
+        
+        if (fotoPasienField) fotoPasienField.disabled = true;
+        if (pdfDokumenField) pdfDokumenField.disabled = true;
+        if (fileUploadNote) fileUploadNote.style.display = 'block';
+
         // Update form title and button
         const formTitle = document.querySelector('.modal-header h2');
         const submitBtn = document.getElementById('submitFormBtn');
@@ -1259,6 +1268,15 @@ class Dashboard {
         if (this.modal) {
             this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Enable file uploads and hide note for new patient (create mode)
+            const fotoPasienField = document.getElementById('fotoPasien');
+            const pdfDokumenField = document.getElementById('pdfDokumen');
+            const fileUploadNote = document.getElementById('fileUploadNote');
+            
+            if (fotoPasienField) fotoPasienField.disabled = false;
+            if (pdfDokumenField) pdfDokumenField.disabled = false;
+            if (fileUploadNote) fileUploadNote.style.display = 'none';
         }
     }
 
