@@ -121,7 +121,7 @@ class Dashboard {
         try {
             this.showLoadingState('statsGrid', 'stat-card', 'Memuat statistik...');
             
-            const response = await fetch('../backend/dashboardview.php?action=get_stats');
+            const response = await fetch('../backend/dashboardview.php?action=get_stats', { credentials: 'same-origin' });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
