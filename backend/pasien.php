@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $foto_pasien = null;
     $dokumen_pdf = null;
 
-    // Upload foto pasien
+    
     if (isset($_FILES['fotoPasien']) && $_FILES['fotoPasien']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/foto/';
         if (!is_dir($uploadDir)) {

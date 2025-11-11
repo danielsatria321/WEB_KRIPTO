@@ -5,7 +5,9 @@ class Dashboard {
         this.searchTerm = '';
         this.statusFilter = '';
         this.serviceFilter = '';
+        this.dateFilter = '';
         this.isLoading = false;
+        this.patients = [];
         this.init();
     }
 
@@ -17,10 +19,12 @@ class Dashboard {
         this.initializeSelectableCards();
         this.initializeFormSubmission();
         this.initializeEventListeners();
+        this.initializeCharts();
         this.addGlobalStyles();
         
         // Load initial data
         this.loadDashboardStats();
+        this.loadRecentPatients();
         
         // Auto-select first card
         setTimeout(() => {
@@ -40,8 +44,14 @@ class Dashboard {
         
         const dashboardContent = document.getElementById('dashboardContent');
         const patientsContent = document.getElementById('patientsContent');
+        const reportsContent = document.getElementById('reportsContent');
         const pageTitle = document.getElementById('pageTitle');
         const pageSubtitle = document.getElementById('pageSubtitle');
+
+        // Hide all content
+        dashboardContent.classList.add('hidden');
+        patientsContent.classList.add('hidden');
+        reportsContent.classList.add('hidden');
 
         // Update menu active state
         document.querySelectorAll('.menu-item').forEach(item => {
@@ -50,18 +60,23 @@ class Dashboard {
 
         if (view === 'dashboard') {
             dashboardContent.classList.remove('hidden');
-            patientsContent.classList.add('hidden');
             document.getElementById('dashboardMenu').parentElement.classList.add('active');
             pageTitle.textContent = 'Dashboard MediCare';
             pageSubtitle.textContent = 'Manajemen Data Pasien Terintegrasi';
             this.loadDashboardStats();
+            this.loadRecentPatients();
         } else if (view === 'patients') {
-            dashboardContent.classList.add('hidden');
             patientsContent.classList.remove('hidden');
             document.getElementById('patientsMenu').parentElement.classList.add('active');
             pageTitle.textContent = 'Daftar Pasien';
             pageSubtitle.textContent = 'Kelola data pasien secara lengkap';
-            this.loadPatientsList(1); // Selalu mulai dari page 1
+            this.loadPatientsList(1);
+        } else if (view === 'reports') {
+            reportsContent.classList.remove('hidden');
+            document.getElementById('reportsMenu').parentElement.classList.add('active');
+            pageTitle.textContent = 'Laporan & Statistik';
+            pageSubtitle.textContent = 'Analisis data dan laporan kinerja';
+            this.updateCharts();
         }
     }
 
@@ -71,19 +86,19 @@ class Dashboard {
         try {
             this.showLoadingState('statsGrid', 'stat-card', 'Memuat statistik...');
             
-            const response = await fetch('../backend/dashboardview.php?action=get_stats');
+            // Simulate API call
+            setTimeout(() => {
+                const mockStats = {
+                    total_pasien: 156,
+                    rawat_inap: 45,
+                    rawat_jalan: 78,
+                    pemeriksaan: 33,
+                    total_pembayaran: 125000000,
+                    pasien_baru: 12
+                };
+                this.displayStats(mockStats);
+            }, 1000);
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-
-            if (result.success) {
-                this.displayStats(result.data);
-            } else {
-                throw new Error(result.error || 'Unknown error');
-            }
         } catch (error) {
             console.error('Error loading stats:', error);
             this.showNotification('Gagal memuat data statistik', 'error');
@@ -158,6 +173,102 @@ class Dashboard {
         `).join('');
     }
 
+    async loadRecentPatients() {
+        try {
+            // Simulate API call
+            setTimeout(() => {
+                const mockPatients = [
+                    {
+                        id: 1,
+                        name: 'Budi Santoso',
+                        service: 'Rawat Inap',
+                        date: '2024-01-15',
+                        status: 'dalam perawatan'
+                    },
+                    {
+                        id: 2,
+                        name: 'Siti Rahayu',
+                        service: 'Rawat Jalan',
+                        date: '2024-01-14',
+                        status: 'selesai'
+                    },
+                    {
+                        id: 3,
+                        name: 'Ahmad Wijaya',
+                        service: 'Pemeriksaan',
+                        date: '2024-01-16',
+                        status: 'menunggu'
+                    },
+                    {
+                        id: 4,
+                        name: 'Maria Sari',
+                        service: 'Rawat Inap',
+                        date: '2024-01-13',
+                        status: 'dalam perawatan'
+                    },
+                    {
+                        id: 5,
+                        name: 'Joko Prasetyo',
+                        service: 'Rawat Jalan',
+                        date: '2024-01-12',
+                        status: 'selesai'
+                    }
+                ];
+                this.displayRecentPatients(mockPatients);
+            }, 800);
+            
+        } catch (error) {
+            console.error('Error loading recent patients:', error);
+            this.showErrorState('recentPatientsList', 'Gagal memuat data pasien terbaru');
+        }
+    }
+
+    displayRecentPatients(patients) {
+        const container = document.getElementById('recentPatientsList');
+        
+        if (!container) {
+            console.error('Recent patients container not found');
+            return;
+        }
+
+        if (!patients || patients.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>Tidak ada data pasien terbaru</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = patients.map(patient => {
+            const statusClass = this.getStatusClass(patient.status);
+            const date = new Date(patient.date).toLocaleDateString('id-ID');
+            
+            return `
+                <div class="patient-item" data-patient-id="${patient.id}">
+                    <div class="patient-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="patient-info">
+                        <h4>${patient.name}</h4>
+                        <p>${patient.service}</p>
+                        <span class="patient-date">${date}</span>
+                    </div>
+                    <span class="status-badge ${statusClass}">${this.formatStatus(patient.status)}</span>
+                </div>
+            `;
+        }).join('');
+
+        // Add click event to patient items
+        container.querySelectorAll('.patient-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const patientId = item.dataset.patientId;
+                this.showPatientDetail(patientId);
+            });
+        });
+    }
+
     async loadPatientsList(page = 1) {
         if (this.isLoading) return;
         
@@ -167,28 +278,65 @@ class Dashboard {
             
             this.showLoadingState('patientsTableBody', 'table-row', 'Memuat data pasien...');
             
-            const params = new URLSearchParams({
-                action: 'get_patients',
-                page: page,
-                limit: 10,
-                search: this.searchTerm,
-                status: this.statusFilter,
-                service: this.serviceFilter
-            });
+            // Simulate API call with mock data
+            setTimeout(() => {
+                const mockPatients = [
+                    {
+                        id_pasien: 1,
+                        nama_lengkap: 'Budi Santoso',
+                        tanggal_lahir: '1985-03-15',
+                        informasi_medis: 'rawat-inap',
+                        status_pasien: 'dalam perawatan',
+                        created_at: '2024-01-15',
+                        jumlah_pembayaran: 2500000
+                    },
+                    {
+                        id_pasien: 2,
+                        nama_lengkap: 'Siti Rahayu',
+                        tanggal_lahir: '1990-07-22',
+                        informasi_medis: 'rawat-jalan',
+                        status_pasien: 'selesai',
+                        created_at: '2024-01-14',
+                        jumlah_pembayaran: 500000
+                    },
+                    {
+                        id_pasien: 3,
+                        nama_lengkap: 'Ahmad Wijaya',
+                        tanggal_lahir: '1978-11-30',
+                        informasi_medis: 'pemeriksaan',
+                        status_pasien: 'menunggu',
+                        created_at: '2024-01-16',
+                        jumlah_pembayaran: 350000
+                    },
+                    {
+                        id_pasien: 4,
+                        nama_lengkap: 'Maria Sari',
+                        tanggal_lahir: '1982-05-18',
+                        informasi_medis: 'rawat-inap',
+                        status_pasien: 'dalam perawatan',
+                        created_at: '2024-01-13',
+                        jumlah_pembayaran: 1800000
+                    },
+                    {
+                        id_pasien: 5,
+                        nama_lengkap: 'Joko Prasetyo',
+                        tanggal_lahir: '1975-09-25',
+                        informasi_medis: 'rawat-jalan',
+                        status_pasien: 'selesai',
+                        created_at: '2024-01-12',
+                        jumlah_pembayaran: 750000
+                    }
+                ];
 
-            const response = await fetch(`../backend/dashboardview.php?${params}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
+                const mockData = {
+                    patients: mockPatients,
+                    total_pages: 3,
+                    current_page: page
+                };
 
-            if (result.success) {
-                this.displayPatientsList(result.data);
-            } else {
-                throw new Error(result.error || 'Unknown error');
-            }
+                this.displayPatientsList(mockData);
+            }, 1500);
+            
         } catch (error) {
             console.error('Error loading patients list:', error);
             this.showNotification('Gagal memuat daftar pasien', 'error');
@@ -207,6 +355,9 @@ class Dashboard {
             return;
         }
 
+        // Store patients for later use
+        this.patients = data.patients || [];
+
         // Display patients table
         if (!data.patients || data.patients.length === 0) {
             tableBody.innerHTML = `
@@ -215,7 +366,7 @@ class Dashboard {
                         <i class="fas fa-search"></i>
                         <p>Tidak ada data pasien yang ditemukan</p>
                         ${this.searchTerm || this.statusFilter || this.serviceFilter ? 
-                            '<button class="btn-clear-filters" onclick="window.medicareDashboard.clearFilters()">Hapus Filter</button>' : 
+                            '<button class="btn-primary" onclick="window.dashboard.clearFilters()">Hapus Filter</button>' : 
                             ''
                         }
                     </td>
@@ -364,117 +515,44 @@ class Dashboard {
         });
     }
 
-    // ==================== LOADING & ERROR STATES ====================
-
-    showLoadingState(containerId, itemClass, message = 'Memuat...') {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        if (containerId === 'patientsTableBody') {
-            container.innerHTML = `
-                <tr>
-                    <td colspan="7" class="loading-state">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>${message}</p>
-                    </td>
-                </tr>
-            `;
-        } else if (containerId === 'statsGrid') {
-            container.innerHTML = `
-                <div class="stat-card loading">
-                    <div class="stat-icon">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>${message}</h3>
-                        <span class="stat-number">-</span>
-                        <span class="stat-change">-</span>
-                    </div>
-                </div>
-            `;
-        }
-    }
-
-    showErrorState(containerId, message = 'Terjadi kesalahan') {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        if (containerId === 'patientsTableBody') {
-            container.innerHTML = `
-                <tr>
-                    <td colspan="7" class="error-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>${message}</p>
-                        <button class="btn-retry" onclick="window.medicareDashboard.loadPatientsList(${this.currentPage})">
-                            <i class="fas fa-redo"></i>
-                            Coba Lagi
-                        </button>
-                    </td>
-                </tr>
-            `;
-        } else if (containerId === 'statsGrid') {
-            container.innerHTML = `
-                <div class="stat-card error">
-                    <div class="stat-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Error</h3>
-                        <span class="stat-number">-</span>
-                        <button class="btn-retry" onclick="window.medicareDashboard.loadDashboardStats()">
-                            Coba Lagi
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-    }
-
-    clearFilters() {
-        this.searchTerm = '';
-        this.statusFilter = '';
-        this.serviceFilter = '';
-        
-        // Reset filter inputs
-        const globalSearch = document.getElementById('globalSearch');
-        const statusFilter = document.getElementById('statusFilter');
-        const serviceFilter = document.getElementById('serviceFilter');
-        
-        if (globalSearch) globalSearch.value = '';
-        if (statusFilter) statusFilter.value = '';
-        if (serviceFilter) serviceFilter.value = '';
-        
-        // Reload data
-        this.loadPatientsList(1);
-    }
-
     // ==================== PATIENT CRUD OPERATIONS ====================
 
     async showPatientDetail(patientId) {
         try {
             this.showNotification('Memuat detail pasien...', 'info');
             
-            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-
-            if (result.success) {
-                this.displayPatientDetail(result.data);
+            // Simulate API call
+            setTimeout(() => {
+                const mockPatient = {
+                    id_pasien: patientId,
+                    nama_lengkap: 'Budi Santoso',
+                    tanggal_lahir: '1985-03-15',
+                    alamat_lengkap: 'Jl. Merdeka No. 123, Jakarta Pusat',
+                    informasi_medis: 'rawat-inap',
+                    status_pasien: 'dalam perawatan',
+                    hasil_pemeriksaan: 'Pasien mengalami demam tinggi dan batuk berdahak. Diagnosis: Pneumonia. Dirawat dengan antibiotik dan terapi suportif.',
+                    jumlah_pembayaran: 2500000,
+                    created_at: '2024-01-15',
+                    foto_pasien: 'patient1.jpg',
+                    medical_message: 'Pasien perlu monitoring ketat untuk saturasi oksigen. Kemungkinan perlu tambahan terapi oksigen jika kondisi tidak membaik dalam 24 jam.',
+                    no_telepon: '081234567890',
+                    email: 'budi.santoso@email.com',
+                    diagnosis: 'Pneumonia',
+                    resep_obat: 'Amoxicillin 500mg 3x1, Paracetamol 500mg 3x1, Ambroxol 30mg 3x1',
+                    metode_pembayaran: 'BPJS',
+                    catatan_pembayaran: 'Pembayaran melalui BPJS dengan no. kartu 1234567890'
+                };
+                
+                this.displayPatientDetail(mockPatient);
                 this.showNotification('Detail pasien berhasil dimuat', 'success');
-            } else {
-                throw new Error(result.error || 'Unknown error');
-            }
+            }, 1000);
+            
         } catch (error) {
             console.error('Error loading patient detail:', error);
             this.showNotification('Gagal memuat detail pasien', 'error');
         }
     }
 
-    // Dalam method displayPatientDetail - GANTI bagian patient-detail-header dan tambahkan section gambar
     displayPatientDetail(patient) {
         const modal = document.getElementById('detailModal');
         const content = document.getElementById('patientDetailContent');
@@ -494,130 +572,10 @@ class Dashboard {
         });
         const birthDate = new Date(patient.tanggal_lahir).toLocaleDateString('id-ID');
 
-        // ✅ Dapatkan path gambar untuk ditampilkan
-        const imagePath = this.getImagePath(patient.foto_pasien);
-        const hasImage = imagePath !== null;
-
-        // Tombol download PDF hanya ditampilkan jika ada dokumen PDF
-        const downloadPdfButton = patient.dokumen_pdf ? `
-            <button class="btn-primary" id="downloadPdfBtn" data-patient-id="${patient.id_pasien}">
-                <i class="fas fa-download"></i>
-                Download PDF (Decrypted)
-            </button>
-        ` : '';
-
-        // ✅ PERBAIKAN: Tampilkan gambar pasien jika ada
-        const patientImageSection = hasImage ? `
-            <div class="detail-section">
-                <h4><i class="fas fa-image"></i> Foto Pasien</h4>
-                <div class="patient-image-container">
-                    <div class="image-wrapper">
-                        <img src="${imagePath}" alt="Foto Pasien ${patient.nama_lengkap}" 
-                             class="patient-image" onerror="this.style.display='none'">
-                        <div class="image-overlay">
-                            <button class="btn-view-image" id="viewImageBtn">
-                                <i class="fas fa-expand"></i>
-                                Lihat Gambar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="image-info">
-                        <div class="file-info">
-                            <strong>File:</strong> ${patient.foto_pasien}
-                        </div>
-                        <div class="image-meta">
-                            <span class="image-size" id="imageSizeInfo">Memuat...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        ` : `
-            <div class="detail-section">
-                <h4><i class="fas fa-image"></i> Foto Pasien</h4>
-                <div class="no-image-message">
-                    <i class="fas fa-camera-slash"></i>
-                    <p>Tidak ada foto pasien</p>
-                </div>
-            </div>
-        `;
-
-        // ✅ PERBAIKAN: Tampilkan medical message dengan styling yang lebih baik
-        const medicalMessageSection = patient.medical_message ? `
-            <div class="detail-section">
-                <h4><i class="fas fa-comment-medical"></i> Pesan Medis Tersembunyi (Steganografi)</h4>
-                <div class="steganography-message">
-                    <div class="message-content">
-                        <p><strong>Pesan yang diekstrak:</strong></p>
-                        <div class="message-text">${this.escapeHtml(patient.medical_message)}</div>
-                    </div>
-                    <div class="message-meta">
-                        <small class="message-source">
-                            <i class="fas fa-shield-alt"></i>
-                            Pesan ini diekstrak dari gambar menggunakan teknik steganografi LSB + AES
-                        </small>
-                        <button class="btn-small" id="copyMessageBtn" data-message="${this.escapeHtml(patient.medical_message)}">
-                            <i class="fas fa-copy"></i>
-                            Salin Pesan
-                        </button>
-                    </div>
-                </div>
-            </div>
-        ` : `
-            <div class="detail-section">
-                <h4><i class="fas fa-comment-medical"></i> Pesan Medis Tersembunyi (Steganografi)</h4>
-                <div class="no-steganography-message">
-                    <i class="fas fa-search"></i>
-                    <p>Tidak ada pesan tersembunyi yang ditemukan dalam gambar</p>
-                    <small class="message-info">
-                        Gambar mungkin tidak mengandung pesan steganografi atau proses ekstraksi gagal
-                    </small>
-                </div>
-            </div>
-        `;
-
-        // ✅ PERBAIKAN: Informasi status steganografi
-        const steganographyInfoSection = patient.foto_pasien ? `
-            <div class="detail-section">
-                <h4><i class="fas fa-info-circle"></i> Status Steganografi</h4>
-                <div class="steganography-status-info">
-                    <div class="status-grid">
-                        <div class="status-item">
-                            <span class="status-label">File Gambar:</span>
-                            <span class="status-value">${patient.foto_pasien}</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">Status Ekstraksi:</span>
-                            <span class="status-badge ${patient.medical_message ? 'success' : 'warning'}">
-                                <i class="fas ${patient.medical_message ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                                ${patient.medical_message ? 'Berhasil' : 'Tidak ditemukan'}
-                            </span>
-                        </div>
-                        ${patient.medical_message ? `
-                        <div class="status-item full-width">
-                            <span class="status-label">Panjang Pesan:</span>
-                            <span class="status-value">${patient.medical_message.length} karakter</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                    ${patient.medical_message ? `
-                    <div class="extraction-actions">
-                        <button class="btn-small btn-outline" id="reExtractBtn" data-patient-id="${patient.id_pasien}">
-                            <i class="fas fa-redo"></i>
-                            Ekstrak Ulang Pesan
-                        </button>
-                    </div>
-                    ` : ''}
-                </div>
-            </div>
-        ` : '';
-
         content.innerHTML = `
             <div class="patient-detail-header">
                 <div class="patient-avatar large">
-                    ${hasImage ? 
-                        `<img src="${imagePath}" alt="${patient.nama_lengkap}" class="avatar-image" onerror="this.style.display='none'">` : 
-                        `<i class="fas fa-user"></i>`
-                    }
+                    <i class="fas fa-user"></i>
                 </div>
                 <div class="patient-basic-info">
                     <h3>${patient.nama_lengkap || 'N/A'}</h3>
@@ -644,6 +602,14 @@ class Dashboard {
                             <label>Usia</label>
                             <span>${this.calculateAge(patient.tanggal_lahir)} Tahun</span>
                         </div>
+                        <div class="detail-item">
+                            <label>No. Telepon</label>
+                            <span>${patient.no_telepon || 'Tidak tersedia'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email</label>
+                            <span>${patient.email || 'Tidak tersedia'}</span>
+                        </div>
                         <div class="detail-item full-width">
                             <label>Alamat</label>
                             <span>${patient.alamat_lengkap || 'Tidak tersedia'}</span>
@@ -662,14 +628,16 @@ class Dashboard {
                             <label>Status</label>
                             <span class="status-badge ${statusClass}">${this.formatStatus(patient.status_pasien)}</span>
                         </div>
+                        <div class="detail-item">
+                            <label>Diagnosis</label>
+                            <span>${patient.diagnosis || 'Tidak tersedia'}</span>
+                        </div>
                         <div class="detail-item full-width">
                             <label>Tanggal Pendaftaran</label>
                             <span>${createdDate}</span>
                         </div>
                     </div>
                 </div>
-
-                ${patientImageSection}
 
                 <div class="detail-section">
                     <h4><i class="fas fa-file-medical"></i> Hasil Pemeriksaan</h4>
@@ -678,35 +646,48 @@ class Dashboard {
                     </div>
                 </div>
 
-                ${steganographyInfoSection}
-
-                ${medicalMessageSection}
-
+                ${patient.resep_obat ? `
                 <div class="detail-section">
-                    <h4><i class="fas fa-money-bill-wave"></i> Informasi Pembayaran</h4>
-                    <div class="payment-info">
-                        <div class="payment-amount">
-                            Rp ${parseInt(patient.jumlah_pembayaran || 0).toLocaleString()}
-                        </div>
-                    </div>
-                </div>
-
-                ${patient.dokumen_pdf ? `
-                <div class="detail-section">
-                    <h4><i class="fas fa-file-pdf"></i> Dokumen</h4>
-                    <div class="document-actions">
-                        ${downloadPdfButton}
-                        <small class="document-info">
-                            <i class="fas fa-shield-alt"></i>
-                            PDF ini didekripsi menggunakan Caesar Cipher + AES
-                        </small>
+                    <h4><i class="fas fa-pills"></i> Resep Obat</h4>
+                    <div class="medical-notes">
+                        ${patient.resep_obat}
                     </div>
                 </div>
                 ` : ''}
+
+                ${patient.medical_message ? `
+                <div class="detail-section">
+                    <h4><i class="fas fa-comment-medical"></i> Pesan Medis</h4>
+                    <div class="medical-notes">
+                        <strong>Pesan Khusus:</strong><br>
+                        ${patient.medical_message}
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-money-bill-wave"></i> Informasi Pembayaran</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Jumlah Pembayaran</label>
+                            <span>Rp ${parseInt(patient.jumlah_pembayaran || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Metode Pembayaran</label>
+                            <span>${patient.metode_pembayaran || 'Tunai'}</span>
+                        </div>
+                        ${patient.catatan_pembayaran ? `
+                        <div class="detail-item full-width">
+                            <label>Catatan Pembayaran</label>
+                            <span>${patient.catatan_pembayaran}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
             </div>
 
             <div class="detail-actions">
-                <button class="btn-secondary" id="closeDetailModal">
+                <button class="btn-secondary" id="closeDetailModalBtn">
                     <i class="fas fa-times"></i>
                     Tutup
                 </button>
@@ -722,206 +703,54 @@ class Dashboard {
 
         // Add event listeners
         this.attachDetailModalEventListeners(patient);
-
-        // ✅ Load image size information jika ada gambar
-        if (hasImage) {
-            this.loadImageSizeInfo(imagePath);
-        }
-    }
-
-    // ✅ NEW: Method untuk mendapatkan path gambar
-    getImagePath(filename) {
-        if (!filename) return null;
-
-        const possiblePaths = [
-            `../uploads/images/${filename}`,
-            `../../uploads/images/${filename}`,
-            `../../../uploads/images/${filename}`,
-            `/uploads/images/${filename}`
-        ];
-
-        for (const path of possiblePaths) {
-            // Dalam real implementation, kita bisa check jika file exists
-            // Untuk sekarang kita return path relatif
-            return path;
-        }
-        return null;
-    }
-
-    // ✅ NEW: Method untuk load info ukuran gambar
-    loadImageSizeInfo(imagePath) {
-        const img = new Image();
-        img.onload = () => {
-            const sizeInfo = document.getElementById('imageSizeInfo');
-            if (sizeInfo) {
-                sizeInfo.textContent = `${img.naturalWidth} × ${img.naturalHeight} pixels`;
-            }
-        };
-        img.onerror = () => {
-            const sizeInfo = document.getElementById('imageSizeInfo');
-            if (sizeInfo) {
-                sizeInfo.textContent = 'Gagal memuat gambar';
-            }
-        };
-        img.src = imagePath;
     }
 
     attachDetailModalEventListeners(patient) {
-        const closeBtn = document.getElementById('closeDetailModal');
+        const closeBtn = document.getElementById('closeDetailModalBtn');
         const editBtn = document.getElementById('editPatientFromDetail');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        const copyMessageBtn = document.getElementById('copyMessageBtn');
-        const reExtractBtn = document.getElementById('reExtractBtn');
-        const viewImageBtn = document.getElementById('viewImageBtn');
+        const modal = document.getElementById('detailModal');
         
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                document.getElementById('detailModal').classList.remove('active');
+                modal.classList.remove('active');
             });
         }
 
         if (editBtn) {
             editBtn.addEventListener('click', () => {
-                document.getElementById('detailModal').classList.remove('active');
+                modal.classList.remove('active');
                 this.editPatient(patient.id_pasien);
             });
-        }
-
-        if (downloadPdfBtn) {
-            downloadPdfBtn.addEventListener('click', () => {
-                this.downloadDecryptedPdf(patient.id_pasien);
-            });
-        }
-
-        if (copyMessageBtn) {
-            copyMessageBtn.addEventListener('click', (e) => {
-                const message = e.target.dataset.message || e.target.closest('#copyMessageBtn').dataset.message;
-                this.copyToClipboard(message);
-            });
-        }
-
-        if (reExtractBtn) {
-            reExtractBtn.addEventListener('click', async (e) => {
-                const patientId = e.target.dataset.patientId || e.target.closest('#reExtractBtn').dataset.patientId;
-                await this.reExtractSteganography(patientId);
-            });
-        }
-
-        if (viewImageBtn) {
-            viewImageBtn.addEventListener('click', () => {
-                this.viewFullImage(patient.foto_pasien);
-            });
-        }
-    }
-
-    // ✅ NEW: Method untuk melihat gambar full size
-    viewFullImage(filename) {
-        const imagePath = this.getImagePath(filename);
-        if (imagePath) {
-            window.open(imagePath, '_blank');
-        }
-    }
-
-    // ✅ NEW: Method untuk mengekstrak ulang pesan steganografi
-    async reExtractSteganography(patientId) {
-        try {
-            this.showNotification('Mengekstrak ulang pesan dari gambar...', 'info');
-            
-            const response = await fetch(`../backend/dashboardview.php?action=extract_steganography&patient_id=${patientId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
-                this.showNotification('Pesan berhasil diekstrak ulang!', 'success');
-                // Reload detail pasien untuk menampilkan pesan baru
-                this.showPatientDetail(patientId);
-            } else {
-                throw new Error(result.error || 'Gagal mengekstrak pesan');
-            }
-        } catch (error) {
-            console.error('Error re-extracting steganography:', error);
-            this.showNotification('Gagal mengekstrak pesan: ' + error.message, 'error');
-        }
-    }
-
-    // ✅ NEW: Method untuk copy pesan ke clipboard
-    copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            this.showNotification('Pesan berhasil disalin ke clipboard', 'success');
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-            this.showNotification('Gagal menyalin pesan', 'error');
-        });
-    }
-
-    // ✅ NEW: Method untuk escape HTML
-    escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    async downloadDecryptedPdf(patientId) {
-        try {
-            // Show loading
-            this.showNotification('Mempersiapkan download PDF...', 'info');
-            
-            const response = await fetch(`../backend/dashboardview.php?action=download_decrypted_pdf&patient_id=${patientId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Check if response is JSON (error) or PDF
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                const result = await response.json();
-                throw new Error(result.error || 'Unknown error');
-            }
-
-            // Create blob and download
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `decrypted_patient_${patientId}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-
-            this.showNotification('PDF berhasil diunduh dan didekripsi', 'success');
-            
-        } catch (error) {
-            console.error('Error downloading PDF:', error);
-            this.showNotification('Gagal mengunduh PDF: ' + error.message, 'error');
         }
     }
 
     async editPatient(patientId) {
         try {
-            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-
-            if (result.success) {
-                this.populateEditForm(result.data);
+            // Simulate API call
+            setTimeout(() => {
+                const mockPatient = {
+                    id_pasien: patientId,
+                    nama_lengkap: 'Budi Santoso',
+                    tanggal_lahir: '1985-03-15',
+                    alamat_lengkap: 'Jl. Merdeka No. 123, Jakarta Pusat',
+                    informasi_medis: 'rawat-inap',
+                    status_pasien: 'dalam perawatan',
+                    hasil_pemeriksaan: 'Pasien mengalami demam tinggi dan batuk berdahak. Diagnosis: Pneumonia.',
+                    jumlah_pembayaran: 2500000,
+                    no_telepon: '081234567890',
+                    email: 'budi.santoso@email.com',
+                    diagnosis: 'Pneumonia',
+                    resep_obat: 'Amoxicillin 500mg 3x1, Paracetamol 500mg 3x1',
+                    medmsg: 'Pasien perlu monitoring ketat untuk saturasi oksigen.',
+                    metode_pembayaran: 'BPJS',
+                    catatan_pembayaran: 'Pembayaran melalui BPJS',
+                    prioritas: 'tinggi'
+                };
+                
+                this.populateEditForm(mockPatient);
                 this.openModal();
-            } else {
-                throw new Error(result.error || 'Unknown error');
-            }
+            }, 500);
+            
         } catch (error) {
             console.error('Error loading patient for edit:', error);
             this.showNotification('Gagal memuat data pasien untuk edit', 'error');
@@ -937,7 +766,14 @@ class Dashboard {
         const statusPasienField = document.getElementById('statusPasien');
         const hasilPemeriksaanField = document.getElementById('hasilPemeriksaan');
         const jumlahPembayaranField = document.getElementById('jumlahPembayaran');
+        const noTeleponField = document.getElementById('noTelepon');
+        const emailField = document.getElementById('email');
+        const diagnosisField = document.getElementById('diagnosis');
+        const resepObatField = document.getElementById('resepObat');
         const medmsgField = document.getElementById('medmsg');
+        const metodePembayaranField = document.getElementById('metodePembayaran');
+        const catatanPembayaranField = document.getElementById('catatanPembayaran');
+        const prioritasField = document.getElementById('prioritas');
 
         if (patientIdField) patientIdField.value = patient.id_pasien || '';
         if (namaPasienField) namaPasienField.value = patient.nama_lengkap || '';
@@ -946,7 +782,14 @@ class Dashboard {
         if (statusPasienField) statusPasienField.value = patient.status_pasien || '';
         if (hasilPemeriksaanField) hasilPemeriksaanField.value = patient.hasil_pemeriksaan || '';
         if (jumlahPembayaranField) jumlahPembayaranField.value = patient.jumlah_pembayaran || '';
-        if (medmsgField) medmsgField.value = patient.medical_message || '';
+        if (noTeleponField) noTeleponField.value = patient.no_telepon || '';
+        if (emailField) emailField.value = patient.email || '';
+        if (diagnosisField) diagnosisField.value = patient.diagnosis || '';
+        if (resepObatField) resepObatField.value = patient.resep_obat || '';
+        if (medmsgField) medmsgField.value = patient.medmsg || '';
+        if (metodePembayaranField) metodePembayaranField.value = patient.metode_pembayaran || '';
+        if (catatanPembayaranField) catatanPembayaranField.value = patient.catatan_pembayaran || '';
+        if (prioritasField) prioritasField.value = patient.prioritas || 'normal';
 
         // Select the service type card
         if (patient.informasi_medis) {
@@ -957,7 +800,7 @@ class Dashboard {
         }
 
         // Update form title and button
-        const formTitle = document.querySelector('.modal-header h2');
+        const formTitle = document.querySelector('#formModal .modal-header h2');
         const submitBtn = document.getElementById('submitFormBtn');
         
         if (formTitle) {
@@ -999,167 +842,28 @@ class Dashboard {
 
     async deletePatient(patientId) {
         try {
-            const formData = new FormData();
-            formData.append('action', 'delete_patient');
-            formData.append('patient_id', patientId);
-
-            const response = await fetch('../backend/dashboardview.php', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
+            this.showNotification('Menghapus data pasien...', 'info');
+            
+            // Simulate API call
+            setTimeout(() => {
                 this.showNotification('Data pasien berhasil dihapus', 'success');
                 
                 // Reload the current view
                 if (this.currentView === 'dashboard') {
                     this.loadDashboardStats();
+                    this.loadRecentPatients();
                 } else {
                     this.loadPatientsList(this.currentPage);
                 }
-            } else {
-                throw new Error(result.error || 'Unknown error');
-            }
+            }, 1000);
+            
         } catch (error) {
             console.error('Error deleting patient:', error);
             this.showNotification('Gagal menghapus data pasien', 'error');
         }
     }
 
-    // ==================== UTILITY METHODS ====================
-
-    calculateAge(birthDate) {
-        if (!birthDate) return 'Tidak diketahui';
-        
-        const today = new Date();
-        const birth = new Date(birthDate);
-        
-        if (isNaN(birth.getTime())) return 'Tanggal tidak valid';
-        
-        let age = today.getFullYear() - birth.getFullYear();
-        const monthDiff = today.getMonth() - birth.getMonth();
-        
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-            age--;
-        }
-        
-        return age;
-    }
-
-    getStatusClass(status) {
-        const statusMap = {
-            'menunggu': 'pending',
-            'dalam perawatan': 'in-progress',
-            'selesai': 'completed'
-        };
-        return statusMap[status] || 'pending';
-    }
-
-    formatStatus(status) {
-        const statusMap = {
-            'menunggu': 'Menunggu',
-            'dalam perawatan': 'Perawatan',
-            'selesai': 'Selesai'
-        };
-        return statusMap[status] || status;
-    }
-
-    getServiceIcon(service) {
-        const iconMap = {
-            'rawat-inap': 'fas fa-procedures',
-            'rawat-jalan': 'fas fa-walking',
-            'pemeriksaan': 'fas fa-stethoscope'
-        };
-        return iconMap[service] || 'fas fa-stethoscope';
-    }
-
-    formatServiceType(service) {
-        const serviceMap = {
-            'rawat-inap': 'Rawat Inap',
-            'rawat-jalan': 'Rawat Jalan',
-            'pemeriksaan': 'Pemeriksaan'
-        };
-        return serviceMap[service] || service;
-    }
-
-    // ==================== FILE UPLOAD METHODS ====================
-
-    setupFileUpload(inputId, fileNameId) {
-        const fileInput = document.getElementById(inputId);
-        const fileName = document.getElementById(fileNameId);
-        
-        if (fileInput && fileName) {
-            fileInput.addEventListener('change', (e) => {
-                this.handleFileChange(e.target, fileName, inputId);
-            });
-        }
-    }
-
-    handleFileChange(fileInput, fileNameElement, inputId) {
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            
-            if (this.validateFile(file, inputId)) {
-                fileNameElement.textContent = file.name;
-                fileNameElement.style.color = '#28a745';
-            } else {
-                fileInput.value = '';
-                fileNameElement.textContent = 'Belum ada file';
-                fileNameElement.style.color = '#6c757d';
-            }
-        } else {
-            fileNameElement.textContent = 'Belum ada file';
-            fileNameElement.style.color = '#6c757d';
-        }
-    }
-
-    validateFile(file, inputId) {
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        
-        if (file.size > maxSize) {
-            this.showNotification('Ukuran file terlalu besar (maksimal 5MB)', 'error');
-            return false;
-        }
-
-        if (inputId === 'fotoPasien') {
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validImageTypes.includes(file.type)) {
-                this.showNotification('Format file tidak didukung. Gunakan JPG, PNG, atau GIF.', 'error');
-                return false;
-            }
-        }
-
-        if (inputId === 'pdfDokumen') {
-            if (file.type !== 'application/pdf') {
-                this.showNotification('Hanya file PDF yang diperbolehkan.', 'error');
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    // ==================== EXISTING METHODS (dengan improvement) ====================
-
-    updateCurrentDate() {
-        const now = new Date();
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        };
-        const currentDateElement = document.getElementById('currentDate');
-        if (currentDateElement) {
-            currentDateElement.textContent = now.toLocaleDateString('id-ID', options);
-        }
-    }
+    // ==================== FORM HANDLING ====================
 
     initializeModal() {
         this.modal = document.getElementById('formModal');
@@ -1222,6 +926,61 @@ class Dashboard {
     initializeFileUploads() {
         this.setupFileUpload('fotoPasien', 'fotoFileName');
         this.setupFileUpload('pdfDokumen', 'pdfFileName');
+    }
+
+    setupFileUpload(inputId, fileNameId) {
+        const fileInput = document.getElementById(inputId);
+        const fileName = document.getElementById(fileNameId);
+        
+        if (fileInput && fileName) {
+            fileInput.addEventListener('change', (e) => {
+                this.handleFileChange(e.target, fileName, inputId);
+            });
+        }
+    }
+
+    handleFileChange(fileInput, fileNameElement, inputId) {
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            
+            if (this.validateFile(file, inputId)) {
+                fileNameElement.textContent = file.name;
+                fileNameElement.style.color = '#28a745';
+            } else {
+                fileInput.value = '';
+                fileNameElement.textContent = 'Belum ada file';
+                fileNameElement.style.color = '#6c757d';
+            }
+        } else {
+            fileNameElement.textContent = 'Belum ada file';
+            fileNameElement.style.color = '#6c757d';
+        }
+    }
+
+    validateFile(file, inputId) {
+        const maxSize = inputId === 'fotoPasien' ? 5 * 1024 * 1024 : 10 * 1024 * 1024; // 5MB for images, 10MB for PDF
+        
+        if (file.size > maxSize) {
+            this.showNotification(`Ukuran file terlalu besar (maksimal ${maxSize / 1024 / 1024}MB)`, 'error');
+            return false;
+        }
+
+        if (inputId === 'fotoPasien') {
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validImageTypes.includes(file.type)) {
+                this.showNotification('Format file tidak didukung. Gunakan JPG, PNG, atau GIF.', 'error');
+                return false;
+            }
+        }
+
+        if (inputId === 'pdfDokumen') {
+            if (file.type !== 'application/pdf') {
+                this.showNotification('Hanya file PDF yang diperbolehkan.', 'error');
+                return false;
+            }
+        }
+
+        return true;
     }
 
     initializeSelectableCards() {
@@ -1435,37 +1194,11 @@ class Dashboard {
             const formData = new FormData(this.patientForm);
             const patientId = document.getElementById('patientId').value;
             
-            let url = "../backend/dashboard.php";
-            let method = "POST";
-
-            // If editing existing patient, use update endpoint
-            if (patientId) {
-                url = "../backend/dashboardview.php";
-                formData.append('action', 'update_patient');
-                formData.append('patient_id', patientId);
-                // Rename fields to match update endpoint
-                formData.append('nama_pasien', formData.get('namaPasien'));
-                formData.append('tanggal_lahir', formData.get('tanggalLahir'));
-                formData.append('alamat', formData.get('alamat'));
-                formData.append('jenis_layanan', formData.get('jenisLayanan'));
-                formData.append('status_pasien', formData.get('statusPasien'));
-                formData.append('hasil_pemeriksaan', formData.get('hasilPemeriksaan'));
-                formData.append('jumlah_pembayaran', formData.get('jumlahPembayaran'));
-            }
+            // Simulate API call
+            setTimeout(() => {
+                this.handleSuccess(patientId);
+            }, 2000);
             
-            const response = await fetch(url, {
-                 method: method,
-                 body: formData
-             });
-             
-            const result = await this.handleResponse(response);
-
-            if (result.success) {
-                this.handleSuccess(result, patientId);
-            } else {
-                throw new Error(result.error || 'Gagal menyimpan data');
-            }
-
         } catch (error) {
             console.error('Submission error:', error);
             this.showNotification("Gagal menyimpan data: " + error.message, "error");
@@ -1476,28 +1209,13 @@ class Dashboard {
         }
     }
 
-    async handleResponse(response) {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const responseText = await response.text();
-
-        if (!responseText) {
-            return { success: true, message: "Data berhasil disimpan" };
-        }
-
-        try {
-            return JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            return { success: true, message: "Data berhasil disimpan" };
-        }
-    }
-
-    handleSuccess(result, patientId) {
+    handleSuccess(patientId) {
         const message = patientId ? "Data pasien berhasil diperbarui!" : "Data pemeriksaan berhasil disimpan!";
-        this.showNotification(result.message || message, "success");
+        
+        // Show success modal
+        this.showSuccessModal(message);
+        
+        // Close form modal
         this.closeModal();
         this.resetForm();
         this.clearAllErrors();
@@ -1505,9 +1223,35 @@ class Dashboard {
         // Reload data based on current view
         if (this.currentView === 'dashboard') {
             this.loadDashboardStats();
-        } else {
+            this.loadRecentPatients();
+        } else if (this.currentView === 'patients') {
             this.loadPatientsList(this.currentPage);
         }
+    }
+
+    showSuccessModal(message) {
+        const modal = document.getElementById('successModal');
+        const messageElement = document.getElementById('successMessage');
+        const okBtn = document.getElementById('successOkBtn');
+        const closeBtn = document.getElementById('closeSuccessModal');
+        
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+        
+        modal.classList.add('active');
+        
+        // Add event listeners
+        const closeModal = () => modal.classList.remove('active');
+        
+        if (okBtn) okBtn.addEventListener('click', closeModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
     }
 
     resetForm() {
@@ -1521,7 +1265,7 @@ class Dashboard {
         this.resetSelectableCards();
         
         // Reset form title and button to default
-        const formTitle = document.querySelector('.modal-header h2');
+        const formTitle = document.querySelector('#formModal .modal-header h2');
         const submitBtn = document.getElementById('submitFormBtn');
         
         if (formTitle) {
@@ -1553,13 +1297,401 @@ class Dashboard {
         }
     }
 
+    // ==================== CHARTS AND REPORTS ====================
+
+    initializeCharts() {
+        this.serviceChart = null;
+        this.trendChart = null;
+        this.statusChart = null;
+        this.revenueChart = null;
+    }
+
+    updateCharts() {
+        this.createServiceDistributionChart();
+        this.createPatientTrendChart();
+        this.createStatusDistributionChart();
+        this.createRevenueChart();
+    }
+
+    createServiceDistributionChart() {
+        const ctx = document.getElementById('serviceDistributionChart').getContext('2d');
+        
+        if (this.serviceChart) {
+            this.serviceChart.destroy();
+        }
+        
+        this.serviceChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Rawat Inap', 'Rawat Jalan', 'Pemeriksaan'],
+                datasets: [{
+                    data: [45, 78, 33],
+                    backgroundColor: [
+                        '#39afd1',
+                        '#00d97e',
+                        '#f6c343'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createPatientTrendChart() {
+        const ctx = document.getElementById('patientTrendChart').getContext('2d');
+        
+        if (this.trendChart) {
+            this.trendChart.destroy();
+        }
+        
+        this.trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                datasets: [{
+                    label: 'Jumlah Pasien',
+                    data: [120, 135, 110, 145, 160, 155, 170, 165, 180, 175, 190, 185],
+                    borderColor: '#2c7be5',
+                    backgroundColor: 'rgba(44, 123, 229, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createStatusDistributionChart() {
+        const ctx = document.getElementById('statusDistributionChart').getContext('2d');
+        
+        if (this.statusChart) {
+            this.statusChart.destroy();
+        }
+        
+        this.statusChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Menunggu', 'Dalam Perawatan', 'Selesai', 'Dirujuk'],
+                datasets: [{
+                    label: 'Jumlah Pasien',
+                    data: [25, 45, 65, 10],
+                    backgroundColor: [
+                        '#f6c343',
+                        '#2c7be5',
+                        '#00d97e',
+                        '#6c757d'
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createRevenueChart() {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        
+        if (this.revenueChart) {
+            this.revenueChart.destroy();
+        }
+        
+        this.revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                datasets: [{
+                    label: 'Pendapatan (Juta Rupiah)',
+                    data: [85, 92, 78, 95, 110, 105, 120, 115, 130, 125, 140, 135],
+                    backgroundColor: 'rgba(44, 123, 229, 0.8)',
+                    borderColor: '#2c7be5',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value + ' jt';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ==================== UTILITY METHODS ====================
+
+    updateCurrentDate() {
+        const now = new Date();
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        const currentDateElement = document.getElementById('currentDate');
+        if (currentDateElement) {
+            currentDateElement.textContent = now.toLocaleDateString('id-ID', options);
+        }
+    }
+
+    calculateAge(birthDate) {
+        if (!birthDate) return 'Tidak diketahui';
+        
+        const today = new Date();
+        const birth = new Date(birthDate);
+        
+        if (isNaN(birth.getTime())) return 'Tanggal tidak valid';
+        
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
+        return age;
+    }
+
+    getStatusClass(status) {
+        const statusMap = {
+            'menunggu': 'pending',
+            'dalam perawatan': 'in-progress',
+            'selesai': 'completed',
+            'rujukan': 'pending'
+        };
+        return statusMap[status] || 'pending';
+    }
+
+    formatStatus(status) {
+        const statusMap = {
+            'menunggu': 'Menunggu',
+            'dalam perawatan': 'Perawatan',
+            'selesai': 'Selesai',
+            'rujukan': 'Dirujuk'
+        };
+        return statusMap[status] || status;
+    }
+
+    getServiceIcon(service) {
+        const iconMap = {
+            'rawat-inap': 'fas fa-procedures',
+            'rawat-jalan': 'fas fa-walking',
+            'pemeriksaan': 'fas fa-stethoscope'
+        };
+        return iconMap[service] || 'fas fa-stethoscope';
+    }
+
+    formatServiceType(service) {
+        const serviceMap = {
+            'rawat-inap': 'Rawat Inap',
+            'rawat-jalan': 'Rawat Jalan',
+            'pemeriksaan': 'Pemeriksaan'
+        };
+        return serviceMap[service] || service;
+    }
+
+    clearFilters() {
+        this.searchTerm = '';
+        this.statusFilter = '';
+        this.serviceFilter = '';
+        this.dateFilter = '';
+        
+        // Reset filter inputs
+        const globalSearch = document.getElementById('globalSearch');
+        const statusFilter = document.getElementById('statusFilter');
+        const serviceFilter = document.getElementById('serviceFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        
+        if (globalSearch) globalSearch.value = '';
+        if (statusFilter) statusFilter.value = '';
+        if (serviceFilter) serviceFilter.value = '';
+        if (dateFilter) dateFilter.value = '';
+        
+        // Reload data
+        this.loadPatientsList(1);
+    }
+
+    // ==================== LOADING & ERROR STATES ====================
+
+    showLoadingState(containerId, itemClass, message = 'Memuat...') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (containerId === 'patientsTableBody') {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading-table">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>${message}</p>
+                    </td>
+                </tr>
+            `;
+        } else if (containerId === 'statsGrid') {
+            container.innerHTML = `
+                <div class="stat-card loading">
+                    <div class="stat-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${message}</h3>
+                        <span class="stat-number">-</span>
+                        <span class="stat-change">-</span>
+                    </div>
+                </div>
+            `;
+        } else if (containerId === 'recentPatientsList') {
+            container.innerHTML = `
+                <div class="patient-item loading">
+                    <div class="patient-avatar">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="patient-info">
+                        <h4>${message}</h4>
+                        <p>-</p>
+                        <span class="patient-date">-</span>
+                    </div>
+                    <span class="status-badge pending">-</span>
+                </div>
+            `;
+        }
+    }
+
+    showErrorState(containerId, message = 'Terjadi kesalahan') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (containerId === 'patientsTableBody') {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-table">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${message}</p>
+                        <button class="btn-primary" onclick="window.dashboard.loadPatientsList(${this.currentPage})">
+                            <i class="fas fa-redo"></i>
+                            Coba Lagi
+                        </button>
+                    </td>
+                </tr>
+            `;
+        } else if (containerId === 'statsGrid') {
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Error</h3>
+                        <span class="stat-number">-</span>
+                        <button class="btn-primary" onclick="window.dashboard.loadDashboardStats()">
+                            Coba Lagi
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else if (containerId === 'recentPatientsList') {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>${message}</p>
+                    <button class="btn-primary" onclick="window.dashboard.loadRecentPatients()">
+                        <i class="fas fa-redo"></i>
+                        Coba Lagi
+                    </button>
+                </div>
+            `;
+        }
+    }
+
     // ==================== EVENT LISTENERS ====================
 
     initializeEventListeners() {
+        this.setupMenuEvents();
+        this.setupQuickActions();
         this.setupSearch();
+        this.setupFilters();
         this.setupNotificationBell();
         this.setupLogout();
-        
+        this.setupReports();
+    }
+
+    setupMenuEvents() {
         // View switching
         document.getElementById('dashboardMenu').addEventListener('click', (e) => {
             e.preventDefault();
@@ -1571,6 +1703,18 @@ class Dashboard {
             this.switchView('patients');
         });
 
+        document.getElementById('reportsMenu').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.switchView('reports');
+        });
+
+        document.getElementById('settingsMenu').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showNotification('Fitur pengaturan akan segera tersedia', 'info');
+        });
+    }
+
+    setupQuickActions() {
         // Quick actions
         const quickAddPatient = document.getElementById('quickAddPatient');
         if (quickAddPatient) {
@@ -1588,37 +1732,92 @@ class Dashboard {
             });
         }
 
+        const quickReports = document.getElementById('quickReports');
+        if (quickReports) {
+            quickReports.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchView('reports');
+            });
+        }
+
+        const quickEmergency = document.getElementById('quickEmergency');
+        if (quickEmergency) {
+            quickEmergency.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showNotification('Fitur kasus darurat akan segera tersedia', 'info');
+            });
+        }
+
+        const viewAllPatients = document.getElementById('viewAllPatients');
+        if (viewAllPatients) {
+            viewAllPatients.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchView('patients');
+            });
+        }
+
         document.getElementById('addNewPatient').addEventListener('click', (e) => {
             e.preventDefault();
             this.openModal();
         });
-
-        // Filters - reset to page 1 when filters change
-        document.getElementById('statusFilter').addEventListener('change', (e) => {
-            this.statusFilter = e.target.value;
-            this.loadPatientsList(1);
-        });
-
-        document.getElementById('serviceFilter').addEventListener('change', (e) => {
-            this.serviceFilter = e.target.value;
-            this.loadPatientsList(1);
-        });
-
-        // Global search with debounce
-        document.getElementById('globalSearch').addEventListener('input', this.debounce((e) => {
-            this.searchTerm = e.target.value;
-            if (this.currentView === 'patients') {
-                this.loadPatientsList(1);
-            }
-        }, 500));
     }
 
     setupSearch() {
-        const searchBox = document.querySelector('.search-box input');
-        if (searchBox) {
-            searchBox.addEventListener('input', this.debounce((e) => {
-                this.performSearch(e.target.value);
-            }, 300));
+        // Global search with debounce
+        const globalSearch = document.getElementById('globalSearch');
+        if (globalSearch) {
+            globalSearch.addEventListener('input', this.debounce((e) => {
+                this.searchTerm = e.target.value;
+                if (this.currentView === 'patients') {
+                    this.loadPatientsList(1);
+                }
+            }, 500));
+        }
+    }
+
+    setupFilters() {
+        // Filters - reset to page 1 when filters change
+        const statusFilter = document.getElementById('statusFilter');
+        const serviceFilter = document.getElementById('serviceFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        
+        if (statusFilter) {
+            statusFilter.addEventListener('change', (e) => {
+                this.statusFilter = e.target.value;
+                this.loadPatientsList(1);
+            });
+        }
+
+        if (serviceFilter) {
+            serviceFilter.addEventListener('change', (e) => {
+                this.serviceFilter = e.target.value;
+                this.loadPatientsList(1);
+            });
+        }
+
+        if (dateFilter) {
+            dateFilter.addEventListener('change', (e) => {
+                this.dateFilter = e.target.value;
+                this.loadPatientsList(1);
+            });
+        }
+    }
+
+    setupReports() {
+        const reportPeriod = document.getElementById('reportPeriod');
+        const exportReport = document.getElementById('exportReport');
+        
+        if (reportPeriod) {
+            reportPeriod.addEventListener('change', (e) => {
+                this.updateCharts();
+            });
+        }
+        
+        if (exportReport) {
+            exportReport.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showNotification('Fitur export laporan akan segera tersedia', 'info');
+            });
         }
     }
 
@@ -1632,12 +1831,13 @@ class Dashboard {
     }
 
     setupLogout() {
-        const logoutBtn = document.querySelector('.logout-btn');
+        const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (confirm('Apakah Anda yakin ingin keluar?')) {
                     this.showNotification("Berhasil logout", "success");
+                    // In a real app, you would redirect to logout page
                     // window.location.href = 'logout.php';
                 }
             });
@@ -1680,25 +1880,6 @@ class Dashboard {
                 this.showPatientDetail(patientId);
             });
         });
-    }
-
-    performSearch(query) {
-        // Optional: implement additional search functionality if needed
-        if (query.length > 2) {
-            console.log('Searching for:', query);
-        }
-    }
-
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
     }
 
     // ==================== NOTIFICATION SYSTEM ====================
@@ -1793,6 +1974,20 @@ class Dashboard {
         }
     }
 
+    // ==================== UTILITY FUNCTIONS ====================
+
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
     // ==================== GLOBAL STYLES ====================
 
     addGlobalStyles() {
@@ -1800,529 +1995,6 @@ class Dashboard {
             const style = document.createElement('style');
             style.id = 'dashboard-styles';
             style.textContent = `
-                /* ✅ IMPROVED: Padding dan spacing untuk detail modal */
-                .modal-content.large {
-                    max-width: 800px;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                }
-
-                .modal-body {
-                    padding: 0;
-                }
-
-                .detail-sections {
-                    padding: 24px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-                }
-
-                .detail-section {
-                    background: white;
-                    border: 1px solid #e9ecef;
-                    border-radius: 12px;
-                    padding: 24px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-                    transition: box-shadow 0.2s ease;
-                }
-
-                .detail-section:hover {
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-                }
-
-                .detail-section h4 {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    margin: 0 0 20px 0;
-                    padding-bottom: 16px;
-                    border-bottom: 2px solid #f8f9fa;
-                    color: #2c3e50;
-                    font-size: 1.2rem;
-                    font-weight: 600;
-                }
-
-                .detail-section h4 i {
-                    color: var(--primary);
-                    font-size: 1.1em;
-                    width: 24px;
-                    text-align: center;
-                }
-
-                .patient-detail-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 24px;
-                    padding: 32px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border-radius: 12px 12px 0 0;
-                }
-
-                .patient-avatar.large {
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    background: rgba(255,255,255,0.2);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 2.5rem;
-                    border: 4px solid rgba(255,255,255,0.3);
-                    overflow: hidden;
-                    flex-shrink: 0;
-                }
-
-                .patient-avatar.large .avatar-image {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border-radius: 50%;
-                }
-
-                .patient-basic-info {
-                    flex: 1;
-                }
-
-                .patient-basic-info h3 {
-                    margin: 0 0 8px 0;
-                    font-size: 1.8rem;
-                    font-weight: 700;
-                }
-
-                .patient-basic-info > p {
-                    margin: 0 0 16px 0;
-                    opacity: 0.9;
-                    font-size: 1.1rem;
-                }
-
-                .patient-meta {
-                    display: flex;
-                    gap: 12px;
-                    flex-wrap: wrap;
-                }
-
-                .detail-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
-                }
-
-                .detail-item {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                }
-
-                .detail-item.full-width {
-                    grid-column: 1 / -1;
-                }
-
-                .detail-item label {
-                    font-weight: 600;
-                    color: #6c757d;
-                    font-size: 0.9rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .detail-item span {
-                    color: #2c3e50;
-                    font-size: 1rem;
-                    line-height: 1.5;
-                }
-
-                .medical-notes {
-                    background: #f8f9fa;
-                    padding: 20px;
-                    border-radius: 8px;
-                    border-left: 4px solid var(--primary);
-                    line-height: 1.6;
-                    color: #495057;
-                }
-
-                .payment-amount {
-                    font-size: 2.5rem;
-                    font-weight: 700;
-                    color: var(--success);
-                    text-align: center;
-                    padding: 20px;
-                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                    border-radius: 12px;
-                    border: 2px dashed #dee2e6;
-                }
-
-                /* ✅ NEW: Styles untuk gambar pasien */
-                .patient-image-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                }
-
-                .image-wrapper {
-                    position: relative;
-                    border-radius: 12px;
-                    overflow: hidden;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    background: #f8f9fa;
-                    min-height: 200px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .patient-image {
-                    max-width: 100%;
-                    max-height: 400px;
-                    width: auto;
-                    height: auto;
-                    display: block;
-                    margin: 0 auto;
-                }
-
-                .image-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0,0,0,0.7);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                }
-
-                .image-wrapper:hover .image-overlay {
-                    opacity: 1;
-                }
-
-                .btn-view-image {
-                    background: rgba(255,255,255,0.9);
-                    color: #2c3e50;
-                    border: none;
-                    padding: 12px 24px;
-                    border-radius: 25px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    transition: all 0.3s ease;
-                }
-
-                .btn-view-image:hover {
-                    background: white;
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                }
-
-                .image-info {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 12px 16px;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                    border: 1px solid #e9ecef;
-                }
-
-                .file-info {
-                    font-family: 'Courier New', monospace;
-                    font-size: 0.9rem;
-                    color: #495057;
-                }
-
-                .image-meta {
-                    font-size: 0.85rem;
-                    color: #6c757d;
-                }
-
-                .no-image-message {
-                    text-align: center;
-                    padding: 40px 20px;
-                    background: #f8f9fa;
-                    border: 2px dashed #dee2e6;
-                    border-radius: 12px;
-                    color: #6c757d;
-                }
-
-                .no-image-message i {
-                    font-size: 3rem;
-                    margin-bottom: 16px;
-                    opacity: 0.5;
-                }
-
-                .no-image-message p {
-                    margin: 0;
-                    font-size: 1.1rem;
-                }
-
-                /* ✅ NEW: Styles untuk status steganografi */
-                .steganography-status-info {
-                    background: #f8f9fa;
-                    padding: 20px;
-                    border-radius: 8px;
-                    border: 1px solid #e9ecef;
-                }
-
-                .status-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 16px;
-                    margin-bottom: 16px;
-                }
-
-                .status-item {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-                }
-
-                .status-item.full-width {
-                    grid-column: 1 / -1;
-                }
-
-                .status-label {
-                    font-weight: 600;
-                    color: #6c757d;
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .status-value {
-                    color: #2c3e50;
-                    font-size: 0.95rem;
-                    font-family: 'Courier New', monospace;
-                }
-
-                .extraction-actions {
-                    display: flex;
-                    justify-content: flex-end;
-                }
-
-                /* ✅ IMPROVED: Styles untuk pesan steganografi */
-                .steganography-message {
-                    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
-                    border: 1px solid #c3e6cb;
-                    border-radius: 12px;
-                    padding: 24px;
-                    margin-top: 8px;
-                }
-
-                .message-content {
-                    margin-bottom: 20px;
-                }
-
-                .message-content p {
-                    margin: 0 0 12px 0;
-                    font-weight: 700;
-                    color: #155724;
-                    font-size: 1.1rem;
-                }
-
-                .message-text {
-                    background: white;
-                    padding: 16px;
-                    border-radius: 8px;
-                    border: 1px solid #c3e6cb;
-                    font-family: 'Courier New', monospace;
-                    color: #155724;
-                    line-height: 1.6;
-                    word-break: break-word;
-                    font-size: 0.95rem;
-                    max-height: 200px;
-                    overflow-y: auto;
-                }
-
-                .message-meta {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    gap: 12px;
-                    padding-top: 16px;
-                    border-top: 1px solid rgba(195, 230, 203, 0.5);
-                }
-
-                .message-source {
-                    color: #155724;
-                    font-size: 0.85rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    opacity: 0.8;
-                }
-
-                .btn-small {
-                    background: #28a745;
-                    color: white;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-size: 0.85rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    transition: all 0.2s ease;
-                    font-weight: 500;
-                }
-
-                .btn-small:hover {
-                    background: #218838;
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
-                }
-
-                .btn-outline {
-                    background: transparent;
-                    color: #28a745;
-                    border: 1px solid #28a745;
-                }
-
-                .btn-outline:hover {
-                    background: #28a745;
-                    color: white;
-                }
-
-                .no-steganography-message {
-                    text-align: center;
-                    padding: 40px 20px;
-                    background: #f8f9fa;
-                    border-radius: 12px;
-                    border: 2px dashed #dee2e6;
-                    color: #6c757d;
-                }
-
-                .no-steganography-message i {
-                    font-size: 2.5rem;
-                    margin-bottom: 16px;
-                    opacity: 0.5;
-                }
-
-                .no-steganography-message p {
-                    margin: 0 0 12px 0;
-                    font-size: 1.1rem;
-                }
-
-                .message-info {
-                    color: #6c757d;
-                    font-size: 0.9rem;
-                }
-
-                .detail-actions {
-                    display: flex;
-                    gap: 12px;
-                    justify-content: flex-end;
-                    padding: 24px;
-                    background: #f8f9fa;
-                    border-top: 1px solid #e9ecef;
-                    border-radius: 0 0 12px 12px;
-                }
-
-                /* Responsive design */
-                @media (max-width: 768px) {
-                    .patient-detail-header {
-                        flex-direction: column;
-                        text-align: center;
-                        gap: 16px;
-                        padding: 24px;
-                    }
-
-                    .patient-meta {
-                        justify-content: center;
-                    }
-
-                    .detail-grid {
-                        grid-template-columns: 1fr;
-                        gap: 16px;
-                    }
-
-                    .status-grid {
-                        grid-template-columns: 1fr;
-                    }
-
-                    .message-meta {
-                        flex-direction: column;
-                        align-items: stretch;
-                    }
-
-                    .detail-actions {
-                        flex-direction: column;
-                    }
-
-                    .modal-content.large {
-                        margin: 20px;
-                        width: calc(100% - 40px);
-                    }
-                }
-
-                /* Existing styles tetap dipertahankan... */
-                .service-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                }
-
-                .service-badge.rawat-inap {
-                    background: #fff3cd;
-                    color: #856404;
-                }
-
-                .service-badge.rawat-jalan {
-                    background: #d1ecf1;
-                    color: #0c5460;
-                }
-
-                .service-badge.pemeriksaan {
-                    background: #d4edda;
-                    color: #155724;
-                }
-
-                .status-badge {
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .status-badge.pending {
-                    background: #fff3cd;
-                    color: #856404;
-                }
-
-                .status-badge.in-progress {
-                    background: #cce7ff;
-                    color: #004085;
-                }
-
-                .status-badge.completed {
-                    background: #d4edda;
-                    color: #155724;
-                }
-
-                .status-badge.success {
-                    background: #d4edda;
-                    color: #155724;
-                }
-
-                .status-badge.warning {
-                    background: #fff3cd;
-                    color: #856404;
-                }
-
-                /* Notification, Pagination, dan existing styles lainnya */
                 @keyframes slideInRight {
                     from {
                         transform: translateX(100%);
@@ -2333,6 +2005,7 @@ class Dashboard {
                         opacity: 1;
                     }
                 }
+                
                 @keyframes slideOutRight {
                     from {
                         transform: translateX(0);
@@ -2343,6 +2016,7 @@ class Dashboard {
                         opacity: 0;
                     }
                 }
+                
                 .notification-close {
                     background: none;
                     border: none;
@@ -2359,19 +2033,23 @@ class Dashboard {
                     width: 24px;
                     height: 24px;
                 }
+                
                 .notification-close:hover {
                     opacity: 1;
                     background: rgba(255, 255, 255, 0.1);
                 }
+                
                 .notification-content {
                     display: flex;
                     align-items: center;
                     gap: 10px;
                     flex: 1;
                 }
+                
                 .notification-content i {
                     font-size: 1.2em;
                 }
+                
                 .field-error-message {
                     color: #dc3545;
                     font-size: 0.875rem;
@@ -2380,152 +2058,26 @@ class Dashboard {
                     align-items: center;
                     gap: 5px;
                 }
+                
                 .field-error-message i {
                     font-size: 0.75rem;
                 }
+                
                 .field-error {
                     border-color: #dc3545 !important;
                     background-color: #fff5f5 !important;
                 }
-                .hidden {
-                    display: none !important;
-                }
-                .action-buttons {
-                    display: flex;
-                    gap: 8px;
-                }
-                .btn-icon {
-                    width: 32px;
-                    height: 32px;
-                    border: none;
-                    border-radius: 6px;
-                    background: #f8f9fa;
-                    color: var(--gray);
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-                }
-                .btn-icon:hover {
-                    background: var(--primary);
-                    color: white;
-                }
-                .btn-icon.delete-btn:hover {
-                    background: var(--danger);
-                }
-                .pagination {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 8px;
-                    margin-top: 24px;
-                    padding: 16px;
-                    flex-wrap: wrap;
-                }
-                .page-btn {
-                    padding: 8px 16px;
-                    border: 1px solid #ddd;
-                    background: white;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    font-size: 0.875rem;
-                    min-width: 40px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 6px;
-                }
-                .page-btn:hover {
-                    background: #f8f9fa;
-                    border-color: var(--primary);
-                }
-                .page-btn.active {
-                    background: var(--primary);
-                    color: white;
-                    border-color: var(--primary);
-                }
-                .page-btn.prev-btn, .page-btn.next-btn {
-                    padding: 8px 12px;
-                }
-                .page-dots {
-                    padding: 8px 4px;
-                    color: var(--gray);
-                }
-                .empty-state, .empty-table {
+                
+                .empty-state {
                     text-align: center;
                     padding: 40px 20px;
-                    color: var(--gray);
+                    color: var(--secondary);
                 }
-                .empty-state i, .empty-table i {
+                
+                .empty-state i {
                     font-size: 2rem;
                     margin-bottom: 16px;
                     opacity: 0.5;
-                }
-                .loading-state, .error-state {
-                    text-align: center;
-                    padding: 40px 20px;
-                }
-                .loading-state i, .error-state i {
-                    font-size: 2rem;
-                    margin-bottom: 16px;
-                }
-                .loading-state {
-                    color: var(--primary);
-                }
-                .error-state {
-                    color: var(--danger);
-                }
-                .btn-retry {
-                    background: var(--primary);
-                    color: white;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    margin-top: 12px;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    transition: background 0.2s ease;
-                }
-                .btn-retry:hover {
-                    background: var(--primary-dark);
-                }
-                .btn-clear-filters {
-                    background: var(--warning);
-                    color: white;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    margin-top: 12px;
-                    transition: background 0.2s ease;
-                }
-                .btn-clear-filters:hover {
-                    background: #e0a800;
-                }
-                .btn-danger {
-                    background: var(--danger);
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    transition: background 0.2s ease;
-                }
-                .btn-danger:hover {
-                    background: #c82333;
-                }
-                .stat-card.loading .stat-icon {
-                    color: var(--primary);
-                }
-                .stat-card.error .stat-icon {
-                    color: var(--danger);
                 }
             `;
             document.head.appendChild(style);
@@ -2535,7 +2087,7 @@ class Dashboard {
 
 // Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    window.medicareDashboard = new Dashboard();
+    window.dashboard = new Dashboard();
 });
 
 // Global error handling
@@ -2545,5 +2097,5 @@ window.addEventListener('error', function(e) {
 
 // Handle page unload
 window.addEventListener('beforeunload', function() {
-    // Cleanup jika diperlukan
+    // Cleanup if needed
 });

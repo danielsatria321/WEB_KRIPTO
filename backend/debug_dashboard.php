@@ -14,7 +14,7 @@ try {
     if ($conn->connect_error) {
         die("❌ DATABASE CONNECTION FAILED: " . $conn->connect_error);
     }
-    echo "✅ DATABASE CONNECTED\n\n";
+    echo " DATABASE CONNECTED\n\n";
 
     // Test 1: Check if table exists and has data
     echo "1. CHECKING TABLE & DATA:\n";

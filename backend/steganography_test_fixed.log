@@ -1,87 +1,152 @@
 === STEGANOGRAPHY TEST FIXED STARTED ===
-2025-11-08 12:14:53
+2025-11-11 16:41:32
 
-[2025-11-08 12:14:53] Testing steganography on all patient images with FIXED algorithm...
-[2025-11-08 12:14:53] Found 5 patients with images
-[2025-11-08 12:14:53] 
+[2025-11-11 16:41:32] Testing steganography on all patient images with FIXED algorithm...
+[2025-11-11 16:41:33] Found 11 patients with images
+[2025-11-11 16:41:33] 
 --- Testing Patient: LhcNGhcIEwswUzcMHAQYOwQ= (ID: 1) ---
-[2025-11-08 12:14:53] Testing image: 690eeeda6f828_1762586330.webp
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690eeeda6f828_1762586330.webp
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690eeeda6f828_1762586330.webp
-[2025-11-08 12:14:53] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690eeeda6f828_1762586330.webp
-[2025-11-08 12:14:53] ✓ File size: 70498 bytes
-[2025-11-08 12:14:53] Starting FIXED steganography extraction...
-[2025-11-08 12:14:53] Image dimensions: 1275x1600, Type: 18
-[2025-11-08 12:14:53] ERROR: WebP not supported on this server
-[2025-11-08 12:14:53] ✗ No message found or extraction failed
-[2025-11-08 12:14:53] 
---- Testing Patient: IAAXGgo= (ID: 2) ---
-[2025-11-08 12:14:53] Testing image: 690f00d9946c2_1762590937.webp
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f00d9946c2_1762590937.webp
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f00d9946c2_1762590937.webp
-[2025-11-08 12:14:53] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f00d9946c2_1762590937.webp
-[2025-11-08 12:14:53] ✓ File size: 70498 bytes
-[2025-11-08 12:14:53] Starting FIXED steganography extraction...
-[2025-11-08 12:14:53] Image dimensions: 1275x1600, Type: 18
-[2025-11-08 12:14:53] ERROR: WebP not supported on this server
-[2025-11-08 12:14:53] ✗ No message found or extraction failed
-[2025-11-08 12:14:53] 
+[2025-11-11 16:41:33] Testing image: 690eeeda6f828_1762586330.webp
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/uploads/images/690eeeda6f828_1762586330.webp
+[2025-11-11 16:41:33] ✗ ERROR: Image not found in any path
+[2025-11-11 16:41:33] 
 --- Testing Patient: LwQJCwIPFQ== (ID: 4) ---
-[2025-11-08 12:14:53] Testing image: 690f114e49877_1762595150.png
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f114e49877_1762595150.png
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
-[2025-11-08 12:14:53] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
-[2025-11-08 12:14:53] ✓ File size: 200952 bytes
-[2025-11-08 12:14:53] Starting FIXED steganography extraction...
-[2025-11-08 12:14:53] Image dimensions: 1024x1024, Type: 3
-[2025-11-08 12:14:53] Loaded as PNG
-[2025-11-08 12:14:53] Extracting header...
-[2025-11-08 12:14:53] Header bits extracted: 32
-[2025-11-08 12:14:53] Message length from header: 32
-[2025-11-08 12:14:53] Extracting message data (256 bits needed)...
-[2025-11-08 12:14:53] Message bits extracted: 256
-[2025-11-08 12:14:53] Total bits processed: 288
-[2025-11-08 12:14:53] Encrypted message length: 32 bytes
-[2025-11-08 12:14:53] Attempting AES decryption...
-[2025-11-08 12:14:53] ✓ Decryption successful
-[2025-11-08 12:14:53] ✓ SUCCESS: Message extracted: "okeaja"
-[2025-11-08 12:14:53] 
+[2025-11-11 16:41:33] Testing image: 690f114e49877_1762595150.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f114e49877_1762595150.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f114e49877_1762595150.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/uploads/images/690f114e49877_1762595150.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/uploads/images/690f114e49877_1762595150.png
+[2025-11-11 16:41:33] ✗ ERROR: Image not found in any path
+[2025-11-11 16:41:33] 
 --- Testing Patient: JgoWDA8S (ID: 5) ---
-[2025-11-08 12:14:53] Testing image: 690f16d58477c_1762596565.png
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f16d58477c_1762596565.png
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
-[2025-11-08 12:14:53] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
-[2025-11-08 12:14:53] ✓ File size: 1498381 bytes
-[2025-11-08 12:14:53] Starting FIXED steganography extraction...
-[2025-11-08 12:14:53] Image dimensions: 1184x864, Type: 3
-[2025-11-08 12:14:53] Loaded as PNG
-[2025-11-08 12:14:53] Extracting header...
-[2025-11-08 12:14:53] Header bits extracted: 32
-[2025-11-08 12:14:53] Message length from header: 32
-[2025-11-08 12:14:53] Extracting message data (256 bits needed)...
-[2025-11-08 12:14:53] Message bits extracted: 256
-[2025-11-08 12:14:53] Total bits processed: 288
-[2025-11-08 12:14:53] Encrypted message length: 32 bytes
-[2025-11-08 12:14:53] Attempting AES decryption...
-[2025-11-08 12:14:53] ✓ Decryption successful
-[2025-11-08 12:14:53] ✓ SUCCESS: Message extracted: "Koreldraw"
-[2025-11-08 12:14:53] 
+[2025-11-11 16:41:33] Testing image: 690f16d58477c_1762596565.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f16d58477c_1762596565.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f16d58477c_1762596565.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/uploads/images/690f16d58477c_1762596565.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/uploads/images/690f16d58477c_1762596565.png
+[2025-11-11 16:41:33] ✗ ERROR: Image not found in any path
+[2025-11-11 16:41:33] 
 --- Testing Patient: GRcNGhYFGw== (ID: 6) ---
-[2025-11-08 12:14:53] Testing image: 690f25aa7c13e_1762600362.png
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f25aa7c13e_1762600362.png
-[2025-11-08 12:14:53] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f25aa7c13e_1762600362.png
-[2025-11-08 12:14:53] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f25aa7c13e_1762600362.png
-[2025-11-08 12:14:53] ✓ File size: 1498369 bytes
-[2025-11-08 12:14:53] Starting FIXED steganography extraction...
-[2025-11-08 12:14:53] Image dimensions: 1184x864, Type: 3
-[2025-11-08 12:14:53] Loaded as PNG
-[2025-11-08 12:14:53] Extracting header...
-[2025-11-08 12:14:53] Header bits extracted: 32
-[2025-11-08 12:14:53] Message length from header: 32
-[2025-11-08 12:14:53] Extracting message data (256 bits needed)...
-[2025-11-08 12:14:53] Message bits extracted: 256
-[2025-11-08 12:14:53] Total bits processed: 288
-[2025-11-08 12:14:53] Encrypted message length: 32 bytes
-[2025-11-08 12:14:53] Attempting AES decryption...
-[2025-11-08 12:14:53] ✓ Decryption successful
-[2025-11-08 12:14:53] ✓ SUCCESS: Message extracted: "sukarno"
+[2025-11-11 16:41:33] Testing image: 690f25aa7c13e_1762600362.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/690f25aa7c13e_1762600362.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/690f25aa7c13e_1762600362.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/uploads/images/690f25aa7c13e_1762600362.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/uploads/images/690f25aa7c13e_1762600362.png
+[2025-11-11 16:41:33] ✗ ERROR: Image not found in any path
+[2025-11-11 16:41:33] 
+--- Testing Patient: BwsPAw0LGQ== (ID: 8) ---
+[2025-11-11 16:41:33] Testing image: 6912f9ee5ea53_1762851310.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/6912f9ee5ea53_1762851310.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/6912f9ee5ea53_1762851310.jpg
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/6912f9ee5ea53_1762851310.jpg
+[2025-11-11 16:41:33] ✓ File size: 24476 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 250x375, Type: 2
+[2025-11-11 16:41:33] Loaded as JPEG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 1917243099
+[2025-11-11 16:41:33] No valid message found (invalid length: 1917243099)
+[2025-11-11 16:41:33] ✗ No message found or extraction failed
+[2025-11-11 16:41:33] 
+--- Testing Patient: CQQXDQ0AGBY7HQ8CFgsH (ID: 9) ---
+[2025-11-11 16:41:33] Testing image: 6912faf1cce86_1762851569.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/6912faf1cce86_1762851569.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/6912faf1cce86_1762851569.jpg
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/6912faf1cce86_1762851569.jpg
+[2025-11-11 16:41:33] ✓ File size: 24476 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 250x375, Type: 2
+[2025-11-11 16:41:33] Loaded as JPEG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 1917243099
+[2025-11-11 16:41:33] No valid message found (invalid length: 1917243099)
+[2025-11-11 16:41:33] ✗ No message found or extraction failed
+[2025-11-11 16:41:33] 
+--- Testing Patient: DgAPSQwK (ID: 10) ---
+[2025-11-11 16:41:33] Testing image: 69132cbc744b4_1762864316.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/69132cbc744b4_1762864316.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/69132cbc744b4_1762864316.jpg
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/69132cbc744b4_1762864316.jpg
+[2025-11-11 16:41:33] ✓ File size: 24435 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 250x375, Type: 2
+[2025-11-11 16:41:33] Loaded as JPEG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 1917243079
+[2025-11-11 16:41:33] No valid message found (invalid length: 1917243079)
+[2025-11-11 16:41:33] ✗ No message found or extraction failed
+[2025-11-11 16:41:33] 
+--- Testing Patient: DxcFDQ== (ID: 11) ---
+[2025-11-11 16:41:33] Testing image: 69132d31ee37d_1762864433.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/69132d31ee37d_1762864433.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/69132d31ee37d_1762864433.jpg
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/69132d31ee37d_1762864433.jpg
+[2025-11-11 16:41:33] ✓ File size: 24437 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 250x375, Type: 2
+[2025-11-11 16:41:33] Loaded as JPEG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 1917242936
+[2025-11-11 16:41:33] No valid message found (invalid length: 1917242936)
+[2025-11-11 16:41:33] ✗ No message found or extraction failed
+[2025-11-11 16:41:33] 
+--- Testing Patient: DxcFDQ== (ID: 12) ---
+[2025-11-11 16:41:33] Testing image: 6913372c364ac_1762866988.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/6913372c364ac_1762866988.jpg
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/6913372c364ac_1762866988.jpg
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/6913372c364ac_1762866988.jpg
+[2025-11-11 16:41:33] ✓ File size: 24428 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 250x375, Type: 2
+[2025-11-11 16:41:33] Loaded as JPEG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 1917243079
+[2025-11-11 16:41:33] No valid message found (invalid length: 1917243079)
+[2025-11-11 16:41:33] ✗ No message found or extraction failed
+[2025-11-11 16:41:33] 
+--- Testing Patient: DxcFDRMIBhE= (ID: 13) ---
+[2025-11-11 16:41:33] Testing image: 691337a9d510f_1762867113.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/691337a9d510f_1762867113.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/691337a9d510f_1762867113.png
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/691337a9d510f_1762867113.png
+[2025-11-11 16:41:33] ✓ File size: 1498383 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 1184x864, Type: 3
+[2025-11-11 16:41:33] Loaded as PNG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 32
+[2025-11-11 16:41:33] Extracting message data (256 bits needed)...
+[2025-11-11 16:41:33] Message bits extracted: 256
+[2025-11-11 16:41:33] Total bits processed: 288
+[2025-11-11 16:41:33] Encrypted message length: 32 bytes
+[2025-11-11 16:41:33] Attempting AES decryption...
+[2025-11-11 16:41:33] ✓ Decryption successful
+[2025-11-11 16:41:33] ✓ SUCCESS: Message extracted: "tescek"
+[2025-11-11 16:41:33] 
+--- Testing Patient: DxcLExQ= (ID: 14) ---
+[2025-11-11 16:41:33] Testing image: 691339cd445a8_1762867661.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../../uploads/images/691339cd445a8_1762867661.png
+[2025-11-11 16:41:33] Checking path: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/691339cd445a8_1762867661.png
+[2025-11-11 16:41:33] ✓ Image found at: /Applications/XAMPP/xamppfiles/htdocs/web_kriptografi/backend/../uploads/images/691339cd445a8_1762867661.png
+[2025-11-11 16:41:33] ✓ File size: 2558319 bytes
+[2025-11-11 16:41:33] Starting FIXED steganography extraction...
+[2025-11-11 16:41:33] Image dimensions: 1752x1664, Type: 3
+[2025-11-11 16:41:33] Loaded as PNG
+[2025-11-11 16:41:33] Extracting header...
+[2025-11-11 16:41:33] Header bits extracted: 32
+[2025-11-11 16:41:33] Message length from header: 32
+[2025-11-11 16:41:33] Extracting message data (256 bits needed)...
+[2025-11-11 16:41:33] Message bits extracted: 256
+[2025-11-11 16:41:33] Total bits processed: 288
+[2025-11-11 16:41:33] Encrypted message length: 32 bytes
+[2025-11-11 16:41:33] Attempting AES decryption...
+[2025-11-11 16:41:33] ✓ Decryption successful
+[2025-11-11 16:41:33] ✓ SUCCESS: Message extracted: "tesvers"
