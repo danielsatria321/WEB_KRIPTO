@@ -676,6 +676,11 @@ class DashboardView
     private function getDashboardStats()
     {
         try {
+            // Validate session
+            if (!isset($_SESSION['username'])) {
+                throw new Exception("Session tidak valid. Silakan login kembali.");
+            }
+
             // Total patients
             $totalQuery = "SELECT COUNT(*) as total_pasien FROM pasien";
             $totalResult = $this->conn->query($totalQuery);
@@ -725,6 +730,11 @@ class DashboardView
     private function getRecentPatients()
     {
         try {
+            // Validate session
+            if (!isset($_SESSION['username'])) {
+                throw new Exception("Session tidak valid. Silakan login kembali.");
+            }
+
             $query = "SELECT * FROM pasien ORDER BY created_at DESC LIMIT 5";
             $result = $this->conn->query($query);
 
@@ -748,6 +758,11 @@ class DashboardView
     private function getPatientsList()
     {
         try {
+            // Validate session
+            if (!isset($_SESSION['username'])) {
+                throw new Exception("Session tidak valid. Silakan login kembali.");
+            }
+
             $page = intval($_GET['page'] ?? 1);
             $limit = intval($_GET['limit'] ?? 10);
             $search = $_GET['search'] ?? '';
