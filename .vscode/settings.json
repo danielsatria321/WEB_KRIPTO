@@ -1,0 +1,11 @@
+{
+  "[php]": {
+    "editor.formatOnSave": false
+  },
+  "intelephense.diagnosticsFormat": "markup",
+  "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": false,
+  "intelephense.diagnostics.undefinedVariables": false,
+  "intelephense.diagnostics.undefinedMethods": false,
+  "intelephense.diagnostics.undefinedTypes": false,
+  "intelephense.diagnostics.implementationErrors": true
+}

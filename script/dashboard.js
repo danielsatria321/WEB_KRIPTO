@@ -1055,7 +1055,8 @@ class Dashboard {
 
             const response = await fetch('../backend/dashboardview.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'same-origin'
             });
 
             if (!response.ok) {
@@ -1505,7 +1506,8 @@ class Dashboard {
             
             const response = await fetch(url, {
                  method: method,
-                 body: formData
+                 body: formData,
+                 credentials: 'same-origin'
              });
              
             const result = await this.handleResponse(response);
