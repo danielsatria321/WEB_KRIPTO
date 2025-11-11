@@ -1,6 +1,7 @@
 # 🔍 Debug Patient Detail Loading - Complete Testing Guide
 
 ## ✅ Backend Status
+
 - **API bekerja**: ✓ Tested dengan curl - returns patient data correctly
 - **Session handling**: ✓ Added to all methods
 - **CORS headers**: ✓ Fixed with credentials support
@@ -9,6 +10,7 @@
 ## 🧪 Testing Steps
 
 ### Step 1: Simple Test (Easiest)
+
 **URL**: `http://localhost/web_kriptografi/simple-test.html`
 
 1. Buka di browser
@@ -17,16 +19,18 @@
 4. Jika ada error, copy-paste error message
 
 ### Step 2: Debug with Console
+
 **URL**: `http://localhost/web_kriptografi/debug-patient.html`
 
 1. Buka di browser
 2. Buka Developer Console (F12 → Console tab)
 3. Klik "1. Login (321/321)" → lihat output
-4. Klik "2. Check Session After Login" → lihat output  
+4. Klik "2. Check Session After Login" → lihat output
 5. Klik "3. Get Patient Detail" → lihat output
 6. Jika error, lihat di console tab
 
 ### Step 3: Real Dashboard Test
+
 **URL**: `http://localhost/web_kriptografi/templates/dashboard.html`
 
 1. Fresh reload halaman (Ctrl+Shift+R untuk clear cache)
@@ -40,18 +44,19 @@
 
 ## 🐛 Common Issues & Solutions
 
-| Gejala | Kemungkinan Penyebab | Solusi |
-|-------|-------------------|--------|
-| "gagal memuat detail pasien" | Browser tidak kirim session cookie | Clear cookies, re-login |
-| Modal tidak terbuka | CSS issue atau element tidak ada | Buka F12, cek Console tab |
-| "Session tidak valid" | Session expired | Logout + Login lagi |
-| Data kosong di modal | Response tidak di-parse | Check F12 → Network tab |
+| Gejala                       | Kemungkinan Penyebab               | Solusi                    |
+| ---------------------------- | ---------------------------------- | ------------------------- |
+| "gagal memuat detail pasien" | Browser tidak kirim session cookie | Clear cookies, re-login   |
+| Modal tidak terbuka          | CSS issue atau element tidak ada   | Buka F12, cek Console tab |
+| "Session tidak valid"        | Session expired                    | Logout + Login lagi       |
+| Data kosong di modal         | Response tidak di-parse            | Check F12 → Network tab   |
 
 ---
 
 ## 📊 Expected Outputs
 
 ### simple-test.html Output Should Look Like:
+
 ```
 === START TEST ===
 
@@ -78,6 +83,7 @@ Alamat: Portugal
 ## 🔧 If Still Error - Debug Steps:
 
 ### Check 1: Clear Browser Cookies
+
 - Open DevTools (F12)
 - Go to Application → Cookies → localhost
 - Delete all cookies
@@ -85,6 +91,7 @@ Alamat: Portugal
 - Try login again
 
 ### Check 2: Check Network Requests
+
 - Open DevTools (F12)
 - Go to Network tab
 - Try login again
@@ -92,6 +99,7 @@ Alamat: Portugal
 - Check if it has `Set-Cookie` header in Response
 
 ### Check 3: Check Console Errors
+
 - Open DevTools (F12)
 - Go to Console tab
 - Reload page
@@ -126,7 +134,8 @@ curl -b /tmp/cookies.txt "http://localhost/web_kriptografi/backend/dashboardview
 
 ---
 
-**Next Action**: 
+**Next Action**:
+
 1. Open `simple-test.html` in browser
 2. Click the test button
 3. If error, share the output/error message
