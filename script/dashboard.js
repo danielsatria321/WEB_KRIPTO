@@ -1638,7 +1638,7 @@ class Dashboard {
                 e.preventDefault();
                 if (confirm('Apakah Anda yakin ingin keluar?')) {
                     this.showNotification("Berhasil logout", "success");
-                    // window.location.href = 'logout.php';
+                    window.location.href = '../backend/logout.php';
                 }
             });
         }
