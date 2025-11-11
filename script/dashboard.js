@@ -47,7 +47,8 @@ class Dashboard {
 
     async checkSession() {
         try {
-            const response = await fetch('../backend/check_session.php');
+            // include credentials so browser sends PHP session cookie (same-origin)
+            const response = await fetch('../backend/check_session.php', { credentials: 'same-origin' });
             const result = await response.json();
             
             if (result.success) {
