@@ -1,5 +1,8 @@
 <?php
 
+// Start session FIRST before any output
+session_start();
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -517,6 +520,11 @@ class DashboardView
     private function downloadDecryptedPdf()
     {
         try {
+            // Validate session
+            if (!isset($_SESSION['username'])) {
+                throw new Exception("Session tidak valid. Silakan login kembali.");
+            }
+
             $patientId = intval($_GET['patient_id'] ?? 0);
 
             if ($patientId <= 0) {
@@ -591,6 +599,11 @@ class DashboardView
     private function extractSteganographyMessage()
     {
         try {
+            // Validate session
+            if (!isset($_SESSION['username'])) {
+                throw new Exception("Session tidak valid. Silakan login kembali.");
+            }
+
             $patientId = intval($_GET['patient_id'] ?? $_POST['patient_id'] ?? 0);
 
             if ($patientId <= 0) {
@@ -820,6 +833,11 @@ class DashboardView
     private function getPatientDetail()
     {
         try {
+            // Validate session
+            if (!isset($_SESSION['username'])) {
+                throw new Exception("Session tidak valid. Silakan login kembali.");
+            }
+
             $patientId = intval($_GET['patient_id'] ?? $_POST['patient_id'] ?? 0);
 
             if ($patientId <= 0) {
