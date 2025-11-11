@@ -226,7 +226,7 @@ class Dashboard {
                 service: this.serviceFilter
             });
 
-            const response = await fetch(`../backend/dashboardview.php?${params}`);
+            const response = await fetch(`../backend/dashboardview.php?${params}`, { credentials: 'same-origin' });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -504,7 +504,7 @@ class Dashboard {
         try {
             this.showNotification('Memuat detail pasien...', 'info');
             
-            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
+            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`, { credentials: 'same-origin' });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -877,7 +877,7 @@ class Dashboard {
         try {
             this.showNotification('Mengekstrak ulang pesan dari gambar...', 'info');
             
-            const response = await fetch(`../backend/dashboardview.php?action=extract_steganography&patient_id=${patientId}`);
+            const response = await fetch(`../backend/dashboardview.php?action=extract_steganography&patient_id=${patientId}`, { credentials: 'same-origin' });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -923,7 +923,7 @@ class Dashboard {
             // Show loading
             this.showNotification('Mempersiapkan download PDF...', 'info');
             
-            const response = await fetch(`../backend/dashboardview.php?action=download_decrypted_pdf&patient_id=${patientId}`);
+            const response = await fetch(`../backend/dashboardview.php?action=download_decrypted_pdf&patient_id=${patientId}`, { credentials: 'same-origin' });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -958,7 +958,7 @@ class Dashboard {
 
     async editPatient(patientId) {
         try {
-            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`);
+            const response = await fetch(`../backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`, { credentials: 'same-origin' });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
