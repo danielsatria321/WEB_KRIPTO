@@ -22,7 +22,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const res = await fetch("../backend/login.php", {
                 method: "POST",
                 body: formData,
-                cache: "no-store"
+                cache: "no-store",
+                // ensure cookies (Set-Cookie from PHP) are accepted for same-origin
+                credentials: 'same-origin'
             });
 
             // baca response sebagai text dahulu untuk debugging bila bukan JSON
