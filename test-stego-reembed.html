@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Steganography Re-Embedding</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin: 5px 0;
+        }
+        
+        .step-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .flow {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 2;
+        }
+        
+        .success {
+            color: #27ae60;
+            background: #d5f4e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .warning {
+            color: #f39c12;
+            background: #fef5e7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .info {
+            color: #3498db;
+            background: #ebf5fb;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #c0392b;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        
+        .status h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Test Steganography Re-Embedding</h1>
+        <p class="subtitle">Verify bahwa steganografi tetap ada setelah edit foto</p>
+        
+        <div class="step">
+            <div class="step-number">📋 FLOW PROSES</div>
+            <div class="step-description">
+                <div class="flow">
+User Upload Foto Baru
+   ↓
+Extract steganografi dari foto lama
+   ↓
+Re-Embed ke foto baru
+   ↓
+Backup foto lama (_original)
+   ↓
+Database update
+   ↓
+✓ Steganografi tetap ada!
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">✅ STEP 1: Persiapan</div>
+            <div class="step-title">Patient 22 sudah restore ke file original</div>
+            <div class="step-description">
+                File: <code>6913af600393b_1762897760.png</code><br>
+                Status: Has steganography ✓
+                <div class="success">Patient 22 siap untuk di-edit</div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">🖼️ STEP 2: Edit Patient</div>
+            <div class="step-title">Upload foto baru</div>
+            <div class="step-description">
+                1. Buka Dashboard<br>
+                2. Login (username: dokter1, password: dokter123)<br>
+                3. Cari Patient 22<br>
+                4. Klik <strong>Edit</strong><br>
+                5. Upload foto baru (any JPG/PNG)<br>
+                6. Klik <strong>Update Data Pasien</strong><br>
+                <div class="info">Sistem akan otomatis extract & re-embed steganografi</div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">🔍 STEP 3: Verifikasi</div>
+            <div class="step-title">Extract pesan steganografi</div>
+            <div class="step-description">
+                1. Kembali ke detail Patient 22<br>
+                2. Klik <strong>Lihat Detail</strong><br>
+                3. Scroll ke <strong>Status Steganografi</strong><br>
+                4. Klik <strong>Ekstrak Pesan</strong><br>
+                <div class="success">✓ Pesan asli masih terbaca!</div>
+                <div class="info">Foto baru sekarang memiliki steganografi ter-embed</div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">⚙️ BACKEND LOGIC</div>
+            <div class="step-description">
+                <strong>updatePatientFiles() Method:</strong>
+                <div class="code">
+1. Get foto_pasien lama dari database
+2. Extract steganografi via extractMessageFromImage()
+3. Upload foto baru ke temp
+4. applySteganographyToImage(foto_baru, pesan_lama)
+5. Backup foto lama → _original
+6. Update database dengan foto_baru
+7. Return success
+                </div>
+                <div class="warning">
+                    ⚠️ Fallback: Jika embedding gagal, foto tetap terupload tanpa steganografi
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">🔐 STEGANOGRAPHY ALGORITHM</div>
+            <div class="step-description">
+                <strong>Embedding Process:</strong>
+                <div class="code">
+Message: "Asma, hipertensi"
+   ↓
+Pad dengan PKCS7 (16 bytes)
+   ↓
+Encrypt AES-256-CBC
+   ↓
+Header: 4 bytes (message length)
+   ↓
+Binary: header + encrypted data
+   ↓
+LSB Embed: RGB channels
+   ↓
+Save foto ter-stegano
+                </div>
+            </div>
+        </div>
+        
+        <div class="status">
+            <h3>📊 Expected Result</h3>
+            <ul>
+                <li>Foto baru ter-update di database</li>
+                <li>Steganografi bisa diextract</li>
+                <li>Pesan sama dengan original (Asma, hipertensi)</li>
+                <li>File backup tersimpan dengan suffix _original</li>
+            </ul>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="window.location.href='http://localhost/web_kriptografi/index.html'">
+                ➜ Buka Dashboard
+            </button>
+            <button class="btn-secondary" onclick="window.location.href='javascript:history.back()'">
+                ← Kembali
+            </button>
+        </div>
+    </div>
+</body>
+</html>

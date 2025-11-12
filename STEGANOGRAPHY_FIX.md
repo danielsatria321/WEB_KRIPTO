@@ -34,23 +34,27 @@ Database update dengan nama file baru
 ### Backend Methods (dashboardview.php)
 
 **`updatePatientFiles()`** - Enhanced untuk auto re-embedding
+
 - Get nama file foto lama dari database
 - Extract steganografi dari foto lama menggunakan `extractMessageFromImage()`
 - Apply steganografi ke foto baru menggunakan `applySteganographyToImage()`
-- Backup foto lama dengan suffix _original
+- Backup foto lama dengan suffix \_original
 - Update database dengan nama file baru
 
 **`applySteganographyToImage($sourcePath, $targetPath, $message)`** - NEW
+
 - Embed pesan terenkripsi ke foto menggunakan LSB technique
 - Support JPEG, PNG, GIF
 - Algoritma sama dengan saat patient creation
 
 **`aesEncryptForSteganography($data)`** - NEW
+
 - Encrypt pesan dengan AES-256-CBC
 - Add PKCS7 padding
 - Return binary encrypted data
 
 **`pkcs7Pad($data, $blockSize)`** - NEW
+
 - PKCS7 padding untuk AES encryption
 
 ### Steganography Algorithm
@@ -73,24 +77,23 @@ Output: Foto dengan pesan tersembunyi
 ## File yang Dimodifikasi
 
 ### `backend/dashboardview.php`
+
 - **`updatePatientFiles()`**
   - Extract steganografi dari foto lama
   - Apply steganografi ke foto baru
   - Fallback: Copy file jika ekstraksi gagal
-  
 - **`applySteganographyToImage($sourcePath, $targetPath, $message)`** (NEW)
   - Embed steganografi ke foto baru
   - Support JPEG, PNG, GIF
-  
 - **`aesEncryptForSteganography($data)`** (NEW)
   - Encrypt dengan AES-256-CBC + PKCS7
-  
 - **`pkcs7Pad($data, $blockSize)`** (NEW)
   - PKCS7 padding helper
 
 ## Testing Scenario
 
 ### Test 1: Verify Steganografi Preserved
+
 ```
 1. Go Dashboard → Patient 22 (has steganografi)
 2. Click Edit
@@ -103,12 +106,12 @@ Output: Foto dengan pesan tersembunyi
 
 ### Error Handling
 
-| Scenario | Handling |
-|----------|----------|
-| Extract fails | Copy file as-is (no steganografi) |
-| File too small | Error: Message too large |
-| Invalid image format | Error: Unsupported type |
-| File upload fails | Error: Upload gagal |
+| Scenario             | Handling                          |
+| -------------------- | --------------------------------- |
+| Extract fails        | Copy file as-is (no steganografi) |
+| File too small       | Error: Message too large          |
+| Invalid image format | Error: Unsupported type           |
+| File upload fails    | Error: Upload gagal               |
 
 ## Solusi yang Diimplementasikan
 

@@ -1158,10 +1158,14 @@ class DashboardView
 
                 // ✅ NEW: Extract steganography message from old image
                 $steganographyMessage = null;
+                $steganographyExtracted = false;
                 if ($oldImageFile && file_exists($uploadDir . $oldImageFile)) {
                     $steganographyMessage = $this->extractMessageFromImage($uploadDir . $oldImageFile);
                     if ($steganographyMessage && $steganographyMessage !== false) {
-                        $this->logMessage("✓ Steganography extracted from old image: " . substr($steganographyMessage, 0, 50) . "...");
+                        $steganographyExtracted = true;
+                        $this->logMessage("✓ Steganography extracted from old image: " . strlen($steganographyMessage) . " bytes");
+                    } else {
+                        $this->logMessage("⚠ No steganography found in old image, will upload without steganography");
                     }
                 }
 
@@ -1176,14 +1180,19 @@ class DashboardView
                 $targetPath = $uploadDir . $newFileName;
 
                 // ✅ NEW: Apply steganography to new image if message exists
-                if ($steganographyMessage && $steganographyMessage !== false) {
+                if ($steganographyExtracted && $steganographyMessage) {
                     $uploadSuccess = $this->applySteganographyToImage($fotoFile['tmp_name'], $targetPath, $steganographyMessage);
-                    if (!$uploadSuccess) {
-                        throw new Exception("Gagal sisipkan steganografi ke foto baru");
+                    if ($uploadSuccess) {
+                        $this->logMessage("✓ Steganography embedded to new image");
+                    } else {
+                        // Fallback: if embedding fails, just move file without steganography
+                        $this->logMessage("⚠ Steganography embedding failed, uploading without steganography");
+                        if (!move_uploaded_file($fotoFile['tmp_name'], $targetPath)) {
+                            throw new Exception("Gagal upload foto");
+                        }
                     }
-                    $this->logMessage("✓ Steganography embedded to new image");
                 } else {
-                    // No steganography, just move file
+                    // No steganography to embed, just move file
                     if (!move_uploaded_file($fotoFile['tmp_name'], $targetPath)) {
                         throw new Exception("Gagal upload foto");
                     }
