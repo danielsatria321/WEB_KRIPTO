@@ -1130,6 +1130,8 @@ class DashboardView
 
             $updates = [];
             $updateFields = [];
+            $uploadDir = __DIR__ . '/../uploads/images/';
+            $pdfUploadDir = __DIR__ . '/../uploads/pdfs/';
 
             // Handle foto upload
             if (isset($_FILES['fotoPasien']) && $_FILES['fotoPasien']['error'] === UPLOAD_ERR_OK) {
@@ -1141,7 +1143,7 @@ class DashboardView
                     throw new Exception("File foto bukan gambar yang valid");
                 }
 
-                // Get current image filename for backup
+                // Get current image filename for backup & steganography extraction
                 $currentImageQuery = "SELECT foto_pasien FROM pasien WHERE id_pasien = ?";
                 $stmt_current = $this->conn->prepare($currentImageQuery);
                 $stmt_current->bind_param("i", $patientId);
@@ -1150,12 +1152,20 @@ class DashboardView
                 $current_patient = $current_result->fetch_assoc();
                 $oldImageFile = $current_patient['foto_pasien'] ?? null;
 
-                // Backup original image if exists (for steganography extraction)
-                $uploadDir = __DIR__ . '/../uploads/images/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
 
+                // ✅ NEW: Extract steganography message from old image
+                $steganographyMessage = null;
+                if ($oldImageFile && file_exists($uploadDir . $oldImageFile)) {
+                    $steganographyMessage = $this->extractMessageFromImage($uploadDir . $oldImageFile);
+                    if ($steganographyMessage && $steganographyMessage !== false) {
+                        $this->logMessage("✓ Steganography extracted from old image: " . substr($steganographyMessage, 0, 50) . "...");
+                    }
+                }
+
+                // Backup original image if exists (for audit trail)
                 if ($oldImageFile && file_exists($uploadDir . $oldImageFile) && !file_exists($uploadDir . $oldImageFile . '_original')) {
                     copy($uploadDir . $oldImageFile, $uploadDir . $oldImageFile . '_original');
                 }
@@ -1165,12 +1175,22 @@ class DashboardView
                 $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
                 $targetPath = $uploadDir . $newFileName;
 
-                if (move_uploaded_file($fotoFile['tmp_name'], $targetPath)) {
-                    $updateFields[] = 'foto_pasien = ?';
-                    $updates['foto'] = $newFileName;
+                // ✅ NEW: Apply steganography to new image if message exists
+                if ($steganographyMessage && $steganographyMessage !== false) {
+                    $uploadSuccess = $this->applySteganographyToImage($fotoFile['tmp_name'], $targetPath, $steganographyMessage);
+                    if (!$uploadSuccess) {
+                        throw new Exception("Gagal sisipkan steganografi ke foto baru");
+                    }
+                    $this->logMessage("✓ Steganography embedded to new image");
                 } else {
-                    throw new Exception("Gagal upload foto");
+                    // No steganography, just move file
+                    if (!move_uploaded_file($fotoFile['tmp_name'], $targetPath)) {
+                        throw new Exception("Gagal upload foto");
+                    }
                 }
+
+                $updateFields[] = 'foto_pasien = ?';
+                $updates['foto'] = $newFileName;
             }
 
             // Handle PDF upload
@@ -1186,15 +1206,13 @@ class DashboardView
                     throw new Exception("File bukan PDF yang valid");
                 }
 
-                // For now, just move PDF without encryption (or could add encryption later)
-                $uploadDir = __DIR__ . '/../uploads/pdfs/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
+                if (!is_dir($pdfUploadDir)) {
+                    mkdir($pdfUploadDir, 0755, true);
                 }
 
                 $fileExtension = pathinfo($pdfFile['name'], PATHINFO_EXTENSION);
                 $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
-                $targetPath = $uploadDir . $newFileName;
+                $targetPath = $pdfUploadDir . $newFileName;
 
                 if (move_uploaded_file($pdfFile['tmp_name'], $targetPath)) {
                     $updateFields[] = 'dokumen_pdf = ?';
@@ -1235,6 +1253,173 @@ class DashboardView
         } catch (Exception $e) {
             $this->sendError("Error updating files: " . $e->getMessage());
         }
+    }
+
+    /**
+     * ✅ NEW: Embed steganography message to image (for edit uploads)
+     */
+    private function applySteganographyToImage($sourcePath, $targetPath, $message)
+    {
+        try {
+            if (empty($message)) {
+                // No message, just copy original
+                return copy($sourcePath, $targetPath);
+            }
+
+            $imageInfo = getimagesize($sourcePath);
+            if ($imageInfo === false) {
+                throw new Exception("Cannot get image information");
+            }
+
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+            $imageType = $imageInfo[2];
+
+            // Load image based on type
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
+                    $image = imagecreatefromjpeg($sourcePath);
+                    break;
+                case IMAGETYPE_PNG:
+                    $image = imagecreatefrompng($sourcePath);
+                    break;
+                case IMAGETYPE_GIF:
+                    $image = imagecreatefromgif($sourcePath);
+                    break;
+                default:
+                    throw new Exception("Unsupported image type");
+            }
+
+            if (!$image) {
+                throw new Exception("Cannot create image from source");
+            }
+
+            // Step 1: Encrypt message with AES
+            $encryptedMessage = $this->aesEncryptForSteganography($message);
+
+            // Step 2: Calculate maximum message capacity
+            $maxCapacity = ($width * $height * 3) / 8;
+            $messageLength = strlen($encryptedMessage);
+            
+            if ($messageLength > $maxCapacity - 10) {
+                throw new Exception("Message too large for image");
+            }
+
+            // Step 3: Add header to message (message length + encrypted message)
+            $header = pack('N', $messageLength); // 4 bytes for length
+            $dataToHide = $header . $encryptedMessage;
+            $dataToHideLength = strlen($dataToHide);
+
+            // Step 4: Convert data to binary string
+            $binaryData = '';
+            for ($i = 0; $i < $dataToHideLength; $i++) {
+                $byte = ord($dataToHide[$i]);
+                $binaryData .= str_pad(decbin($byte), 8, '0', STR_PAD_LEFT);
+            }
+
+            $binaryDataLength = strlen($binaryData);
+
+            // Step 5: Embed data using LSB
+            $bitPosition = 0;
+
+            for ($y = 0; $y < $height; $y++) {
+                for ($x = 0; $x < $width; $x++) {
+                    if ($bitPosition >= $binaryDataLength) {
+                        break 2;
+                    }
+
+                    $rgb = imagecolorat($image, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    // Embed in Red channel
+                    if ($bitPosition < $binaryDataLength) {
+                        $r = ($r & 0xFE) | intval($binaryData[$bitPosition]);
+                        $bitPosition++;
+                    }
+
+                    // Embed in Green channel  
+                    if ($bitPosition < $binaryDataLength) {
+                        $g = ($g & 0xFE) | intval($binaryData[$bitPosition]);
+                        $bitPosition++;
+                    }
+
+                    // Embed in Blue channel
+                    if ($bitPosition < $binaryDataLength) {
+                        $b = ($b & 0xFE) | intval($binaryData[$bitPosition]);
+                        $bitPosition++;
+                    }
+
+                    $newColor = imagecolorallocate($image, $r, $g, $b);
+                    if ($newColor === -1) {
+                        $newColor = imagecolorclosest($image, $r, $g, $b);
+                    }
+                    imagesetpixel($image, $x, $y, $newColor);
+                }
+            }
+
+            // Step 6: Save image
+            $result = false;
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
+                    $result = imagejpeg($image, $targetPath, 90);
+                    break;
+                case IMAGETYPE_PNG:
+                    $result = imagepng($image, $targetPath);
+                    break;
+                case IMAGETYPE_GIF:
+                    $result = imagegif($image, $targetPath);
+                    break;
+            }
+
+            imagedestroy($image);
+
+            if (!$result) {
+                throw new Exception("Failed to save steganographed image");
+            }
+
+            return true;
+
+        } catch (Exception $e) {
+            $this->logMessage("ERROR in applySteganographyToImage: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * AES Encryption for Steganography
+     */
+    private function aesEncryptForSteganography($data)
+    {
+        if (empty($data)) {
+            return '';
+        }
+        
+        $paddedData = $this->pkcs7Pad($data, 16);
+        
+        $encrypted = openssl_encrypt(
+            $paddedData,
+            'AES-256-CBC',
+            AES_KEY,
+            OPENSSL_RAW_DATA,
+            AES_IV
+        );
+
+        if ($encrypted === false) {
+            throw new Exception("AES encryption failed: " . openssl_error_string());
+        }
+
+        return $encrypted;
+    }
+
+    /**
+     * PKCS7 Padding for AES
+     */
+    private function pkcs7Pad($data, $blockSize)
+    {
+        $padding = $blockSize - (strlen($data) % $blockSize);
+        return $data . str_repeat(chr($padding), $padding);
     }
 
     public function __destruct()
