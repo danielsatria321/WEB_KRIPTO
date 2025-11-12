@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Edit Pasien</title>
+    <style>
+        body { font-family: Arial; margin: 50px; }
+        .section { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 3px solid #4CAF50; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #45a049; }
+        pre { background: white; padding: 15px; border-radius: 4px; overflow-x: auto; border: 1px solid #ddd; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Edit Pasien</h1>
+    
+    <div class="section">
+        <h2>Step 1: Get Patient Detail</h2>
+        <label>ID Pasien: <input id="patientId" type="number" value="1"></label>
+        <button onclick="getPatientDetail()">Get Detail</button>
+        <pre id="detailOutput"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Step 2: Edit Pasien</h2>
+        <form id="editForm">
+            <div>
+                <label>Nama:</label><br>
+                <input type="text" id="nama_pasien" required style="width: 100%;">
+            </div>
+            <div>
+                <label>Tgl Lahir:</label><br>
+                <input type="date" id="tanggal_lahir" required>
+            </div>
+            <div>
+                <label>Alamat:</label><br>
+                <input type="text" id="alamat" required style="width: 100%;">
+            </div>
+            <div>
+                <label>Layanan:</label><br>
+                <select id="jenis_layanan" required>
+                    <option value="rawat-inap">Rawat Inap</option>
+                    <option value="rawat-jalan">Rawat Jalan</option>
+                    <option value="pemeriksaan">Pemeriksaan</option>
+                </select>
+            </div>
+            <div>
+                <label>Status:</label><br>
+                <select id="status_pasien" required>
+                    <option value="menunggu">Menunggu</option>
+                    <option value="proses">Proses</option>
+                    <option value="selesai">Selesai</option>
+                </select>
+            </div>
+            <div>
+                <label>Hasil Pemeriksaan:</label><br>
+                <textarea id="hasil_pemeriksaan" required style="width: 100%; height: 100px;"></textarea>
+            </div>
+            <div>
+                <label>Jumlah Pembayaran:</label><br>
+                <input type="number" id="jumlah_pembayaran" required>
+            </div>
+            <button type="button" onclick="submitEdit()">Simpan Edit</button>
+        </form>
+        <pre id="editOutput"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Step 3: Verify Data Changed</h2>
+        <button onclick="verifyUpdate()">Verify Data</button>
+        <pre id="verifyOutput"></pre>
+    </div>
+
+    <script>
+        function log(elementId, msg, type = 'info') {
+            const el = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
+            const className = type;
+            el.innerHTML += `<span class="${className}">[${timestamp}] ${prefix}</span> ${msg}\n`;
+        }
+
+        async function getPatientDetail() {
+            const patientId = document.getElementById('patientId').value;
+            document.getElementById('detailOutput').innerHTML = '';
+            
+            log('detailOutput', `Mengambil data pasien ID: ${patientId}...`, 'info');
+            
+            try {
+                const url = `./backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`;
+                const response = await fetch(url, { credentials: 'same-origin' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('detailOutput', `✓ Data berhasil dimuat!`, 'success');
+                    
+                    // Populate form
+                    document.getElementById('nama_pasien').value = data.data.nama_lengkap;
+                    document.getElementById('tanggal_lahir').value = data.data.tanggal_lahir;
+                    document.getElementById('alamat').value = data.data.alamat_lengkap;
+                    document.getElementById('jenis_layanan').value = data.data.informasi_medis;
+                    document.getElementById('status_pasien').value = data.data.status_pasien;
+                    document.getElementById('hasil_pemeriksaan').value = data.data.hasil_pemeriksaan;
+                    document.getElementById('jumlah_pembayaran').value = data.data.jumlah_pembayaran;
+                    
+                    log('detailOutput', `Nama: ${data.data.nama_lengkap}`, 'success');
+                    log('detailOutput', `Form sudah siap untuk edit`, 'success');
+                } else {
+                    log('detailOutput', `✗ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('detailOutput', `✗ Exception: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function submitEdit() {
+            const patientId = document.getElementById('patientId').value;
+            document.getElementById('editOutput').innerHTML = '';
+            
+            log('editOutput', `Mengirim update untuk patient ID ${patientId}...`, 'info');
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'update_patient');
+                formData.append('patient_id', patientId);
+                formData.append('nama_pasien', document.getElementById('nama_pasien').value);
+                formData.append('tanggal_lahir', document.getElementById('tanggal_lahir').value);
+                formData.append('alamat', document.getElementById('alamat').value);
+                formData.append('jenis_layanan', document.getElementById('jenis_layanan').value);
+                formData.append('status_pasien', document.getElementById('status_pasien').value);
+                formData.append('hasil_pemeriksaan', document.getElementById('hasil_pemeriksaan').value);
+                formData.append('jumlah_pembayaran', document.getElementById('jumlah_pembayaran').value);
+                
+                const response = await fetch('./backend/dashboardview.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('editOutput', `✓ Update berhasil!`, 'success');
+                    log('editOutput', `Message: ${data.message}`, 'success');
+                } else {
+                    log('editOutput', `✗ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('editOutput', `✗ Exception: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function verifyUpdate() {
+            const patientId = document.getElementById('patientId').value;
+            document.getElementById('verifyOutput').innerHTML = '';
+            
+            log('verifyOutput', `Memverifikasi data pasien ID ${patientId}...`, 'info');
+            
+            try {
+                const response = await fetch(`./backend/dashboardview.php?action=get_patient_detail&patient_id=${patientId}`, 
+                    { credentials: 'same-origin' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('verifyOutput', `✓ Data current di database:`, 'success');
+                    log('verifyOutput', `Nama: ${data.data.nama_lengkap}`, 'info');
+                    log('verifyOutput', `Alamat: ${data.data.alamat_lengkap}`, 'info');
+                    log('verifyOutput', `Hasil: ${data.data.hasil_pemeriksaan}`, 'info');
+                } else {
+                    log('verifyOutput', `✗ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('verifyOutput', `✗ Exception: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

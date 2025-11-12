@@ -1575,6 +1575,7 @@ class Dashboard {
         // Reload data based on current view
         if (this.currentView === 'dashboard') {
             this.loadDashboardStats();
+            this.loadRecentPatients();
         } else {
             this.loadPatientsList(this.currentPage);
         }
