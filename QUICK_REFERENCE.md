@@ -25,14 +25,17 @@ Save & Update DB
 ## 📝 What's New
 
 ### New Methods
+
 - `applySteganographyToImage()` - Embed message ke foto
 - `aesEncryptForSteganography()` - Encrypt message AES
 - `pkcs7Pad()` - Add padding untuk AES
 
 ### Enhanced Methods
+
 - `updatePatientFiles()` - Now extracts & re-embeds steganografi
 
 ### Test Files
+
 - `test-stego-reembed.html` - Interactive guide
 - `test_stego_reembed.sh` - CLI test
 
@@ -53,11 +56,13 @@ curl -s "http://localhost/web_kriptografi/backend/dashboardview.php?action=get_p
 ## 🚀 Steps to Test
 
 1. **Open Test Page**
+
    ```
    http://localhost/web_kriptografi/test-stego-reembed.html
    ```
 
 2. **Login & Edit**
+
    - Go Dashboard
    - Find Patient 22
    - Click Edit
@@ -72,6 +77,7 @@ curl -s "http://localhost/web_kriptografi/backend/dashboardview.php?action=get_p
 ## 📊 Algorithm
 
 ### Encrypt + Embed
+
 ```
 Message (e.g., "Asma, hipertensi")
   ↓
@@ -89,6 +95,7 @@ Save foto ter-stegano
 ```
 
 ### Extract + Decrypt
+
 ```
 Foto ter-stegano
   ↓
@@ -107,12 +114,12 @@ Return original message ✅
 
 ## ⚙️ Error Handling
 
-| Problem | Solution |
-|---------|----------|
-| Extract fails | Upload tanpa stegano (graceful) |
-| Embed fails | Fallback move file |
-| Foto too small | Error: message too large |
-| Invalid format | Error: unsupported type |
+| Problem        | Solution                        |
+| -------------- | ------------------------------- |
+| Extract fails  | Upload tanpa stegano (graceful) |
+| Embed fails    | Fallback move file              |
+| Foto too small | Error: message too large        |
+| Invalid format | Error: unsupported type         |
 
 ## 📁 Key Files
 
@@ -163,8 +170,8 @@ After:
 ```bash
 # After edit, check new photo has steganografi
 curl -s "http://localhost/web_kriptografi/backend/dashboardview.php?action=extract_steganography&patient_id=22" \
-  | jq '.data.message' 
-  
+  | jq '.data.message'
+
 # Should return the original message! ✅
 ```
 

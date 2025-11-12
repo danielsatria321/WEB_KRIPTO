@@ -1156,10 +1156,18 @@ class DashboardView
                     mkdir($uploadDir, 0755, true);
                 }
 
-                // ✅ NEW: Extract steganography message from old image
+                // ✅ PRIORITY: Check if user provided new medmsg in form
                 $steganographyMessage = null;
                 $steganographyExtracted = false;
-                if ($oldImageFile && file_exists($uploadDir . $oldImageFile)) {
+                
+                // Priority 1: User entered new medmsg → use that
+                if (isset($_POST['medmsg']) && !empty(trim($_POST['medmsg']))) {
+                    $steganographyMessage = trim($_POST['medmsg']);
+                    $steganographyExtracted = true;
+                    $this->logMessage("✓ Using new medmsg from user input: " . strlen($steganographyMessage) . " bytes");
+                }
+                // Priority 2: No new medmsg → extract from old image
+                else if ($oldImageFile && file_exists($uploadDir . $oldImageFile)) {
                     $steganographyMessage = $this->extractMessageFromImage($uploadDir . $oldImageFile);
                     if ($steganographyMessage && $steganographyMessage !== false) {
                         $steganographyExtracted = true;
@@ -1167,6 +1175,8 @@ class DashboardView
                     } else {
                         $this->logMessage("⚠ No steganography found in old image, will upload without steganography");
                     }
+                } else {
+                    $this->logMessage("⚠ No medmsg provided and no old image, will upload without steganography");
                 }
 
                 // Backup original image if exists (for audit trail)

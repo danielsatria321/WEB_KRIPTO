@@ -1555,6 +1555,12 @@ class Dashboard {
         const fotoInput = document.getElementById('fotoPasien');
         const pdfInput = document.getElementById('pdfDokumen');
         
+        // ✅ NEW: Pass medmsg if user entered new one (for re-embedding steganography)
+        const medmsgInput = document.getElementById('medmsg');
+        if (medmsgInput && medmsgInput.value.trim()) {
+            fileFormData.append('medmsg', medmsgInput.value.trim());
+        }
+        
         if (fotoInput.files.length > 0) {
             fileFormData.append('fotoPasien', fotoInput.files[0]);
         }

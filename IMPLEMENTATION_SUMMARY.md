@@ -1,11 +1,13 @@
 # ✅ STEGANOGRAPHY RE-EMBEDDING IMPLEMENTATION - COMPLETE
 
 ## Overview
+
 Sistem telah diimplementasikan untuk **otomatis mengekstrak steganografi dari foto lama dan menyisipkannya ke foto baru** saat patient di-edit.
 
 ## 🎯 Masalah yang Diselesaikan
 
 ### Sebelumnya (Broken):
+
 ```
 User Edit Patient 22
   ↓
@@ -17,6 +19,7 @@ Foto lama ter-delete
 ```
 
 ### Sekarang (Fixed):
+
 ```
 User Edit Patient 22
   ↓
@@ -32,7 +35,9 @@ Embed ke foto baru secara otomatis
 ### Backend Methods (dashboardview.php)
 
 #### 1. `updatePatientFiles()` - Enhanced [Line 1140+]
+
 **Proses:**
+
 - Extract `foto_pasien` lama dari database
 - Call `extractMessageFromImage($oldImagePath)` untuk ambil pesan
 - Validate steganografi ada atau tidak
@@ -41,35 +46,45 @@ Embed ke foto baru secara otomatis
 - Update database dengan nama file baru
 
 **Error Handling:**
+
 - Jika ekstraksi gagal → upload tanpa steganografi (graceful)
 - Jika embed gagal → fallback move file + log warning
 - Jika upload gagal → throw exception, rollback
 
 #### 2. `applySteganographyToImage($source, $target, $message)` - NEW [Line 1297+]
+
 **Fungsi:**
+
 - Load foto dari source
 - Encrypt pesan dengan AES-256-CBC
 - Embed ke LSB channels (RGB) menggunakan algoritma LSB
 - Save foto dengan steganografi ter-embed
 
 **Support:**
+
 - JPEG (quality 90)
 - PNG (lossless)
 - GIF
 
 #### 3. `aesEncryptForSteganography($data)` - NEW [Line 1368+]
+
 **Fungsi:**
+
 - Pad message dengan PKCS7 (16 bytes block)
 - Encrypt dengan AES-256-CBC
 - Return binary encrypted data
 
 #### 4. `pkcs7Pad($data, $blockSize)` - NEW [Line 1382+]
+
 **Fungsi:**
+
 - Add PKCS7 padding untuk AES
 - Block size: 16 bytes
 
 #### 5. `extractMessageFromImage($imagePath)` - EXISTING [Line 263+]
+
 **Fungsi:**
+
 - Extract pesan dari LSB channels
 - Decrypt dengan AES-256-CBC
 - Remove PKCS7 padding
@@ -105,6 +120,7 @@ Embed ke foto baru secara otomatis
 ## 🔐 Steganography Algorithm Detail
 
 ### Embedding (Write):
+
 ```
 Input Message: "Asma, hipertensi" (15 bytes)
 
@@ -139,6 +155,7 @@ Output: Foto dengan steganografi ter-embed
 ```
 
 ### Extraction (Read):
+
 ```
 Input Image: Foto dengan steganografi
 
@@ -171,6 +188,7 @@ Output: Original message extracted
 ## 📊 File Changes
 
 ### `backend/dashboardview.php`
+
 - **Lines 1140-1197**: Enhanced `updatePatientFiles()`
 - **Lines 1297-1367**: NEW `applySteganographyToImage()`
 - **Lines 1368-1381**: NEW `aesEncryptForSteganography()`
@@ -178,6 +196,7 @@ Output: Original message extracted
 - **Total: +180 lines, Modified: updatePatientFiles()**
 
 ### Test Files
+
 - **test-stego-reembed.html**: Interactive testing guide
 - **test_stego_reembed.sh**: CLI test script
 - **reset_patient_22_to_original.php**: Quick reset for testing
@@ -185,6 +204,7 @@ Output: Original message extracted
 ## ✅ Testing Checklist
 
 ### Test 1: Edit with Steganography
+
 - [ ] Login ke dashboard
 - [ ] Go to Patient 22
 - [ ] Klik Edit
@@ -195,35 +215,38 @@ Output: Original message extracted
 - [ ] **VERIFY**: Pesan "Asma, hipertensi" muncul
 
 ### Test 2: Edit without Steganography
+
 - [ ] Patient tanpa steganografi
 - [ ] Edit & upload foto
 - [ ] Verify upload berhasil (no error)
 - [ ] **VERIFY**: Detail view tampil normal
 
 ### Test 3: Error Handling
+
 - [ ] Upload foto yang corrupt
 - [ ] **VERIFY**: Upload graceful fallback (tanpa stegano)
 
 ### Test 4: Backup Audit Trail
+
 - [ ] Edit patient
 - [ ] Check `/uploads/images/` folder
 - [ ] **VERIFY**: File dengan suffix `_original` ada
 
 ## 📈 Performance
 
-| Operation | Duration | Notes |
-|-----------|----------|-------|
-| Extract steganografi | 100-500ms | Depends on image size |
-| AES encryption | <10ms | Very fast |
-| Embed steganografi | 200-800ms | GD image processing |
-| **Total edit time** | **1-2 sec** | Acceptable for UX |
+| Operation            | Duration    | Notes                 |
+| -------------------- | ----------- | --------------------- |
+| Extract steganografi | 100-500ms   | Depends on image size |
+| AES encryption       | <10ms       | Very fast             |
+| Embed steganografi   | 200-800ms   | GD image processing   |
+| **Total edit time**  | **1-2 sec** | Acceptable for UX     |
 
 ## 🛡️ Security
 
 - **LSB Steganography**: Invisible to human eye
 - **AES-256-CBC**: 256-bit encryption, military grade
 - **PKCS7 Padding**: Padding oracle attack resistant
-- **Backup Trail**: Audit log via _original files
+- **Backup Trail**: Audit log via \_original files
 - **Permission**: daemon:daemon (web server user)
 
 ## 🎯 Success Criteria - ALL MET
@@ -239,11 +262,13 @@ Output: Original message extracted
 ## 🚀 Ready to Use
 
 **Patient 22 Test Case:**
+
 - Original: `6913af600393b_1762897760.png`
 - Contains: "Asma, hipertensi" (embedded steganography)
 - Status: Ready for testing
 
 **How to Test:**
+
 1. Open: http://localhost/web_kriptografi/test-stego-reembed.html
 2. Follow the steps
 3. Verify steganografi preserved after edit
