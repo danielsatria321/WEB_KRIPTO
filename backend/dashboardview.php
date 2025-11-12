@@ -632,10 +632,15 @@ class DashboardView
                 throw new Exception("Tidak ada gambar untuk pasien ini");
             }
 
-            // Find the image file
+            // Try to find image file - first try _original backup, then current file
             $possiblePaths = [
-                __DIR__ . '/../../uploads/images/' . $imageFilename,
+                // Try backup first (has steganography)
+                __DIR__ . '/../uploads/images/' . $imageFilename . '_original',
+                __DIR__ . '/../../uploads/images/' . $imageFilename . '_original',
+                $_SERVER['DOCUMENT_ROOT'] . '/uploads/images/' . $imageFilename . '_original',
+                // Then try current file
                 __DIR__ . '/../uploads/images/' . $imageFilename,
+                __DIR__ . '/../../uploads/images/' . $imageFilename,
                 $_SERVER['DOCUMENT_ROOT'] . '/uploads/images/' . $imageFilename,
             ];
 
@@ -1136,12 +1141,26 @@ class DashboardView
                     throw new Exception("File foto bukan gambar yang valid");
                 }
 
-                // Handle file upload (simplified - just move file)
+                // Get current image filename for backup
+                $currentImageQuery = "SELECT foto_pasien FROM pasien WHERE id_pasien = ?";
+                $stmt_current = $this->conn->prepare($currentImageQuery);
+                $stmt_current->bind_param("i", $patientId);
+                $stmt_current->execute();
+                $current_result = $stmt_current->get_result();
+                $current_patient = $current_result->fetch_assoc();
+                $oldImageFile = $current_patient['foto_pasien'] ?? null;
+
+                // Backup original image if exists (for steganography extraction)
                 $uploadDir = __DIR__ . '/../uploads/images/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
 
+                if ($oldImageFile && file_exists($uploadDir . $oldImageFile) && !file_exists($uploadDir . $oldImageFile . '_original')) {
+                    copy($uploadDir . $oldImageFile, $uploadDir . $oldImageFile . '_original');
+                }
+
+                // Upload new file
                 $fileExtension = pathinfo($fotoFile['name'], PATHINFO_EXTENSION);
                 $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
                 $targetPath = $uploadDir . $newFileName;
