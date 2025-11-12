@@ -1,78 +1,105 @@
-# Quick Reference - Steganography Re-Embedding
+# Quick Reference - Steganography Re-Embedding with Custom Message Support
 
 ## ⚡ TL;DR
 
-**Fitur**: Ketika edit patient dan upload foto baru, steganografi **OTOMATIS di-extract dari foto lama dan di-embed ke foto baru**.
+**Fitur**: Ketika edit patient:
 
-**Hasil**: Steganografi **tetap ada** setelah edit! ✅
+- **Jika input medmsg baru** → Gunakan medmsg baru untuk embed ke foto
+- **Jika medmsg kosong** → Extract dari foto lama & gunakan itu
+- **Hasil**: Steganografi tetap ada (dengan pesan sesuai prioritas)! ✅
 
-## 🔄 Proses Auto (Invisible to User)
+## 🔄 Priority Logic
 
 ```
-User: Upload foto baru
-  ↓ [Backend otomatis]
-Extract pesan dari foto lama
-  ↓ [Backend otomatis]
-Embed ke foto baru
-  ↓ [Backend otomatis]
-Backup foto lama (_original)
-  ↓ [Backend otomatis]
-Save & Update DB
+User Edit Patient + Upload Foto
   ↓
-✅ Done! Foto baru punya steganografi
+Check: Ada medmsg baru dari user?
+  ├─ YES → Gunakan medmsg baru
+  └─ NO  → Extract dari foto lama
+  ↓
+Embed ke foto baru
+  ↓
+Backup foto lama (_original)
+  ↓
+Database update
+  ↓
+✅ Foto baru punya steganografi (sesuai prioritas)
 ```
 
 ## 📝 What's New
 
-### New Methods
-
-- `applySteganographyToImage()` - Embed message ke foto
-- `aesEncryptForSteganography()` - Encrypt message AES
-- `pkcs7Pad()` - Add padding untuk AES
-
 ### Enhanced Methods
 
-- `updatePatientFiles()` - Now extracts & re-embeds steganografi
+- `updatePatientFiles()` - Now supports medmsg priority (new > old)
+- `submitPatientFiles()` - Now passes medmsg to backend
 
-### Test Files
+### New Test File
 
-- `test-stego-reembed.html` - Interactive guide
-- `test_stego_reembed.sh` - CLI test
+- `test-stego-custom-message.html` - 3 scenario testing guide
 
-## 🧪 Quick Test
+### Frontend Update
 
-```bash
-# Verify patient 22 ready
-curl -s "http://localhost/web_kriptografi/backend/dashboardview.php?action=get_patient_detail&patient_id=22" \
-  | jq '{foto: .data.foto_pasien, msg_len: (.data.medical_message | length)}'
+- Form description clarified: Isi medmsg = embed baru, Kosong = ambil lama
+- Dashboard.js passes medmsg to backend
 
-# Output:
-# {
-#   "foto": "6913af600393b_1762897760.png",
-#   "msg_len": 6
-# }
+## 🧪 Test Scenarios
+
+### Scenario 1: Edit dengan Medmsg BARU
+
+```
+Patient 22 current: "okeaja"
+  ↓
+User: Upload foto + Input "Hipertensi Stage 2"
+  ↓
+Embed: "Hipertensi Stage 2" ke foto baru
+  ↓
+Extract: "Hipertensi Stage 2" ✅ (medmsg baru digunakan)
 ```
 
-## 🚀 Steps to Test
+### Scenario 2: Edit dengan Medmsg KOSONG
+
+```
+Patient 22 current: "Hipertensi Stage 2"
+  ↓
+User: Upload foto (kosongkan medmsg)
+  ↓
+Extract: "Hipertensi Stage 2" dari foto lama
+  ↓
+Embed: "Hipertensi Stage 2" ke foto baru
+  ↓
+Extract: "Hipertensi Stage 2" ✅ (medmsg lama dipertahankan)
+```
+
+### Scenario 3: Edit dengan Medmsg BERBEDA
+
+```
+Patient 22 current: "Hipertensi Stage 2"
+  ↓
+User: Upload foto + Input "Perlu follow-up bulanan"
+  ↓
+Embed: "Perlu follow-up bulanan" ke foto baru (ignore old)
+  ↓
+Extract: "Perlu follow-up bulanan" ✅ (medmsg terbaru)
+```
+
+## 🚀 How to Test
 
 1. **Open Test Page**
 
    ```
-   http://localhost/web_kriptografi/test-stego-reembed.html
+   http://localhost/web_kriptografi/test-stego-custom-message.html
    ```
 
-2. **Login & Edit**
+2. **Follow 3 Scenarios**
 
-   - Go Dashboard
-   - Find Patient 22
-   - Click Edit
-   - Upload any photo (JPG/PNG)
-   - Save changes
+   - Scenario 1: Edit dengan medmsg baru
+   - Scenario 2: Edit dengan medmsg kosong
+   - Scenario 3: Edit dengan medmsg berbeda
 
-3. **Verify**
-   - Back to patient detail
-   - Click "Ekstrak Pesan"
-   - **Should see steganografi message!** ✅
+3. **Verify Each Step**
+   - Upload foto
+   - Edit/input medmsg sesuai scenario
+   - Extract untuk verify pesan
 
 ## 📊 Algorithm
 
