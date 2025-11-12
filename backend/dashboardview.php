@@ -85,6 +85,9 @@ class DashboardView
             case 'extract_steganography': // NEW ACTION untuk ekstraksi steganografi
                 $this->extractSteganographyMessage();
                 break;
+            case 'update_patient_files':
+                $this->updatePatientFiles();
+                break;
             default:
                 $this->sendError('Action tidak valid');
         }
@@ -1094,6 +1097,125 @@ class DashboardView
             'error' => $message
         ], JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    /**
+     * Update patient files (foto dan PDF)
+     * Called from edit form when user uploads new files
+     */
+    private function updatePatientFiles()
+    {
+        try {
+            $patientId = intval($_POST['patient_id'] ?? 0);
+            
+            if ($patientId <= 0) {
+                throw new Exception("Patient ID tidak valid");
+            }
+
+            // Check if patient exists
+            $query = "SELECT id_pasien FROM pasien WHERE id_pasien = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $patientId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows === 0) {
+                throw new Exception("Patient tidak ditemukan");
+            }
+
+            $updates = [];
+            $updateFields = [];
+
+            // Handle foto upload
+            if (isset($_FILES['fotoPasien']) && $_FILES['fotoPasien']['error'] === UPLOAD_ERR_OK) {
+                $fotoFile = $_FILES['fotoPasien'];
+                
+                // Validate image
+                $imageInfo = getimagesize($fotoFile['tmp_name']);
+                if ($imageInfo === false) {
+                    throw new Exception("File foto bukan gambar yang valid");
+                }
+
+                // Handle file upload (simplified - just move file)
+                $uploadDir = __DIR__ . '/../../uploads/images/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                $fileExtension = pathinfo($fotoFile['name'], PATHINFO_EXTENSION);
+                $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
+                $targetPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($fotoFile['tmp_name'], $targetPath)) {
+                    $updateFields[] = 'foto_pasien = ?';
+                    $updates['foto'] = $newFileName;
+                } else {
+                    throw new Exception("Gagal upload foto");
+                }
+            }
+
+            // Handle PDF upload
+            if (isset($_FILES['pdfDokumen']) && $_FILES['pdfDokumen']['error'] === UPLOAD_ERR_OK) {
+                $pdfFile = $_FILES['pdfDokumen'];
+                
+                // Validate PDF
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $pdfFile['tmp_name']);
+                finfo_close($finfo);
+                
+                if ($mime !== 'application/pdf') {
+                    throw new Exception("File bukan PDF yang valid");
+                }
+
+                // For now, just move PDF without encryption (or could add encryption later)
+                $uploadDir = __DIR__ . '/../../uploads/pdfs/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                $fileExtension = pathinfo($pdfFile['name'], PATHINFO_EXTENSION);
+                $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
+                $targetPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($pdfFile['tmp_name'], $targetPath)) {
+                    $updateFields[] = 'dokumen_pdf = ?';
+                    $updates['pdf'] = $newFileName;
+                } else {
+                    throw new Exception("Gagal upload PDF");
+                }
+            }
+
+            // If no files to update, return success with no changes
+            if (empty($updateFields)) {
+                $this->sendSuccess([], "Tidak ada file yang diupload");
+                return;
+            }
+
+            // Update database
+            $updateFields[] = 'updated_at = NOW()';
+            $updateSql = "UPDATE pasien SET " . implode(', ', $updateFields) . " WHERE id_pasien = ?";
+            
+            $stmt = $this->conn->prepare($updateSql);
+            if (!$stmt) {
+                throw new Exception("Prepare statement gagal: " . $this->conn->error);
+            }
+
+            // Build bind parameters
+            $params = array_values($updates);
+            $params[] = $patientId;
+            $types = str_repeat('s', count($updates)) . 'i';
+            
+            $stmt->bind_param($types, ...$params);
+            
+            if ($stmt->execute()) {
+                $this->sendSuccess($updates, "File pasien berhasil diupdate");
+            } else {
+                throw new Exception("Update gagal: " . $stmt->error);
+            }
+
+        } catch (Exception $e) {
+            $this->sendError("Error updating files: " . $e->getMessage());
+        }
     }
 
     public function __destruct()

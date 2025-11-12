@@ -1006,14 +1006,14 @@ class Dashboard {
             }
         }
 
-        // Disable file uploads in edit mode
+        // Enable file uploads in edit mode - allow changing files
         const fotoPasienField = document.getElementById('fotoPasien');
         const pdfDokumenField = document.getElementById('pdfDokumen');
         const fileUploadNote = document.getElementById('fileUploadNote');
         
-        if (fotoPasienField) fotoPasienField.disabled = true;
-        if (pdfDokumenField) pdfDokumenField.disabled = true;
-        if (fileUploadNote) fileUploadNote.style.display = 'block';
+        if (fotoPasienField) fotoPasienField.disabled = false;
+        if (pdfDokumenField) pdfDokumenField.disabled = false;
+        if (fileUploadNote) fileUploadNote.style.display = 'none';
 
         // Update form title and button
         const formTitle = document.querySelector('.modal-header h2');
@@ -1268,15 +1268,6 @@ class Dashboard {
         if (this.modal) {
             this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Enable file uploads and hide note for new patient (create mode)
-            const fotoPasienField = document.getElementById('fotoPasien');
-            const pdfDokumenField = document.getElementById('pdfDokumen');
-            const fileUploadNote = document.getElementById('fileUploadNote');
-            
-            if (fotoPasienField) fotoPasienField.disabled = false;
-            if (pdfDokumenField) pdfDokumenField.disabled = false;
-            if (fileUploadNote) fileUploadNote.style.display = 'none';
         }
     }
 
@@ -1531,6 +1522,16 @@ class Dashboard {
             const result = await this.handleResponse(response);
 
             if (result.success) {
+                // If editing and there were file uploads, also submit files separately
+                if (patientId) {
+                    const hasFiles = document.getElementById('fotoPasien').files.length > 0 ||
+                                   document.getElementById('pdfDokumen').files.length > 0;
+                    
+                    if (hasFiles) {
+                        await this.submitPatientFiles(patientId);
+                    }
+                }
+                
                 this.handleSuccess(result, patientId);
             } else {
                 throw new Error(result.error || 'Gagal menyimpan data');
@@ -1543,6 +1544,39 @@ class Dashboard {
             // Reset button state
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
+        }
+    }
+
+    async submitPatientFiles(patientId) {
+        const fileFormData = new FormData();
+        fileFormData.append('action', 'update_patient_files');
+        fileFormData.append('patient_id', patientId);
+        
+        const fotoInput = document.getElementById('fotoPasien');
+        const pdfInput = document.getElementById('pdfDokumen');
+        
+        if (fotoInput.files.length > 0) {
+            fileFormData.append('fotoPasien', fotoInput.files[0]);
+        }
+        if (pdfInput.files.length > 0) {
+            fileFormData.append('pdfDokumen', pdfInput.files[0]);
+        }
+        
+        try {
+            const response = await fetch('../backend/dashboardview.php', {
+                method: 'POST',
+                body: fileFormData,
+                credentials: 'same-origin'
+            });
+            
+            const result = await this.handleResponse(response);
+            if (result.success) {
+                console.log('Files uploaded successfully');
+            } else {
+                console.warn('File upload warning:', result.error);
+            }
+        } catch (error) {
+            console.error('File upload error:', error);
         }
     }
 
