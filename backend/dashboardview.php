@@ -1137,7 +1137,7 @@ class DashboardView
                 }
 
                 // Handle file upload (simplified - just move file)
-                $uploadDir = __DIR__ . '/../../uploads/images/';
+                $uploadDir = __DIR__ . '/../uploads/images/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
@@ -1168,7 +1168,7 @@ class DashboardView
                 }
 
                 // For now, just move PDF without encryption (or could add encryption later)
-                $uploadDir = __DIR__ . '/../../uploads/pdfs/';
+                $uploadDir = __DIR__ . '/../uploads/pdfs/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
