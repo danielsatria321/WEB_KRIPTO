@@ -1315,6 +1315,10 @@ class DashboardView
 
             // Step 1: Encrypt message with AES
             $encryptedMessage = $this->aesEncryptForSteganography($message);
+            
+            if (!$encryptedMessage) {
+                throw new Exception("Failed to encrypt message");
+            }
 
             // Step 2: Calculate maximum message capacity
             $maxCapacity = ($width * $height * 3) / 8;
