@@ -235,24 +235,6 @@ web_kriptografi/
 - Enkripsi PDF terbatas pada file 100MB
 - Timeout sesi: 30 menit tidak aktif
 
-## File Testing
-
-- test-stego-custom-message.html: Skenario testing steganografi
-- test-stego-reembed.html: Validasi re-embedding
-- test_stego_reembed.sh: Script testing CLI
-- debug-\*.html: Tools debugging development
-
-## Dokumentasi
-
-- IMPLEMENTATION_SUMMARY.md: Detail implementasi lengkap
-- QUICK_REFERENCE.md: Panduan logika prioritas steganografi
-- STEGANOGRAPHY_FIX.md: Dokumentasi fix preservasi
-- TESTING_GUIDE.md: Instruksi testing komprehensif
-
-## Lisensi
-
-Proprietary - Hak cipta dilindungi
 
 ## Kontributor
-
-Tim Pengembang - Proyek Web Kriptografi
+Daniel Satria Darmawan
